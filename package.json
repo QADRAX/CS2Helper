@@ -1,4 +1,5 @@
 {
+  "version": "0.0.1",
   "name": "cs2-helper",
   "description": "CS2 Helper",
   "main": "./.erb/dll/main.bundle.dev.js",
@@ -143,8 +144,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "CS2Helper",
+    "appId": "org.qadrax.CS2Helper",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -203,8 +204,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "QADRAX",
+      "repo": "CS2Helper"
     }
   },
   "devEngines": {
