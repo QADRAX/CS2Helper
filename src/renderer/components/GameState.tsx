@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { CSState, isGameStatePlaying } from '../../types/CSState';
-import GameMenu from './GameMenu';
-import GamePlaying from './GamePlaying';
+import { CSState } from '../../types/CSState';
+import GameStateViewer from './GameStateViewer';
 
 const GameState: React.FC = () => {
   const [gameState, setGameState] = useState<CSState | null>(null);
@@ -21,11 +20,7 @@ const GameState: React.FC = () => {
 
   return (
     <div>
-      { isGameStatePlaying(gameState) ? (
-        <GamePlaying state={gameState} />
-      ) : (
-        <GameMenu state={gameState} />
-      )}
+      <GameStateViewer gameState={gameState} />
     </div>
   );
 };

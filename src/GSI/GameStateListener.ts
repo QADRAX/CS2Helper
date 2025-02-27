@@ -2,8 +2,6 @@ import http from 'http';
 import { CSState } from '../types/CSState';
 import { createObservable, Observable } from './Observable';
 import { gameStateLogger } from './observers/GameStateLogger';
-import { createGameStartObserver } from './observers/GameStartObserver';
-import { createGameEndObserver } from './observers/GameEndObserver';
 
 export type GameStateListener = Observable<CSState | null> & {
   listen: () => void;
@@ -76,8 +74,6 @@ export function initializeGameStateListener(): GameStateListener {
   const csgoListener = createGameStateListener();
 
   csgoListener.subscribe(gameStateLogger);
-  csgoListener.subscribe(createGameStartObserver(() => console.log('🚀 Match started!')));
-  csgoListener.subscribe(createGameEndObserver(() => console.log('🏁 Match ended!')));
 
   return csgoListener;
 };

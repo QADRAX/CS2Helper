@@ -3,50 +3,7 @@ export interface GameState {
   provider: Provider;
   auth: Auth;
   player?: Player;
-  allplayers?: AllPlayers;
   round?: Round;
-  phase_countdowns?: Phase;
-  grenades?: Grenades;
-  previously?: Previously;
-  added?: AddedPlaying;
-  bomb?: Bomb;
-  map?: Map;
-}
-
-export interface GameStateSpectating {
-  provider: Provider;
-  map: Map;
-  round?: Round;
-  player: Player;
-  allplayers: AllPlayers;
-  phase_countdowns: Phase;
-  grenades: Grenades;
-  previously: Previously;
-  bomb: Bomb;
-  auth: Auth;
-}
-
-export interface GameStateMenu {
-  provider: Provider;
-  player: PlayerMenu;
-  auth: Auth;
-}
-
-export interface GameStatePlaying {
-  provider: Provider;
-  map: Map;
-  round: Round;
-  player: PlayerPlaying;
-  previously?: PreviouslyPlaying;
-  added?: AddedPlaying;
-  auth: Auth;
-}
-
-export interface AddedPlaying {
-  round?: {
-    bomb?: boolean;
-    win_team?: boolean;
-  };
   map?: Map;
 }
 
@@ -54,25 +11,6 @@ export interface Round {
   phase: PhaseRound;
   bomb?: 'planted' | 'defused' | 'exploded';
   win_team?: TeamType;
-}
-
-export interface Previously {
-  provider?: Provider;
-  map?: Map;
-  round?: Round;
-  player?: Player;
-  allplayers?: AllPlayers;
-  phase_countdowns?: Phase;
-  grenades?: Grenades;
-  bomb?: BombState;
-}
-
-export interface PreviouslyPlaying {
-  provider?: Provider;
-  map?: Map;
-  round?: Round;
-  player?: PlayerPlaying;
-  auth?: Auth;
 }
 
 export interface Provider {
@@ -101,40 +39,10 @@ export interface Player {
   weapons?: Weapons;
 }
 
-export interface PlayerPlaying {
-  clan?: string;
-  steamid: string;
-  name: string;
-  observer_slot: ObservatorSlotType;
-  team: TeamType;
-  activity: PlayerActivityType;
-  state: PlayerState;
-}
-
 export interface PlayerMenu {
   steamid: string;
   name: string;
   activity: 'menu';
-}
-
-export interface Grenades {
-  [key: string]: Grenade;
-}
-
-export interface AllPlayers {
-  [steamid: string]: PlayerList;
-}
-
-export interface PlayerList {
-  clan?: string;
-  name: string;
-  observer_slot: ObservatorSlotType;
-  team: TeamType;
-  state: PlayerState;
-  match_stats: PlayerStats;
-  weapons: Weapons;
-  position: string;
-  forward: string;
 }
 
 export type Weapons = {
@@ -142,160 +50,127 @@ export type Weapons = {
 };
 
 export type Weapon =
-  | weaponTypes.Knife
-  | weaponTypes.Pistol
-  | weaponTypes.Bomb
-  | weaponTypes.Grenade
-  | weaponTypes.MachineGun
-  | weaponTypes.Rifle
-  | weaponTypes.Shotgun
-  | weaponTypes.SniperRifle
-  | weaponTypes.SubmachineGun;
+  | Knife
+  | Pistol
+  | Bomb
+  | Grenade
+  | MachineGun
+  | Rifle
+  | Shotgun
+  | SniperRifle
+  | SubmachineGun;
 
-namespace weaponTypes {
-  type WeaponState = 'holstered' | 'active';
+export type WeaponState = 'holstered' | 'active';
 
-  export interface Knife {
-    type: 'Knife';
-    name: 'weapon_knife_t' | 'weapon_knife';
-    paintkit: string;
-    state: WeaponState;
-  }
-
-  export interface Bomb {
-    type: 'C4';
-    name: 'weapon_c4';
-    paintkit: string;
-    state: WeaponState;
-  }
-
-  export interface Pistol {
-    type: 'Pistol';
-    name:
-      | 'weapon_deagle'
-      | 'weapon_elite'
-      | 'weapon_fiveseven'
-      | 'weapon_glock'
-      | 'weapon_cz75a'
-      | 'weapon_hkp2000'
-      | 'weapon_p250'
-      | 'weapon_revolver'
-      | 'weapon_tec9'
-      | 'weapon_usp_silencer';
-    paintkit: string;
-    ammo_clip: number;
-    ammo_clip_max: number;
-    ammo_reserve: number;
-    state: WeaponState;
-  }
-
-  export interface Shotgun {
-    type: 'Shotgun';
-    name: 'weapon_xm1014' | 'weapon_nova' | 'weapon_mag7' | 'weapon_sawedoff';
-    paintkit: string;
-    ammo_clip: number;
-    ammo_clip_max: number;
-    ammo_reserve: number;
-    state: WeaponState;
-  }
-
-  export interface MachineGun {
-    type: 'Machine Gun';
-    name: 'weapon_m249' | 'weapon_negev';
-    paintkit: string;
-    ammo_clip: number;
-    ammo_clip_max: number;
-    ammo_reserve: number;
-    state: WeaponState;
-  }
-
-  export interface SubmachineGun {
-    type: 'Submachine Gun';
-    name:
-      | 'weapon_mac10'
-      | 'weapon_bizon'
-      | 'weapon_mp5sd'
-      | 'weapon_mp7'
-      | 'weapon_mp9'
-      | 'weapon_p90'
-      | 'weapon_ump45';
-    paintkit: string;
-    ammo_clip: number;
-    ammo_clip_max: number;
-    ammo_reserve: number;
-    state: WeaponState;
-  }
-
-  export interface Rifle {
-    type: 'Rifle';
-    name:
-      | 'weapon_ak47'
-      | 'weapon_aug'
-      | 'weapon_famas'
-      | 'weapon_galilar'
-      | 'weapon_m4a1'
-      | 'weapon_m4a1_silencer'
-      | 'weapon_sg556';
-    paintkit: string;
-    ammo_clip: number;
-    ammo_clip_max: number;
-    ammo_reserve: number;
-    state: WeaponState;
-  }
-
-  export interface SniperRifle {
-    type: 'SniperRifle';
-    name: 'weapon_awp' | 'weapon_g3sg1' | 'weapon_scar20' | 'weapon_ssg08';
-    paintkit: string;
-    ammo_clip: number;
-    ammo_clip_max: number;
-    ammo_reserve: number;
-    state: WeaponState;
-  }
-
-  export interface Grenade {
-    type: 'Grenade';
-    name:
-      | 'weapon_smokegrenade'
-      | 'weapon_decoy'
-      | 'weapon_hegrenade'
-      | 'weapon_incgrenade'
-      | 'weapon_molotov';
-    paintkit: string;
-    ammo_reserve: number;
-    state: WeaponState;
-  }
+export interface Knife {
+  type: 'Knife';
+  name: 'weapon_knife_t' | 'weapon_knife';
+  paintkit: string;
+  state: WeaponState;
 }
 
-export type Grenade =
-  | grenadeTypes.DecoySmokeGrenade
-  | grenadeTypes.DefaultGrenade
-  | grenadeTypes.FireBombGrenade;
+export interface Bomb {
+  type: 'C4';
+  name: 'weapon_c4';
+  paintkit: string;
+  state: WeaponState;
+}
 
-namespace grenadeTypes {
-  export interface DecoySmokeGrenade {
-    owner: number;
-    type: 'decoy' | 'smoke';
-    position: string;
-    velocity: string;
-    lifetime: string;
-    effecttime: string;
-  }
+export interface Pistol {
+  type: 'Pistol';
+  name:
+    | 'weapon_deagle'
+    | 'weapon_elite'
+    | 'weapon_fiveseven'
+    | 'weapon_glock'
+    | 'weapon_cz75a'
+    | 'weapon_hkp2000'
+    | 'weapon_p250'
+    | 'weapon_revolver'
+    | 'weapon_tec9'
+    | 'weapon_usp_silencer';
+  paintkit: string;
+  ammo_clip: number;
+  ammo_clip_max: number;
+  ammo_reserve: number;
+  state: WeaponState;
+}
 
-  export interface DefaultGrenade {
-    owner: number;
-    type: 'frag' | 'firebomb' | 'flashbang';
-    position: string;
-    velocity: string;
-    lifetime: string;
-  }
+export interface Shotgun {
+  type: 'Shotgun';
+  name: 'weapon_xm1014' | 'weapon_nova' | 'weapon_mag7' | 'weapon_sawedoff';
+  paintkit: string;
+  ammo_clip: number;
+  ammo_clip_max: number;
+  ammo_reserve: number;
+  state: WeaponState;
+}
 
-  export interface FireBombGrenade {
-    owner: number;
-    type: 'inferno';
-    lifetime: string;
-    flames: { [key: string]: string };
-  }
+export interface MachineGun {
+  type: 'Machine Gun';
+  name: 'weapon_m249' | 'weapon_negev';
+  paintkit: string;
+  ammo_clip: number;
+  ammo_clip_max: number;
+  ammo_reserve: number;
+  state: WeaponState;
+}
+
+export interface SubmachineGun {
+  type: 'Submachine Gun';
+  name:
+    | 'weapon_mac10'
+    | 'weapon_bizon'
+    | 'weapon_mp5sd'
+    | 'weapon_mp7'
+    | 'weapon_mp9'
+    | 'weapon_p90'
+    | 'weapon_ump45';
+  paintkit: string;
+  ammo_clip: number;
+  ammo_clip_max: number;
+  ammo_reserve: number;
+  state: WeaponState;
+}
+
+export interface Rifle {
+  type: 'Rifle';
+  name:
+    | 'weapon_ak47'
+    | 'weapon_aug'
+    | 'weapon_famas'
+    | 'weapon_galilar'
+    | 'weapon_m4a1'
+    | 'weapon_m4a1_silencer'
+    | 'weapon_sg556';
+  paintkit: string;
+  ammo_clip: number;
+  ammo_clip_max: number;
+  ammo_reserve: number;
+  state: WeaponState;
+}
+
+export interface SniperRifle {
+  type: 'SniperRifle';
+  name: 'weapon_awp' | 'weapon_g3sg1' | 'weapon_scar20' | 'weapon_ssg08';
+  paintkit: string;
+  ammo_clip: number;
+  ammo_clip_max: number;
+  ammo_reserve: number;
+  state: WeaponState;
+}
+
+export interface Grenade {
+  type: 'Grenade';
+  name:
+    | 'weapon_smokegrenade'
+    | 'weapon_decoy'
+    | 'weapon_hegrenade'
+    | 'weapon_incgrenade'
+    | 'weapon_molotov';
+  paintkit: string;
+  ammo_reserve: number;
+  state: WeaponState;
 }
 
 export interface PlayerStats {
@@ -314,8 +189,6 @@ export interface Map {
   team_ct: Team;
   team_t: Team;
   num_matches_to_win_series: number;
-  current_spectators: number;
-  souvenirs_total: number;
   round_wins?: { [key: string]: RoundWinningType };
 }
 
@@ -331,13 +204,6 @@ export interface Phase {
   phase: PhaseExt;
   // ! Beaware that 'phase_ends_in' actually returns float in string format.
   phase_ends_in: number;
-}
-
-export interface Bomb {
-  state: BombState;
-  position: string;
-  player?: string;
-  countdown?: string;
 }
 
 export interface PlayerState {
@@ -383,15 +249,6 @@ export type GameModeType = 'casual' | 'competitive';
 export type ObservatorSlotType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 export type TeamType = 'CT' | 'T';
-
-export type BombState =
-  | 'planted'
-  | 'planting'
-  | 'exploded'
-  | 'defusing'
-  | 'defused'
-  | 'carried'
-  | 'dropped';
 
 export type PhaseRound = 'live' | 'freezetime' | 'over';
 
