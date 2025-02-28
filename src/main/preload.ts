@@ -1,25 +1,36 @@
-// Disable no-unused-vars, broken for spread args
-/* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { CSState } from '../types/CSState';
 
-export type Channels = 'game-state';
+export interface IpcChannels {
+  'game-state': [state: CSState];
+}
+
+export type Channels = keyof IpcChannels;
 
 const electronHandler = {
   ipcRenderer: {
-    sendMessage(channel: Channels, ...args: unknown[]) {
+    sendMessage<K extends Channels>(channel: K, ...args: IpcChannels[K]) {
       ipcRenderer.send(channel, ...args);
     },
-    on(channel: Channels, func: (...args: unknown[]) => void) {
-      const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
-        func(...args);
+    on<K extends Channels>(
+      channel: K,
+      listener: (...args: IpcChannels[K]) => void
+    ) {
+      const subscription = (_event: IpcRendererEvent, ...args: any[]) => {
+        listener(...(args as IpcChannels[K]));
+      };
       ipcRenderer.on(channel, subscription);
-
       return () => {
         ipcRenderer.removeListener(channel, subscription);
       };
     },
-    once(channel: Channels, func: (...args: unknown[]) => void) {
-      ipcRenderer.once(channel, (_event, ...args) => func(...args));
+    once<K extends Channels>(
+      channel: K,
+      listener: (...args: IpcChannels[K]) => void
+    ) {
+      ipcRenderer.once(channel, (_event, ...args: any[]) => {
+        listener(...(args as IpcChannels[K]));
+      });
     },
     removeAllListeners(channel: Channels) {
       ipcRenderer.removeAllListeners(channel);

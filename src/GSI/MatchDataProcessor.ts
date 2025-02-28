@@ -1,12 +1,10 @@
-// 📌 Procesadores de eventos
 import { processMatchEvents } from "./processors/matchEvents";
 import { processRoundEvents } from "./processors/roundEvents";
 import { processKillEvents } from "./processors/killEvents";
 import { processDeathEvents } from "./processors/deathEvents";
-import { Observer } from "../Observer";
-import { CSState, isValidGameState } from "../../types/CSState";
+import { CSState, isValidGameState } from "../types/CSState";
+import { Observer } from "../utils/Observer";
 
-// 📌 Lista de procesadores
 const eventProcessors = [
   processMatchEvents,
   processRoundEvents,

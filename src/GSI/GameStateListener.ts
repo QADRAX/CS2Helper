@@ -1,7 +1,7 @@
 import http from 'http';
 import { CSState } from '../types/CSState';
-import { createObservable, Observable } from './Observable';
-import { gameStateLogger } from './observers/GameStateLogger';
+import { gameStateLogger } from './GameStateLogger';
+import { createObservable, Observable } from '../utils/Observable';
 
 export type GameStateListener = Observable<CSState | null> & {
   listen: () => void;

@@ -1,15 +1,12 @@
-import { CSState } from "../../../types/CSState";
-import { getCurrentMatch } from "./matchEvents";
+import { GameState } from "../../types/CSGO";
+import { matchState } from "../matchState";
 
 let lastRoundPhase: string | null = null;
 
-/**
- * Procesa el inicio y fin de rondas.
- */
-export const processRoundEvents = (gameState: CSState) => {
-  const roundPhase = gameState!.round?.phase ?? "over";
-  const gameRound = gameState!.map!.round;
-  const currentMatch = getCurrentMatch();
+export const processRoundEvents = (gameState: Required<GameState>) => {
+  const roundPhase = gameState.round.phase ?? "over";
+  const gameRound = gameState.map.round;
+  const currentMatch = matchState.get();
 
   if (!currentMatch) return;
 
@@ -17,8 +14,14 @@ export const processRoundEvents = (gameState: CSState) => {
   if (roundPhase === "freezetime" && lastRoundPhase !== "freezetime") {
     if (!currentMatch.rounds.some((r) => r.roundNumber === gameRound)) {
       console.log(`🔄 New round detected: ${gameRound}`);
-      currentMatch.rounds.push({ roundNumber: gameRound, kills: [], deaths: [] });
-      // currentRound = gameRound;
+
+      matchState.update((match) => {
+        if (!match) return match;
+        return {
+          ...match,
+          rounds: [...match.rounds, { roundNumber: gameRound, kills: [], deaths: [] }],
+        };
+      });
     }
   }
 

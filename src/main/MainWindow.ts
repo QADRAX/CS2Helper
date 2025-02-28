@@ -4,7 +4,7 @@ import { app, BrowserWindow, shell } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { GameStateListener } from '../GSI/GameStateListener';
-import { createGameStateObserver } from '../GSI/observers/GameStateObserver';
+import { createGameStateObserver } from '../GSI/GameStateObserver';
 import { initializeAutoUpdater } from './AppUpdater';
 
 let mainWindow: BrowserWindow | null = null;

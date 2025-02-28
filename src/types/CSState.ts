@@ -19,6 +19,7 @@ export interface KillRecord {
 export interface DeathRecord {
   timestamp: number;
   roundPhase: PhaseRound;
+  equippedWeapon: string;
 }
 
 export interface RoundData {

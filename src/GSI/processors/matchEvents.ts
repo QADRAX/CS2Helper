@@ -1,7 +1,6 @@
-import { GameState } from "../../../types/CSGO";
-import { MatchData } from "../../../types/CSState";
+import { GameState } from "../../types/CSGO";
+import { matchState } from "../matchState";
 
-let currentMatch: MatchData | null = null;
 let lastMapPhase: string | null = null;
 
 /**
@@ -17,11 +16,15 @@ const generateMatchId = (mapName: string): string => {
 export const processMatchEvents = (gameState: Required<GameState>) => {
   const mapPhase = gameState.map.phase;
   const mapName = gameState.map.name;
+  const currentMatch = matchState.get();
 
   // Iniciar nueva partida si entramos en "warmup"
   if (!currentMatch || (mapPhase === "warmup" && lastMapPhase !== "warmup")) {
-    currentMatch = { matchId: generateMatchId(mapName), rounds: [] };
-    console.log(`🆕 New match detected: ${currentMatch.matchId}`);
+    const matchId = generateMatchId(mapName);
+    matchState.update(() => {
+      return { matchId, rounds: [] }
+    });
+    console.log(`🆕 New match detected: ${matchId}`);
   }
 
   // Terminar la partida si entramos en "gameover"
@@ -30,10 +33,10 @@ export const processMatchEvents = (gameState: Required<GameState>) => {
       console.log(`🏁 Match ended: ${currentMatch.matchId}`);
       // saveMatchData(currentMatch);
     }
-    currentMatch = null;
-  }
+    matchState.update(() => {
+      return null;
+    });  }
 
   lastMapPhase = mapPhase;
 };
 
-export const getCurrentMatch = () => currentMatch;
