@@ -87,7 +87,7 @@ const RoundInfo: React.FC<{ round: Round }> = ({ round }) => (
 const PlayerInfo: React.FC<{ player: Player }> = ({ player }) => (
   <div>
     <h1>{player.name} ({player.team})</h1>
-    <PlayerStateInfo state={player.state} />
+    {player.state && <PlayerStateInfo state={player.state} />}
     {player.weapons && <WeaponsInfo weapons={player.weapons} />}
   </div>
 );

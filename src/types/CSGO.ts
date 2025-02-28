@@ -33,10 +33,10 @@ export interface Player {
   team: TeamType;
   activity: PlayerActivityType;
   state: PlayerState;
-  position: string;
   forward: string;
   spectarget?: string;
   weapons?: Weapons;
+  match_stats?: PlayerStats;
 }
 
 export interface PlayerMenu {
