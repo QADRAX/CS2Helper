@@ -37,11 +37,12 @@ export const processKillEvents = (gameState: Required<GameState>) => {
           smoked: gameState.player.state.smoked,
         });
       }
+      console.log(
+        `💀 Kill detected in round ${gameRound} with: ${equippedWeapon}`,
+      );
       return draft;
     });
-    console.log(
-      `💀 Kill detected in round ${gameRound} with: ${equippedWeapon}`,
-    );
+
   }
 
   lastKills = currentKills;

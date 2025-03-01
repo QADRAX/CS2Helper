@@ -12,6 +12,33 @@ export function isValidGameState(
   );
 }
 
+export interface DamageRecord {
+  /**
+   * Timestamp del hit
+   */
+  timestamp: number;
+  /**
+   * Fase de la ronda cuando se recibió el hit
+   */
+  roundPhase: PhaseRound;
+  /**
+   * Arma equipada mientras el player recibio daño
+   */
+  equippedWeapon: string;
+  /**
+   * Daño infligido en el hit
+   */
+  damage: number;
+  /**
+   * Valor de flashed al momento del hit (hasta 255)
+   */
+  flashed: number;
+  /**
+   * Valor de smoked al momento del hit (hasta 255)
+   */
+  smoked: number;
+}
+
 export interface KillRecord {
   /**
    * Timestamp de la kill
@@ -79,6 +106,10 @@ export interface RoundData {
    * Muertes del jugador en la ronda
    */
   deaths: DeathRecord[];
+  /**
+   * Daño recibido del jugador en la ronda
+   */
+  damageReceived: DamageRecord[];
   /**
    * Equipo del jugador
    */

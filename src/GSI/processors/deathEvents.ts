@@ -34,12 +34,11 @@ export const processDeathEvents = (gameState: Required<GameState>) => {
           smoked: gameState.player.state.smoked,
         },);
       }
+      console.log(
+        `☠️ Player died in round ${gameRound} during phase: ${roundPhase}`,
+      );
       return match;
     });
-
-    console.log(
-      `☠️ Player died in round ${gameRound} during phase: ${roundPhase}`,
-    );
   }
 
   lastDeaths = currentDeaths;

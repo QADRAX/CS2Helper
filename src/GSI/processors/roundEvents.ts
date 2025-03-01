@@ -23,6 +23,7 @@ export const processRoundEvents = (gameState: Required<GameState>) => {
           roundNumber: gameRound,
           kills: [],
           deaths: [],
+          damageReceived: [],
           playerTeam: gameState.player.team,
 
         });
