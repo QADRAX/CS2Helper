@@ -62,6 +62,29 @@ export interface KillRecord {
   smoked: number;
 }
 
+export interface WeaponTransactionRecord {
+  /**
+   * Timestamp de transaccion
+   */
+  timestamp: number;
+  /**
+   * Fase de la ronda
+   */
+  roundPhase: PhaseRound;
+  /**
+   * Tipo de transaccion
+   */
+  transactionType: 'purchase' | 'sale';
+  /**
+   * Nombre del arma
+   */
+  weaponName: string;
+  /**
+   * Coste $$$
+   */
+  cost: number;
+}
+
 export interface DeathRecord {
   /**
    * Timestamp de la muerte
@@ -110,6 +133,10 @@ export interface RoundData {
    * Daño recibido del jugador en la ronda
    */
   damageReceived: DamageRecord[];
+  /**
+   * Compras / ventas
+   */
+  weaponTransactions: WeaponTransactionRecord[];
   /**
    * Equipo del jugador
    */

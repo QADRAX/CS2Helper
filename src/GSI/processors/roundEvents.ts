@@ -24,8 +24,8 @@ export const processRoundEvents = (gameState: Required<GameState>) => {
           kills: [],
           deaths: [],
           damageReceived: [],
+          weaponTransactions: [],
           playerTeam: gameState.player.team,
-
         });
 
         return match;

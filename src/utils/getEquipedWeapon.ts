@@ -7,3 +7,9 @@ export function getEquippedWeapon(weapons?: Weapons): string {
   );
   return activeWeapon ? activeWeapon.name : 'Unknown';
 }
+
+export function getWeaponNames(weapons?: Weapons): string[] {
+  if (!weapons) return [];
+
+  return Object.values(weapons).map(value => value.name);
+}
