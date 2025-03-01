@@ -200,12 +200,6 @@ export interface Team {
   matches_won_this_series: number;
 }
 
-export interface Phase {
-  phase: PhaseExt;
-  // ! Beaware that 'phase_ends_in' actually returns float in string format.
-  phase_ends_in: number;
-}
-
 export interface PlayerState {
   health: number;
   armor: number;

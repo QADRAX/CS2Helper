@@ -1,4 +1,5 @@
 import { GameState } from '../../types/CSGO';
+import { updateIfExists } from '../../utils/GenericStateContainer';
 import { getEquippedWeapon } from '../../utils/getEquipedWeapon';
 import { matchState } from '../state/matchState';
 
@@ -25,20 +26,18 @@ export const processKillEvents = (gameState: Required<GameState>) => {
   const gameRound = gameState.map.round;
 
   if (currentKills > lastKills) {
-    matchState.update((match) => {
-      if (!match) return match; // Si no hay partido activo, no se actualiza.
-      const updatedRounds = match.rounds.map((round) =>
-        round.roundNumber === gameRound
-          ? {
-              ...round,
-              kills: [
-                ...round.kills,
-                { weapon: equippedWeapon, timestamp: gameTimestamp },
-              ],
-            }
-          : round,
-      );
-      return { ...match, rounds: updatedRounds };
+    updateIfExists(matchState, (draft) => {
+      const currentRound = draft.rounds.find(round => round.roundNumber === gameRound);
+      if (currentRound) {
+        currentRound.kills.push({
+          timestamp: gameTimestamp,
+          roundPhase: gameState.round.phase,
+          weapon: getEquippedWeapon(gameState.player.weapons),
+          flashed: gameState.player.state.flashed,
+          smoked: gameState.player.state.smoked,
+        });
+      }
+      return draft;
     });
     console.log(
       `💀 Kill detected in round ${gameRound} with: ${equippedWeapon}`,

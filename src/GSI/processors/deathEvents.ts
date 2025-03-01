@@ -1,5 +1,5 @@
-// processDeathEvents.ts
 import { GameState } from '../../types/CSGO';
+import { updateIfExists } from '../../utils/GenericStateContainer';
 import { getEquippedWeapon } from '../../utils/getEquipedWeapon';
 import { matchState } from '../state/matchState';
 
@@ -23,26 +23,18 @@ export const processDeathEvents = (gameState: Required<GameState>) => {
 
   if (currentDeaths > lastDeaths) {
     // Actualizamos el estado de forma inmutable a través del contenedor.
-    matchState.update((match) => {
-      if (!match) return match;
-      return {
-        ...match,
-        rounds: match.rounds.map((round) =>
-          round.roundNumber === gameRound
-            ? {
-                ...round,
-                deaths: [
-                  ...round.deaths,
-                  {
-                    timestamp: gameTimestamp,
-                    roundPhase,
-                    equippedWeapon: getEquippedWeapon(gameState.player.weapons),
-                  },
-                ],
-              }
-            : round,
-        ),
-      };
+    updateIfExists(matchState, (match) => {
+      const currentRound = match.rounds.find(round => round.roundNumber === gameRound);
+      if(currentRound){
+        currentRound.deaths.push({
+          timestamp: gameTimestamp,
+          roundPhase,
+          equippedWeapon: getEquippedWeapon(gameState.player.weapons),
+          flashed: gameState.player.state.flashed,
+          smoked: gameState.player.state.smoked,
+        },);
+      }
+      return match;
     });
 
     console.log(
