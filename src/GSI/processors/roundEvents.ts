@@ -1,6 +1,6 @@
 import { GameState, PhaseRound, TeamType } from '../../types/CSGO';
 import { updateIfExists } from '../../utils/GenericStateContainer';
-import { matchState } from '../state/matchState';
+import { matchState, updateRoundIfExists } from '../state/matchState';
 
 let lastRoundPhase: PhaseRound | null = null;
 let lastRoundWiningTeam: TeamType | undefined;
@@ -36,12 +36,8 @@ export const processRoundEvents = (gameState: Required<GameState>) => {
   // Detectar fin de la ronda cuando pasa de "live" a "over"
   if (lastRoundPhase === 'live' && roundPhase === 'over') {
     console.log(`🔚 Round ${gameRound} ended`);
-    updateIfExists(matchState, (match) => {
-      const currentRound = match.rounds.find(round => round.roundNumber === gameRound);
-      if(currentRound) {
-        currentRound.roundOverTimestamp = gameState.provider.timestamp;
-      }
-      return match;
+    updateRoundIfExists(gameRound, (currentRound) => {
+      currentRound.roundOverTimestamp = gameState.provider.timestamp;
     });
   }
 
@@ -53,13 +49,8 @@ export const processRoundEvents = (gameState: Required<GameState>) => {
     } else {
       console.log(`🔚 You lose this round!`);
     }
-
-    updateIfExists(matchState, (match) => {
-      const currentRound = match.rounds.find(round => round.roundNumber === gameRound);
-      if(currentRound) {
-        currentRound.winnerTeam = roundWiningTeam;
-      }
-      return match;
+    updateRoundIfExists(gameRound, (currentRound) => {
+      currentRound.winnerTeam = roundWiningTeam;
     });
   }
 
