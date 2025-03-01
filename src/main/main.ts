@@ -9,8 +9,10 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import { app } from 'electron';
-import { initializeGameStateListener } from '../GSI/GameStateListener';
 import { createWindow } from './MainWindow';
+import { createGameStateListener } from '../GSI/GameStateListener';
+import { gameState } from '../GSI/state/gameState';
+import { matchDataProcessor } from '../GSI/MatchDataProcessor';
 
 /*
 ipcMain.on('ipc-example', async (event, arg) => {
@@ -25,13 +27,15 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install();
 }
 
-const csgoListener = initializeGameStateListener();
+const csgoListener = createGameStateListener();
+const unsubscribeMatchProcessor = gameState.subscribe(matchDataProcessor);
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
+    unsubscribeMatchProcessor();
     csgoListener.close();
   }
 });
@@ -40,11 +44,11 @@ app
   .whenReady()
   .then(async () => {
     csgoListener.listen();
-    let mainWindow = await createWindow(csgoListener);
+    let mainWindow = await createWindow();
     app.on('activate', async () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) mainWindow = await createWindow(csgoListener);
+      if (mainWindow === null) mainWindow = await createWindow();
     });
   })
   .catch(console.log);

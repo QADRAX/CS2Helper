@@ -3,9 +3,10 @@ import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { GameStateListener } from '../GSI/GameStateListener';
-import { createGameStateObserver } from '../GSI/GameStateObserver';
+import { createUIObserver } from '../GSI/GameStateObserver';
 import { initializeAutoUpdater } from './AppUpdater';
+import { gameState } from '../GSI/state/gameState';
+import { matchState } from '../GSI/state/matchState';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -29,7 +30,7 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-const createWindow = async (csgoListener: GameStateListener) => {
+const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
@@ -67,7 +68,12 @@ const createWindow = async (csgoListener: GameStateListener) => {
     }
   });
 
+  const unsubscribeGameState = gameState.subscribe(createUIObserver(mainWindow.webContents, 'game-state'));
+  const unsubscribeMatchState = matchState.subscribe(createUIObserver(mainWindow.webContents, 'match-state'));
+
   mainWindow.on('closed', () => {
+    unsubscribeGameState();
+    unsubscribeMatchState();
     mainWindow = null;
   });
 
@@ -83,9 +89,6 @@ const createWindow = async (csgoListener: GameStateListener) => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   initializeAutoUpdater();
-
-  const gameStateObserver = createGameStateObserver(mainWindow.webContents);
-  csgoListener.subscribe(gameStateObserver);
 
   return mainWindow;
 };

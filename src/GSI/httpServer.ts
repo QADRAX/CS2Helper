@@ -4,7 +4,7 @@ import http from 'http';
 export type RequestHandler = (
   body: string,
   req: http.IncomingMessage,
-  res: http.ServerResponse
+  res: http.ServerResponse,
 ) => void;
 
 export interface HttpServer {
@@ -15,7 +15,7 @@ export interface HttpServer {
 export function createHTTPServer(
   handler: RequestHandler,
   port: number = 5000,
-  host: string = '127.0.0.1'
+  host: string = '127.0.0.1',
 ): HttpServer {
   const server = http.createServer((req, res) => {
     if (req.method === 'POST') {

@@ -24,12 +24,14 @@ export interface DeathRecord {
 
 export interface RoundData {
   roundNumber: number;
+  timestamp: number;
   kills: KillRecord[];
   deaths: DeathRecord[];
 }
 
 export interface MatchData {
   matchId: string;
+  timestamp: number;
   rounds: RoundData[];
 }
 

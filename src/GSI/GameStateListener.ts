@@ -1,79 +1,39 @@
-import http from 'http';
-import { CSState } from '../types/CSState';
-import { gameStateLogger } from './GameStateLogger';
-import { createObservable, Observable } from '../utils/Observable';
-
-export type GameStateListener = Observable<CSState | null> & {
-  listen: () => void;
-  close: () => void;
-};
+import { gameState } from './state/gameState';
+import { createHTTPServer, HttpServer } from './httpServer';
+import { GameState } from '../types/CSGO';
 
 export function createGameStateListener(
   port: number = 5000,
   host: string = '127.0.0.1',
   timeoutMs: number = 40000,
-): GameStateListener {
-  const observable = createObservable<CSState | null>();
-
+): HttpServer {
   let timeout: NodeJS.Timeout | null = null;
 
   const resetTimeout = () => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => {
-      observable.notify(null);
+      gameState.update(() => null);
     }, timeoutMs);
   }
 
-  const server = http.createServer((req, res) => {
-    if (req.method === 'POST') {
-      let body = '';
+  return createHTTPServer(
+    (body, _req, res) => {
+      try {
+        const nextState: GameState = JSON.parse(body);
 
-      req.on('data', (chunk) => {
-        body += chunk;
-      });
+        gameState.update(() => nextState);
 
-      req.on('end', () => {
-        try {
-          const gameState: CSState = JSON.parse(body);
-          observable.notify(gameState);
-          resetTimeout(); // Reiniciar el timeout al recibir un nuevo estado
-          res.writeHead(200, { 'Content-Type': 'text/plain' });
-          res.end('OK');
-        } catch (error) {
-          console.error('Invalid JSON received:', error);
-          res.writeHead(400, { 'Content-Type': 'text/plain' });
-          res.end('Invalid JSON');
-        }
-      });
-    } else {
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
-      res.end('GSI Listener running...');
-    }
-  });
-
-  return {
-    ...observable,
-
-    listen() {
-      server.listen(port, host, () => {
-        console.log(`GSI Listener running at http://${host}:${port}`);
-      });
-      resetTimeout(); // Iniciar el timeout cuando el servidor comienza a escuchar
+        resetTimeout(); // Reiniciar el timeout al recibir un nuevo estado
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('OK');
+      } catch (error) {
+        console.error('Invalid JSON received:', error);
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Invalid JSON');
+      }
     },
-
-    close() {
-      if (timeout) clearTimeout(timeout);
-      server.close(() => {
-        console.log('GSI Listener closed.');
-      });
-    },
-  };
+    port,
+    host,
+  );
 }
 
-export function initializeGameStateListener(): GameStateListener {
-  const csgoListener = createGameStateListener();
-
-  csgoListener.subscribe(gameStateLogger);
-
-  return csgoListener;
-};

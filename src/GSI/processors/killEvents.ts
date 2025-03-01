@@ -1,6 +1,6 @@
 import { GameState } from '../../types/CSGO';
 import { getEquippedWeapon } from '../../utils/getEquipedWeapon';
-import { matchState } from '../matchState';
+import { matchState } from '../state/matchState';
 
 let lastKills = 0;
 
