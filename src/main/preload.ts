@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { CSState, MatchData } from '../types/CSState';
+import { MatchData } from '../types/CSState';
+import { GameState } from '../types/CSGO';
 
 export interface IpcChannels {
-  'game-state': [state: CSState];
+  'game-state': [state: GameState];
   'match-state': [state: MatchData];
 }
 

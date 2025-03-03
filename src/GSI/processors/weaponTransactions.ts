@@ -10,7 +10,9 @@ let lastGameRound = 0;
 export const processWeaponTransactionsEvents = (
   gameState: Required<GameState>,
 ) => {
-  if (!gameState.player) return;
+  if (gameState.provider.steamid !== gameState.player.steamid) {
+    return;
+  }
 
   const currentMoney = gameState.player.state.money;
   const currentWeapons: string[] = getWeaponNames(gameState.player.weapons);

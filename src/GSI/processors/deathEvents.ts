@@ -9,14 +9,11 @@ let lastDeaths = 0;
  */
 export const processDeathEvents = (gameState: Required<GameState>) => {
   if (gameState.provider.steamid !== gameState.player.steamid) {
-    console.log(
-      '🚫 Ignoring death event due to spectating another player (deathcam detected).',
-    );
     return;
   }
 
   const currentDeaths = gameState.player.match_stats?.deaths ?? 0;
-  const gameTimestamp = gameState.provider.timestamp * 1000;
+  const gameTimestamp = gameState.provider.timestamp;
   const roundPhase = gameState.round?.phase ?? 'over';
   const gameRound = gameState.map.round;
 

@@ -13,25 +13,23 @@ export const processMatchEvents = (gameState: Required<GameState>) => {
   const currentMatch = matchState.get();
 
   // Iniciar nueva partida si entramos en "warmup"
-  if (!currentMatch || (mapPhase === 'warmup' && lastMapPhase !== 'warmup')) {
+  if (!currentMatch && mapPhase === 'warmup' && lastMapPhase !== 'warmup') {
     matchState.update(() => {
       const newMatch: MatchData = {
         mapName,
         timestamp: gameState.provider.timestamp,
         mode: gameState.map.mode,
         rounds: [],
-      }
+      };
       return newMatch;
     });
     console.log(`🆕 New match detected`);
   }
 
   // Terminar la partida si entramos en "gameover"
-  if (mapPhase === 'gameover' && lastMapPhase !== 'gameover') {
-    if (currentMatch) {
-      console.log(`🏁 Match ended`);
-      // saveMatchData(currentMatch);
-    }
+  if (currentMatch && mapPhase === 'gameover' && lastMapPhase !== 'gameover') {
+    console.log(`🏁 Match ended`);
+    // saveMatchData(currentMatch);
     matchState.update(() => {
       return null;
     });

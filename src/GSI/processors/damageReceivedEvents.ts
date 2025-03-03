@@ -6,9 +6,6 @@ let lastHealth = 0;
 
 export const processDamageReceivedEvents = (gameState: Required<GameState>) => {
   if (gameState.provider.steamid !== gameState.player.steamid) {
-    console.log(
-      '🚫 Ignoring damage event due to spectating another player (deathcam detected).',
-    );
     return;
   }
 

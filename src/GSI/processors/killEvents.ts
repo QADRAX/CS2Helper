@@ -9,9 +9,6 @@ let lastKills = 0;
  */
 export const processKillEvents = (gameState: Required<GameState>) => {
   if (gameState.provider.steamid !== gameState.player.steamid) {
-    console.log(
-      '🚫 Ignoring kill event due to spectating another player (deathcam detected).',
-    );
     return;
   }
 

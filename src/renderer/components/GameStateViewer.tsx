@@ -1,6 +1,17 @@
-import React from "react";
-import "./GameStateViewer.css";
-import { GameState, Map, Player, PlayerState, Provider, Round, Weapon, Weapons } from "../../types/CSGO";
+/* eslint-disable no-use-before-define */
+import React from 'react';
+import './GameStateViewer.css';
+import {
+  GameState,
+  Map,
+  Player,
+  PlayerState,
+  Provider,
+  Round,
+  Weapon,
+  Weapons,
+} from '../../types/CSGO';
+
 interface GameStateProps {
   gameState: GameState;
 }
@@ -9,7 +20,7 @@ const GameStateViewer: React.FC<GameStateProps> = ({ gameState }) => {
   return (
     <div className="game-state-container">
       <h1>CS:GO Game State</h1>
-      <ProviderInfo provider={gameState.provider} />
+      {/* <ProviderInfo provider={gameState.provider} /> */}
       {gameState.map && <MapInfo map={gameState.map} />}
       {gameState.round && <RoundInfo round={gameState.round} />}
       {gameState.player && <PlayerInfo player={gameState.player} />}
@@ -18,6 +29,7 @@ const GameStateViewer: React.FC<GameStateProps> = ({ gameState }) => {
 };
 
 // 🎯 Información del proveedor (Steam)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ProviderInfo: React.FC<{ provider: Provider }> = ({ provider }) => (
   <table className="info-table">
     <thead>
@@ -76,8 +88,8 @@ const RoundInfo: React.FC<{ round: Round }> = ({ round }) => (
     <tbody>
       <tr>
         <td>{round.phase}</td>
-        <td>{round.bomb || "N/A"}</td>
-        <td>{round.win_team || "N/A"}</td>
+        <td>{round.bomb || 'N/A'}</td>
+        <td>{round.win_team || 'N/A'}</td>
       </tr>
     </tbody>
   </table>
@@ -86,7 +98,9 @@ const RoundInfo: React.FC<{ round: Round }> = ({ round }) => (
 // 🎭 Información del jugador
 const PlayerInfo: React.FC<{ player: Player }> = ({ player }) => (
   <div>
-    <h1>{player.name} ({player.team})</h1>
+    <h1>
+      {player.name} ({player.team})
+    </h1>
     {player.state && <PlayerStateInfo state={player.state} />}
     {player.weapons && <WeaponsInfo weapons={player.weapons} />}
   </div>
@@ -112,13 +126,13 @@ const PlayerStateInfo: React.FC<{ state: PlayerState }> = ({ state }) => (
       <tr>
         <td>{state.health}</td>
         <td>{state.armor}</td>
-        <td>{state.helmet ? "✅" : "❌"}</td>
+        <td>{state.helmet ? '✅' : '❌'}</td>
         <td>${state.money}</td>
         <td>${state.equip_value}</td>
         <td>{state.flashed}</td>
         <td>{state.smoked}</td>
         <td>{state.burning}</td>
-        <td>{state.defusekit ? "✅" : "❌"}</td>
+        <td>{state.defusekit ? '✅' : '❌'}</td>
       </tr>
     </tbody>
   </table>
@@ -146,7 +160,10 @@ const WeaponsInfo: React.FC<{ weapons: Weapons }> = ({ weapons }) => (
 );
 
 // 🔫 Renderizar un arma
-const WeaponItem: React.FC<{ slot: string; weapon: Weapon }> = ({ slot, weapon }) => (
+const WeaponItem: React.FC<{ slot: string; weapon: Weapon }> = ({
+  slot,
+  weapon,
+}) => (
   <tr>
     <td>{slot}</td>
     <td>{weapon.type}</td>
@@ -154,9 +171,9 @@ const WeaponItem: React.FC<{ slot: string; weapon: Weapon }> = ({ slot, weapon }
     <td>{weapon.paintkit}</td>
     <td>{weapon.state}</td>
     <td>
-      {"ammo_clip" in weapon
+      {'ammo_clip' in weapon
         ? `${weapon.ammo_clip}/${weapon.ammo_clip_max} (Reserve: ${weapon.ammo_reserve})`
-        : "N/A"}
+        : 'N/A'}
     </td>
   </tr>
 );
