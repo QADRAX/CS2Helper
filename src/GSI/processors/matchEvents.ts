@@ -1,13 +1,16 @@
 import { GameState } from '../../types/CSGO';
 import { MatchData } from '../../types/CSState';
 import { matchState } from '../state/matchState';
+import { EventProcessor } from './EventProcessor';
 
-let lastMapPhase: string | null = null;
+let lastMapPhase: string | undefined;
 
 /**
  * Procesa el inicio y fin de una partida.
  */
-export const processMatchEvents = (gameState: Required<GameState>) => {
+export const processMatchEvents: EventProcessor<GameState> = (gameState, timestamp) => {
+  if(!gameState.map) return;
+
   const mapPhase = gameState.map.phase;
   const mapName = gameState.map.name;
   const currentMatch = matchState.get();
@@ -17,8 +20,8 @@ export const processMatchEvents = (gameState: Required<GameState>) => {
     matchState.update(() => {
       const newMatch: MatchData = {
         mapName,
-        timestamp: gameState.provider.timestamp,
-        mode: gameState.map.mode,
+        timestamp,
+        mode: gameState.map!.mode,
         rounds: [],
       };
       return newMatch;

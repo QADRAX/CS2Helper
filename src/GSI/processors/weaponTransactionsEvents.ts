@@ -2,14 +2,18 @@ import { GameState } from '../../types/CSGO';
 import { WeaponTransactionRecord } from '../../types/CSState';
 import { getWeaponNames } from '../../utils/getEquipedWeapon';
 import { updateRoundIfExists } from '../state/matchState';
+import { EventProcessor } from './EventProcessor';
 
 let lastMoney = 0;
 let lastWeapons: string[] = [];
 let lastGameRound = 0;
 
-export const processWeaponTransactionsEvents = (
-  gameState: Required<GameState>,
+export const processWeaponTransactionsEvents: EventProcessor<GameState> = (
+  gameState,
+  timestamp,
 ) => {
+  if (!gameState.player || !gameState.round || !gameState.map) return;
+
   if (gameState.provider.steamid !== gameState.player.steamid) {
     return;
   }
@@ -17,7 +21,6 @@ export const processWeaponTransactionsEvents = (
   const currentMoney = gameState.player.state.money;
   const currentWeapons: string[] = getWeaponNames(gameState.player.weapons);
 
-  const { timestamp } = gameState.provider;
   const roundPhase = gameState.round.phase;
   const gameRound = gameState.map.round;
 
@@ -66,7 +69,7 @@ export const processWeaponTransactionsEvents = (
       transactions.push({
         timestamp,
         roundPhase,
-        transactionType: 'sale',
+        transactionType: 'refund',
         weaponName: weapon,
         cost: costPerWeapon,
       });
@@ -77,10 +80,11 @@ export const processWeaponTransactionsEvents = (
     updateRoundIfExists(gameRound, (currentRound) => {
       currentRound.weaponTransactions.push(...transactions);
     });
-    console.log(
-      `💰 Weapon transactions detected in round ${gameRound} during phase ${roundPhase}:`,
-      transactions,
-    );
+    for (const transaccion of transactions) {
+      console.log(
+        `💰 Weapon '${transaccion.weaponName}' ${transaccion.transactionType} detected in round ${gameRound} during phase ${roundPhase}: ${transaccion.transactionType === 'purchase' ? '-' : '+'} ${transaccion.cost}$`,
+      );
+    }
   }
 
   // Actualizamos los valores previos para la siguiente comparación.

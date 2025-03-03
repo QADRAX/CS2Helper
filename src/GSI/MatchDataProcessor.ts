@@ -1,11 +1,11 @@
-import { CSState, isValidGameState } from "../types/CSState";
+import { CSState } from "../types/CSState";
 import { Observer } from "../utils/Observer";
 import { processMatchEvents } from "./processors/matchEvents";
 import { processRoundEvents } from "./processors/roundEvents";
 import { processKillEvents } from "./processors/killEvents";
 import { processDeathEvents } from "./processors/deathEvents";
 import { processDamageReceivedEvents } from "./processors/damageReceivedEvents";
-import { processWeaponTransactionsEvents } from "./processors/weaponTransactions";
+import { processWeaponTransactionsEvents } from "./processors/weaponTransactionsEvents";
 
 const eventProcessors = [
   processMatchEvents,
@@ -20,7 +20,9 @@ const eventProcessors = [
  * Procesa el estado del juego aplicando cada procesador de eventos.
  */
 export const matchDataProcessor: Observer<CSState> = (gameState) => {
-  if (!isValidGameState(gameState)) return;
+  if (gameState == null) return;
 
-  eventProcessors.forEach((processor) => processor(gameState));
+  const timestamp = Date.now();
+
+  eventProcessors.forEach((processor) => processor(gameState, timestamp));
 };

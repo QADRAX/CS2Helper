@@ -1,13 +1,17 @@
 import { GameState } from '../../types/CSGO';
 import { getEquippedWeapon } from '../../utils/getEquipedWeapon';
 import { matchState, updateRoundIfExists } from '../state/matchState';
+import { EventProcessor } from './EventProcessor';
 
 let lastKills = 0;
+let lastGameRound: number = 0;
 
 /**
  * Procesa las kills del jugador.
  */
-export const processKillEvents = (gameState: Required<GameState>) => {
+export const processKillEvents: EventProcessor<GameState> = (gameState, timestamp) => {
+  if (!gameState.player || !gameState.round || !gameState.map) return;
+
   if (gameState.provider.steamid !== gameState.player.steamid) {
     return;
   }
@@ -18,17 +22,21 @@ export const processKillEvents = (gameState: Required<GameState>) => {
 
   const currentKills = gameState.player.match_stats?.kills ?? 0;
   const equippedWeapon = getEquippedWeapon(gameState.player.weapons);
-  const gameTimestamp = gameState.provider.timestamp;
   const gameRound = gameState.map.round;
+  const roundPhase = gameState.round.phase;
+  const { flashed, smoked } = gameState.player.state;
 
   if (currentKills > lastKills) {
-    updateRoundIfExists(gameRound, (currentRound) => {
+    // CS2 actualiza la ronda despues de la ultima baja si ganas la ronda por bajas
+    const killRound = roundPhase === 'over' ? lastGameRound : gameRound;
+
+    updateRoundIfExists(killRound, (currentRound) => {
       currentRound.kills.push({
-        timestamp: gameTimestamp,
-        roundPhase: gameState.round.phase,
-        weapon: getEquippedWeapon(gameState.player.weapons),
-        flashed: gameState.player.state.flashed,
-        smoked: gameState.player.state.smoked,
+        timestamp,
+        roundPhase,
+        weapon: equippedWeapon,
+        flashed,
+        smoked,
       });
     });
     console.log(
@@ -37,4 +45,5 @@ export const processKillEvents = (gameState: Required<GameState>) => {
   }
 
   lastKills = currentKills;
+  lastGameRound = gameRound;
 };

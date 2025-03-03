@@ -1,18 +1,21 @@
 import { GameState } from '../../types/CSGO';
 import { getEquippedWeapon } from '../../utils/getEquipedWeapon';
 import { updateRoundIfExists } from '../state/matchState';
+import { EventProcessor } from './EventProcessor';
 
 let lastHealth = 0;
 
-export const processDamageReceivedEvents = (gameState: Required<GameState>) => {
+export const processDamageReceivedEvents: EventProcessor<GameState> = (gameState, timestamp) => {
+  if (!gameState.player || !gameState.round || !gameState.map) return;
+
   if (gameState.provider.steamid !== gameState.player.steamid) {
     return;
   }
 
-  const { timestamp } = gameState.provider;
   const roundPhase = gameState.round.phase;
   const gameRound = gameState.map.round;
   const { flashed, smoked, health: currentHealth } = gameState.player.state;
+  const equippedWeapon = getEquippedWeapon(gameState.player.weapons);
 
   const damage = lastHealth - currentHealth;
 
@@ -24,7 +27,7 @@ export const processDamageReceivedEvents = (gameState: Required<GameState>) => {
         damage,
         flashed,
         smoked,
-        equippedWeapon: getEquippedWeapon(gameState.player.weapons),
+        equippedWeapon,
       });
     });
     console.log(

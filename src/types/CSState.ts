@@ -74,7 +74,7 @@ export interface WeaponTransactionRecord {
   /**
    * Tipo de transaccion
    */
-  transactionType: 'purchase' | 'sale';
+  transactionType: 'purchase' | 'refund';
   /**
    * Nombre del arma
    */
@@ -114,9 +114,13 @@ export interface RoundData {
    */
   roundNumber: number;
   /**
-   * Timestamp de inicio de la ronda
+   * Timestamp de inicio del freezetime ronda
    */
   timestamp: number;
+  /**
+   * Timestamp de cuando el round phase pasa a 'live'
+   */
+  roundLiveTimestamp?: number;
   /**
    * Timestamp de cuando el round phase pasa a 'over'
    */
