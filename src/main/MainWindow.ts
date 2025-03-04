@@ -3,7 +3,7 @@ import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { createUIObserver } from '../GSI/GameStateObserver';
+import { createUIObserver } from '../GSI/UIObserver';
 import { initializeAutoUpdater } from './AppUpdater';
 import { gameState } from '../GSI/state/gameState';
 import { matchState } from '../GSI/state/matchState';

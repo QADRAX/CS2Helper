@@ -40,7 +40,7 @@ export const processKillEvents: EventProcessor<GameState> = (gameState, timestam
       });
     });
     console.log(
-      `💀 Kill detected in round ${gameRound} with: ${equippedWeapon}`,
+      `💀 Kill detected in round ${killRound} with: ${equippedWeapon}`,
     );
   }
 

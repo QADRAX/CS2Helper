@@ -23,7 +23,6 @@ export const processDeathEvents: EventProcessor<GameState> = (gameState, timesta
   const { flashed, smoked } = gameState.player.state;
   const equippedWeapon = getEquippedWeapon(gameState.player.weapons);
 
-
   if (currentDeaths > lastDeaths) {
     const deathRound = roundPhase === 'over' ? lastGameRound : gameRound;
     updateRoundIfExists(deathRound, (currentRound) => {
@@ -35,7 +34,7 @@ export const processDeathEvents: EventProcessor<GameState> = (gameState, timesta
         smoked,
       });
       console.log(
-        `☠️ Death detected in round ${gameRound} with: ${equippedWeapon}`,
+        `☠️ Death detected in round ${deathRound} with: ${equippedWeapon}`,
       );
     });
   }

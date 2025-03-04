@@ -73,7 +73,7 @@ export const processRoundEvents: EventProcessor<GameState> = (gameState, timesta
     } else {
       console.log(`🔚 You lose this round!`);
     }
-    updateRoundIfExists(gameRound, (currentRound) => {
+    updateRoundIfExists(lastGameRound, (currentRound) => {
       currentRound.winnerTeam = roundWiningTeam;
     });
   }
