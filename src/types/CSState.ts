@@ -12,6 +12,11 @@ export function isValidGameState(
   );
 }
 
+export interface FlashRecords {
+  timestamp: number;
+  duration: number;
+}
+
 export interface DamageRecord {
   /**
    * Timestamp del hit
@@ -133,6 +138,7 @@ export interface RoundData {
    * Muertes del jugador en la ronda
    */
   deaths: DeathRecord[];
+  flashes: FlashRecords[];
   /**
    * Daño recibido del jugador en la ronda
    */

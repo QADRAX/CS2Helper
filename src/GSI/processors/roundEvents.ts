@@ -1,7 +1,7 @@
 import { GameState, PhaseRound, TeamType } from '../../types/CSGO';
 import { updateIfExists } from '../../utils/GenericStateContainer';
 import { matchState, updateRoundIfExists } from '../state/matchState';
-import { EventProcessor } from './EventProcessor';
+import { EventProcessor } from '../../types/EventProcessor';
 
 let lastGameRound: number = 0;
 let lastRoundPhase: PhaseRound | null = null;
@@ -41,6 +41,7 @@ export const processRoundEvents: EventProcessor<GameState> = (gameState, timesta
         deaths: [],
         damageReceived: [],
         weaponTransactions: [],
+        flashes: [],
         playerTeam: currentTeam,
       });
 

@@ -1,7 +1,7 @@
 import { GameState } from '../../types/CSGO';
 import { getEquippedWeapon } from '../../utils/getEquipedWeapon';
 import { matchState, updateRoundIfExists } from '../state/matchState';
-import { EventProcessor } from './EventProcessor';
+import { EventProcessor } from '../../types/EventProcessor';
 
 let lastKills = 0;
 let lastGameRound: number = 0;

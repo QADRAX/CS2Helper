@@ -2,7 +2,7 @@ import { GameState } from '../../types/CSGO';
 import { WeaponTransactionRecord } from '../../types/CSState';
 import { getWeaponNames } from '../../utils/getEquipedWeapon';
 import { updateRoundIfExists } from '../state/matchState';
-import { EventProcessor } from './EventProcessor';
+import { EventProcessor } from '../../types/EventProcessor';
 
 let lastMoney = 0;
 let lastWeapons: string[] = [];

@@ -1,7 +1,7 @@
 import { GameState } from '../../types/CSGO';
 import { MatchData } from '../../types/CSState';
 import { matchState } from '../state/matchState';
-import { EventProcessor } from './EventProcessor';
+import { EventProcessor } from '../../types/EventProcessor';
 
 let lastMapPhase: string | undefined;
 

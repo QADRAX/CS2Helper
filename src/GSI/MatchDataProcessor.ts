@@ -6,6 +6,7 @@ import { processKillEvents } from "./processors/killEvents";
 import { processDeathEvents } from "./processors/deathEvents";
 import { processDamageReceivedEvents } from "./processors/damageReceivedEvents";
 import { processWeaponTransactionsEvents } from "./processors/weaponTransactionsEvents";
+import { processFlashEvents } from "./processors/flashEvents";
 
 const eventProcessors = [
   processMatchEvents,
@@ -14,6 +15,7 @@ const eventProcessors = [
   processDeathEvents,
   processDamageReceivedEvents,
   processWeaponTransactionsEvents,
+  processFlashEvents,
 ];
 
 /**
