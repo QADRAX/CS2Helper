@@ -15,7 +15,9 @@
     "test:gsi-processor": "npm run test --workspace=@cs2helper/gsi-processor",
     "build:gsi-gateway": "npm run build --workspace=@cs2helper/gsi-gateway",
     "lint:gsi-gateway": "npm run lint --workspace=@cs2helper/gsi-gateway",
-    "test:gsi-gateway": "npm run test --workspace=@cs2helper/gsi-gateway"
+    "test:gsi-gateway": "npm run test --workspace=@cs2helper/gsi-gateway",
+    "build:shared": "npm run build --workspace=@cs2helper/shared",
+    "lint:shared": "npm run lint --workspace=@cs2helper/shared"
   },
   "devDependencies": {
     "rimraf": "^6.1.3",

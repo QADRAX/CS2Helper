@@ -5,24 +5,9 @@ import type {
   CoreEngineMemoryPort,
   CoreEngineStatePort,
 } from "./contracts";
+import type { UseCase, UseCaseFactory } from "@cs2helper/shared";
 
-/**
- * Generic contract for application use cases.
- *
- * @typeParam TArgs - Ordered tuple of input arguments.
- * @typeParam TResult - Return type produced by the use case.
- */
-export interface UseCase<TArgs extends unknown[] = [], TResult = void> {
-  execute: (...args: TArgs) => TResult;
-}
-
-/**
- * Generic factory for building use cases from a context object.
- *
- * @typeParam TUseCase - Concrete use case contract to create.
- * @typeParam TContext - Context shape required by the use case.
- */
-export type UseCaseFactory<TUseCase, TContext> = (context: TContext) => TUseCase;
+export type { UseCase, UseCaseFactory };
 
 /**
  * Shared execution context available for core engine use cases.

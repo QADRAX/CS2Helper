@@ -4,11 +4,7 @@ import type {
   CS2GameState,
 } from "@cs2helper/gsi-processor";
 import type { EventListener, StateListener } from "./contracts";
-
-/** Generic use-case contract used across the gateway application layer. */
-export interface UseCase<TArgs extends unknown[] = [], TResult = void> {
-  execute: (...args: TArgs) => TResult;
-}
+import type { UseCase } from "@cs2helper/shared";
 
 /** Use case that ingests one raw CS2 GSI tick payload. */
 export type IngestGsiTickUseCase = UseCase<[CS2GameState], void>;

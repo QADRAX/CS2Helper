@@ -1,0 +1,19 @@
+{
+  "name": "@cs2helper/shared",
+  "version": "1.0.0",
+  "description": "Shared primitives and architectural components.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rimraf dist",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "rimraf": "^6.1.3",
+    "eslint": "^10.3.0",
+    "@eslint/js": "^10.0.1",
+    "typescript-eslint": "^8.59.2"
+  }
+}

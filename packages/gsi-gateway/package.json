@@ -12,7 +12,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@cs2helper/gsi-processor": "1.0.0"
+    "@cs2helper/gsi-processor": "1.0.0",
+    "@cs2helper/shared": "1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
