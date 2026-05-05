@@ -1,15 +1,15 @@
 import type {
   CoreEngineEvent,
   CoreEngineState,
-  MatchEngineAPI,
+  GSIProcessor,
 } from "@cs2helper/gsi-processor";
 
 /** Narrow port used by the gateway use cases to interact with the processor. */
 export interface GsiProcessorPort {
-  processTick: MatchEngineAPI["processTick"];
-  getState: MatchEngineAPI["getState"];
-  subscribeState: MatchEngineAPI["subscribeState"];
-  subscribeEvents: MatchEngineAPI["subscribeEvents"];
+  processTick: GSIProcessor["processTick"];
+  getState: GSIProcessor["getState"];
+  subscribeState: GSIProcessor["subscribeState"];
+  subscribeEvents: GSIProcessor["subscribeEvents"];
 }
 
 /** Shared application context injected into gateway use-case factories. */

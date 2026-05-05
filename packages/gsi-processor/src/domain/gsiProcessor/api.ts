@@ -6,7 +6,7 @@ import type { CoreEngineEvent, CoreEngineState, CS2GameState } from "./gsiProces
  * This API is assembled in infrastructure from application use cases,
  * but its contract lives in domain to keep architectural boundaries explicit.
  */
-export interface MatchEngineAPI {
+export interface GSIProcessor {
   /**
    * Processes one CS2 GSI snapshot and updates aggregated match state.
    *

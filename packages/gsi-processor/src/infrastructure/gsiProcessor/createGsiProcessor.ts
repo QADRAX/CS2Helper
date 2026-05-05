@@ -5,9 +5,8 @@ import {
   createSubscribeStateUseCase,
 } from "../../application/gsiProcessor";
 import {
-  composeEngineAPI,
   type CoreEngineUseCaseContext,
-  type MatchEngineAPI,
+  type GSIProcessor,
   createInitialCoreEngineMemory,
   createInitialCoreEngineState,
 } from "../../domain/gsiProcessor";
@@ -28,7 +27,7 @@ export interface CreateGsiProcessorOptions {
  * Infrastructure is the composition root: it chooses concrete state/memory/event
  * adapters, creates the application use cases, and exposes them as a public API.
  */
-export function createGsiProcessor(options: CreateGsiProcessorOptions = {}): MatchEngineAPI {
+export function createGsiProcessor(options: CreateGsiProcessorOptions = {}): GSIProcessor {
   const stateStore = createInMemoryGsiProcessorStateStore(createInitialCoreEngineState());
   const memoryStore = createInMemoryGsiProcessorMemoryStore(createInitialCoreEngineMemory());
   const eventsBus = createInMemoryGsiProcessorEventsBus();
@@ -48,10 +47,10 @@ export function createGsiProcessor(options: CreateGsiProcessorOptions = {}): Mat
   const subscribeStateUseCase = createSubscribeStateUseCase(useCaseContext);
   const subscribeEventsUseCase = createSubscribeEventsUseCase(useCaseContext);
 
-  return composeEngineAPI()
-    .add("processTick", processTickUseCase)
-    .add("getState", getStateUseCase)
-    .add("subscribeState", subscribeStateUseCase)
-    .add("subscribeEvents", subscribeEventsUseCase)
-    .build() as MatchEngineAPI;
+  return {
+    processTick: processTickUseCase.execute,
+    getState: getStateUseCase.execute,
+    subscribeState: subscribeStateUseCase.execute,
+    subscribeEvents: subscribeEventsUseCase.execute,
+  };
 }

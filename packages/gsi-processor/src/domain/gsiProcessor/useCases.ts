@@ -55,11 +55,3 @@ export type SubscribeEventsUseCase = UseCase<
   [(event: CoreEngineEvent) => void],
   () => void
 >;
-
-/** Shape of the assembled use-case map exposed by the processor API. */
-export interface CoreEngineUseCasesMap {
-  processTick: ProcessTickUseCase;
-  getState: GetStateUseCase;
-  subscribeState: SubscribeStateUseCase;
-  subscribeEvents: SubscribeEventsUseCase;
-}

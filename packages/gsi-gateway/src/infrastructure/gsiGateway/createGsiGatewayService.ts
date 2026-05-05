@@ -1,5 +1,5 @@
 import type {
-  MatchEngineAPI,
+  GSIProcessor,
 } from "@cs2helper/gsi-processor";
 import { createGsiProcessor } from "@cs2helper/gsi-processor";
 import {
@@ -26,7 +26,7 @@ export function createGsiGatewayService(
   options: CreateGsiGatewayServiceOptions = {}
 ): GsiGatewayService {
   const config = createDefaultHttpConfig(options);
-  const processor: MatchEngineAPI = createGsiProcessor({
+  const processor: GSIProcessor = createGsiProcessor({
     getTimestamp: options.getTimestamp,
   });
 

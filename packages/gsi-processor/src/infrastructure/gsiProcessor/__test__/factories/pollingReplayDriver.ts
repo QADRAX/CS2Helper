@@ -1,4 +1,4 @@
-import type { MatchEngineAPI } from "../../../../domain/gsiProcessor";
+import type { GSIProcessor } from "../../../../domain/gsiProcessor";
 import type { WatcherPayload } from "../../../../domain/csgo";
 
 export interface ReplayFrame {
@@ -6,7 +6,7 @@ export interface ReplayFrame {
   timestamp: number;
 }
 
-export function replayPollingFrames(engine: MatchEngineAPI, frames: ReplayFrame[]): void {
+export function replayPollingFrames(engine: GSIProcessor, frames: ReplayFrame[]): void {
   for (const frame of frames) {
     engine.processTick(frame.tick, frame.timestamp);
   }
