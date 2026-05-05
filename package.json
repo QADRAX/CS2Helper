@@ -1,0 +1,24 @@
+{
+  "name": "cs2helper",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Qadrax",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:gsi-processor": "npm run build --workspace=@cs2helper/gsi-processor",
+    "lint:gsi-processor": "npm run lint --workspace=@cs2helper/gsi-processor",
+    "test:gsi-processor": "npm run test --workspace=@cs2helper/gsi-processor",
+    "build:gsi-gateway": "npm run build --workspace=@cs2helper/gsi-gateway",
+    "lint:gsi-gateway": "npm run lint --workspace=@cs2helper/gsi-gateway",
+    "test:gsi-gateway": "npm run test --workspace=@cs2helper/gsi-gateway"
+  },
+  "devDependencies": {
+    "rimraf": "^6.1.3",
+    "typescript": "^6.0.3"
+  }
+}
