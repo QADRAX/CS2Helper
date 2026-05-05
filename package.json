@@ -10,6 +10,9 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
+    "lint": "eslint packages/",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "build:gsi-processor": "npm run build --workspace=@cs2helper/gsi-processor",
     "lint:gsi-processor": "npm run lint --workspace=@cs2helper/gsi-processor",
     "test:gsi-processor": "npm run test --workspace=@cs2helper/gsi-processor",
@@ -20,7 +23,14 @@
     "lint:shared": "npm run lint --workspace=@cs2helper/shared"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.1.5",
+    "eslint": "^10.3.0",
     "rimraf": "^6.1.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2",
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
   }
 }
