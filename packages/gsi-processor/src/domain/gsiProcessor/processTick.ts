@@ -1,8 +1,8 @@
 import { normalizeWatcherPayload } from "./normalizeWatcherPayload";
 import type {
-  CoreEngineEvent,
-  CoreEngineMemory,
-  CoreEngineState,
+  GsiProcessorEvent,
+  GsiProcessorMemory,
+  GsiProcessorState,
   TickProcessingResult,
 } from "./gsiProcessorTypes";
 import { cloneState } from "./reducers/helpers";
@@ -27,14 +27,14 @@ import { transitionStreamState } from "./stream/streamStateMachine";
  * - update state/memory/watermarks and emit domain + operational events
  */
 export function processTickDomain(
-  state: CoreEngineState,
-  memory: CoreEngineMemory,
+  state: GsiProcessorState,
+  memory: GsiProcessorMemory,
   payload: WatcherPayload | null,
   timestamp: number
 ): TickProcessingResult {
   const nextState = cloneState(state);
-  const nextMemory: CoreEngineMemory = { ...memory, players: { ...memory.players } };
-  const events: CoreEngineEvent[] = [];
+  const nextMemory: GsiProcessorMemory = { ...memory, players: { ...memory.players } };
+  const events: GsiProcessorEvent[] = [];
 
   nextState.totalTicks += 1;
   nextState.lastProcessedAt = timestamp;

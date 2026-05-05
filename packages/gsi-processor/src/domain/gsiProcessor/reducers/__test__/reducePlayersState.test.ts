@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { minimalDedicatedTick } from "../../../../__test__/fixtures/minimalWatcherTick";
-import { createInitialCoreEngineMemory, createInitialCoreEngineState } from "../../initialState";
+import { createInitialGsiProcessorMemory, createInitialGsiProcessorState } from "../../initialState";
 import { normalizeWatcherPayload } from "../../normalizeWatcherPayload";
 import { reducePlayersState } from "../reducePlayersState";
 import type { ReducerContext } from "../reducerTypes";
@@ -9,8 +9,8 @@ describe("reducePlayersState", () => {
   it("projects each snapshot player into playersBySteamId", () => {
     const snap = normalizeWatcherPayload(minimalDedicatedTick());
     const ctx: ReducerContext = {
-      state: createInitialCoreEngineState(),
-      memory: createInitialCoreEngineMemory(),
+      state: createInitialGsiProcessorState(),
+      memory: createInitialGsiProcessorMemory(),
       snapshot: snap,
       timestamp: 4242,
       events: [],

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createInitialCoreEngineState } from "../../domain/gsiProcessor";
+import { createInitialGsiProcessorState } from "../../domain/gsiProcessor";
 import { createGetStateUseCase } from "../gsiProcessor/useCases/getStateUseCase";
 import { createMockProcessorContext } from "./mockProcessorContext";
 
@@ -11,6 +11,6 @@ describe("createGetStateUseCase", () => {
     const result = useCase.execute();
 
     expect(context.state.getState).toHaveBeenCalledTimes(1);
-    expect(result).toEqual(createInitialCoreEngineState());
+    expect(result).toEqual(createInitialGsiProcessorState());
   });
 });

@@ -1,4 +1,4 @@
-import type { CoreEngineEvent, CoreEngineState, CS2GameState } from "./gsiProcessorTypes";
+import type { GsiProcessorEvent, GsiProcessorState, CS2GameState } from "./gsiProcessorTypes";
 
 /**
  * Public API exposed by the CS2 core engine instance.
@@ -18,7 +18,7 @@ export interface GSIProcessor {
   /**
    * Returns the latest immutable aggregate state for this engine instance.
    */
-  getState: () => Readonly<CoreEngineState>;
+  getState: () => Readonly<GsiProcessorState>;
 
   /**
    * Subscribes to aggregate state changes.
@@ -27,7 +27,7 @@ export interface GSIProcessor {
    * @returns Unsubscribe function.
    */
   subscribeState: (
-    listener: (state: Readonly<CoreEngineState>) => void
+    listener: (state: Readonly<GsiProcessorState>) => void
   ) => () => void;
 
   /**
@@ -36,5 +36,5 @@ export interface GSIProcessor {
    * @param listener - Callback invoked for each emitted event.
    * @returns Unsubscribe function.
    */
-  subscribeEvents: (listener: (event: CoreEngineEvent) => void) => () => void;
+  subscribeEvents: (listener: (event: GsiProcessorEvent) => void) => () => void;
 }

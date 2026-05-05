@@ -1,12 +1,12 @@
 import type {
-  CoreEngineUseCaseContext,
+  GsiProcessorUseCaseContext,
   SubscribeEventsUseCase,
   UseCaseFactory,
 } from "../../../domain/gsiProcessor";
 
 export const createSubscribeEventsUseCase: UseCaseFactory<
   SubscribeEventsUseCase,
-  CoreEngineUseCaseContext
+  GsiProcessorUseCaseContext
 > = ({ events }) => {
   return {
     execute(listener) {

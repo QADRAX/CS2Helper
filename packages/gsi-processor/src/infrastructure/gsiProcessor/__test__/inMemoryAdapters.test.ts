@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-  createInitialCoreEngineMemory,
-  createInitialCoreEngineState,
+  createInitialGsiProcessorMemory,
+  createInitialGsiProcessorState,
 } from "../../../domain/gsiProcessor";
 import { createInMemoryGsiProcessorEventsBus } from "../internal/createInMemoryGsiProcessorEventsBus";
 import { createInMemoryGsiProcessorMemoryStore } from "../internal/createInMemoryGsiProcessorMemoryStore";
@@ -9,13 +9,13 @@ import { createInMemoryGsiProcessorStateStore } from "../internal/createInMemory
 
 describe("in-memory GSI processor adapters", () => {
   it("state store notifies subscribers until unsubscribed", () => {
-    const store = createInMemoryGsiProcessorStateStore(createInitialCoreEngineState());
+    const store = createInMemoryGsiProcessorStateStore(createInitialGsiProcessorState());
     const listener = vi.fn();
     const off = store.subscribeState(listener);
-    store.setState({ ...createInitialCoreEngineState(), totalTicks: 1 });
+    store.setState({ ...createInitialGsiProcessorState(), totalTicks: 1 });
     expect(listener).toHaveBeenCalledTimes(1);
     off();
-    store.setState({ ...createInitialCoreEngineState(), totalTicks: 2 });
+    store.setState({ ...createInitialGsiProcessorState(), totalTicks: 2 });
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
@@ -31,8 +31,8 @@ describe("in-memory GSI processor adapters", () => {
   });
 
   it("memory store holds latest value", () => {
-    const store = createInMemoryGsiProcessorMemoryStore(createInitialCoreEngineMemory());
-    const next = { ...createInitialCoreEngineMemory(), lastGameRound: 5 };
+    const store = createInMemoryGsiProcessorMemoryStore(createInitialGsiProcessorMemory());
+    const next = { ...createInitialGsiProcessorMemory(), lastGameRound: 5 };
     store.setMemory(next);
     expect(store.getMemory().lastGameRound).toBe(5);
   });

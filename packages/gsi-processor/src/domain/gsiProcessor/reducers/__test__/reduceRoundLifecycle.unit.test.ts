@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import type { NormalizedSnapshot } from "../../../csgo";
 import { minimalNormalizedSnapshot } from "../../../../__test__/fixtures/normalizedSnapshot";
 import {
-  type CoreEngineEvent,
+  type GsiProcessorEvent,
 } from "../../gsiProcessorTypes";
 import {
-  createInitialCoreEngineMemory,
-  createInitialCoreEngineState,
+  createInitialGsiProcessorMemory,
+  createInitialGsiProcessorState,
 } from "../../initialState";
 import { reduceRoundLifecycle } from "../reduceRoundLifecycle";
 import type { ReducerContext } from "../reducerTypes";
@@ -28,15 +28,15 @@ function createSnapshot(
 }
 
 function createContext(snapshot: NormalizedSnapshot): ReducerContext {
-  const state = createInitialCoreEngineState();
+  const state = createInitialGsiProcessorState();
   state.currentMatch = {
     mapName: "de_inferno",
     mode: "competitive",
     timestamp: 1000,
     rounds: [],
   };
-  const memory = createInitialCoreEngineMemory();
-  const events: CoreEngineEvent[] = [];
+  const memory = createInitialGsiProcessorMemory();
+  const events: GsiProcessorEvent[] = [];
   return {
     state,
     memory,

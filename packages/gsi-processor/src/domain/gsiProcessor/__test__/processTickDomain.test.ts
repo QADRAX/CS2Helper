@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  createInitialCoreEngineMemory,
-  createInitialCoreEngineState,
+  createInitialGsiProcessorMemory,
+  createInitialGsiProcessorState,
 } from "../initialState";
 import { processTickDomain } from "../processTick";
 import * as snapshotQuality from "../stream/snapshotQuality";
@@ -13,9 +13,9 @@ describe("processTickDomain", () => {
   });
 
   it("on null payload while healthy, enters gap and emits gap_started", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.streamState = "healthy";
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     const result = processTickDomain(state, memory, null, 5000);
     expect(result.state.streamState).toBe("gap");
     expect(result.state.streamWatermarks.requiresResync).toBe(true);
@@ -23,15 +23,15 @@ describe("processTickDomain", () => {
   });
 
   it("on null payload while cold_start, does not emit gap_started", () => {
-    const state = createInitialCoreEngineState();
-    const memory = createInitialCoreEngineMemory();
+    const state = createInitialGsiProcessorState();
+    const memory = createInitialGsiProcessorMemory();
     const result = processTickDomain(state, memory, null, 1000);
     expect(result.events.some((e) => e.type === "gap_started")).toBe(false);
   });
 
   it("first complete tick leaves cold_start, recovers stream and can start match on warmup", () => {
-    const state = createInitialCoreEngineState();
-    const memory = createInitialCoreEngineMemory();
+    const state = createInitialGsiProcessorState();
+    const memory = createInitialGsiProcessorMemory();
     const tick = minimalClientTick();
     const result = processTickDomain(state, memory, tick, 2000);
     expect(result.state.streamState).toBe("healthy");
@@ -43,10 +43,10 @@ describe("processTickDomain", () => {
   });
 
   it("partial snapshot does not advance reliable watermarks", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.streamState = "healthy";
     state.streamWatermarks.lastReliableTimestamp = 999;
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     const tick = minimalClientTick({ map: undefined, round: undefined });
     const result = processTickDomain(state, memory, tick, 3000);
     expect(result.state.streamWatermarks.lastReliableTimestamp).toBe(999);
@@ -54,17 +54,17 @@ describe("processTickDomain", () => {
 
   it("emits snapshot_rejected when quality evaluates to invalid", () => {
     vi.spyOn(snapshotQuality, "evaluateSnapshotQuality").mockReturnValue("invalid");
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.streamState = "healthy";
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     const result = processTickDomain(state, memory, minimalClientTick(), 6000);
     expect(result.events.some((e) => e.type === "snapshot_rejected")).toBe(true);
     expect(result.state.streamMetrics.rejectedSnapshots).toBe(1);
   });
 
   it("updates rolling memory map and round fields after a complete tick", () => {
-    const state = createInitialCoreEngineState();
-    const memory = createInitialCoreEngineMemory();
+    const state = createInitialGsiProcessorState();
+    const memory = createInitialGsiProcessorMemory();
     const tick = minimalClientTick({
       map: { ...minimalClientTick().map!, phase: "live", round: 3 },
       round: { phase: "live", win_team: "CT" },

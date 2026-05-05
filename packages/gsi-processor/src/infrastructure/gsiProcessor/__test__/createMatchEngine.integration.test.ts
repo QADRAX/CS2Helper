@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { WatcherMode } from "../../../domain/csgo";
-import type { CoreEngineEvent } from "../../../domain/gsiProcessor";
+import type { GsiProcessorEvent } from "../../../domain/gsiProcessor";
 import {
   bumpPrimaryPlayerKills,
   midMatchAttachTick,
@@ -25,7 +25,7 @@ describe("createGsiProcessor integration", () => {
 
   it("tracks aggregation and state updates", () => {
     const engine = createGsiProcessor({ getTimestamp: () => 1000 });
-    const events: CoreEngineEvent[] = [];
+    const events: GsiProcessorEvent[] = [];
     let stateUpdates = 0;
     engine.subscribeEvents((event) => events.push(event));
     engine.subscribeState(() => {
@@ -72,7 +72,7 @@ describe("createGsiProcessor integration", () => {
 
   it("cold start mid-match does not emit retroactive critical events", () => {
     const engine = createGsiProcessor({ getTimestamp: () => 3000 });
-    const events: CoreEngineEvent[] = [];
+    const events: GsiProcessorEvent[] = [];
     engine.subscribeEvents((event) => events.push(event));
 
     const tick = withPlayerDelta(
@@ -93,7 +93,7 @@ describe("createGsiProcessor integration", () => {
 
   it("transitions healthy -> gap -> recovering -> healthy", () => {
     const engine = createGsiProcessor({ getTimestamp: () => 2000 });
-    const events: CoreEngineEvent[] = [];
+    const events: GsiProcessorEvent[] = [];
     engine.subscribeEvents((event) => events.push(event));
 
     const base = withRoundPhase(createBaseTick(), {
@@ -147,7 +147,7 @@ describe("createGsiProcessor integration", () => {
     "mid-match attach (%s): sets watcherMode, goes healthy, aggregates players, no retro kill/death",
     (mode) => {
       const engine = createGsiProcessor({ getTimestamp: () => 8000 });
-      const events: CoreEngineEvent[] = [];
+      const events: GsiProcessorEvent[] = [];
       engine.subscribeEvents((event) => events.push(event));
 
       engine.processTick(midMatchAttachTick(mode), 8000);
@@ -167,7 +167,7 @@ describe("createGsiProcessor integration", () => {
     "mid-match attach (%s): kill delta emits kill after first live attach creates currentMatch",
     (mode) => {
       const engine = createGsiProcessor({ getTimestamp: () => 9000 });
-      const events: CoreEngineEvent[] = [];
+      const events: GsiProcessorEvent[] = [];
       engine.subscribeEvents((event) => events.push(event));
 
       const attach = midMatchAttachTick(mode);
@@ -182,7 +182,7 @@ describe("createGsiProcessor integration", () => {
 
   it("gates critical reducers while stream is not healthy", () => {
     const engine = createGsiProcessor({ getTimestamp: () => 3000 });
-    const events: CoreEngineEvent[] = [];
+    const events: GsiProcessorEvent[] = [];
     engine.subscribeEvents((event) => events.push(event));
 
     const partialTick = createBaseTick();

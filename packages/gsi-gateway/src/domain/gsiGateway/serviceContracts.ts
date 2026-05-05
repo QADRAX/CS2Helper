@@ -1,4 +1,4 @@
-import type { CoreEngineEvent, CoreEngineState } from "@cs2helper/gsi-processor";
+import type { GsiProcessorEvent, GsiProcessorState } from "@cs2helper/gsi-processor";
 
 /** Optional runtime overrides for the gateway composition root. */
 export interface CreateGsiGatewayServiceOptions {
@@ -20,9 +20,9 @@ export interface GsiGatewayStartInfo {
 export interface GsiGatewayService {
   start: () => Promise<GsiGatewayStartInfo>;
   stop: () => Promise<void>;
-  getState: () => Readonly<CoreEngineState>;
+  getState: () => Readonly<GsiProcessorState>;
   subscribeState: (
-    listener: (state: Readonly<CoreEngineState>) => void
+    listener: (state: Readonly<GsiProcessorState>) => void
   ) => () => void;
-  subscribeEvents: (listener: (event: CoreEngineEvent) => void) => () => void;
+  subscribeEvents: (listener: (event: GsiProcessorEvent) => void) => () => void;
 }

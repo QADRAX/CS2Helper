@@ -1,7 +1,7 @@
-import type { CoreEngineMemory, CoreEngineState } from "./gsiProcessorTypes";
+import type { GsiProcessorMemory, GsiProcessorState } from "./gsiProcessorTypes";
 
 /** Builds the default state for a fresh processor instance. */
-export function createInitialCoreEngineState(): CoreEngineState {
+export function createInitialGsiProcessorState(): GsiProcessorState {
   return {
     currentMatch: null,
     lastGameState: null,
@@ -26,7 +26,7 @@ export function createInitialCoreEngineState(): CoreEngineState {
 }
 
 /** Builds the default rolling memory for a fresh processor instance. */
-export function createInitialCoreEngineMemory(): CoreEngineMemory {
+export function createInitialGsiProcessorMemory(): GsiProcessorMemory {
   return {
     lastMapPhase: undefined,
     lastRoundPhase: null,

@@ -5,10 +5,10 @@ import {
   createSubscribeStateUseCase,
 } from "../../application/gsiProcessor";
 import {
-  type CoreEngineUseCaseContext,
+  type GsiProcessorUseCaseContext,
   type GSIProcessor,
-  createInitialCoreEngineMemory,
-  createInitialCoreEngineState,
+  createInitialGsiProcessorMemory,
+  createInitialGsiProcessorState,
 } from "../../domain/gsiProcessor";
 import { createInMemoryGsiProcessorEventsBus } from "./internal/createInMemoryGsiProcessorEventsBus";
 import { createInMemoryGsiProcessorMemoryStore } from "./internal/createInMemoryGsiProcessorMemoryStore";
@@ -28,14 +28,14 @@ export interface CreateGsiProcessorOptions {
  * adapters, creates the application use cases, and exposes them as a public API.
  */
 export function createGsiProcessor(options: CreateGsiProcessorOptions = {}): GSIProcessor {
-  const stateStore = createInMemoryGsiProcessorStateStore(createInitialCoreEngineState());
-  const memoryStore = createInMemoryGsiProcessorMemoryStore(createInitialCoreEngineMemory());
+  const stateStore = createInMemoryGsiProcessorStateStore(createInitialGsiProcessorState());
+  const memoryStore = createInMemoryGsiProcessorMemoryStore(createInitialGsiProcessorMemory());
   const eventsBus = createInMemoryGsiProcessorEventsBus();
   const clock = options.getTimestamp
     ? { now: options.getTimestamp }
     : createSystemClock();
 
-  const useCaseContext: CoreEngineUseCaseContext = {
+  const useCaseContext: GsiProcessorUseCaseContext = {
     state: stateStore,
     memory: memoryStore,
     events: eventsBus,

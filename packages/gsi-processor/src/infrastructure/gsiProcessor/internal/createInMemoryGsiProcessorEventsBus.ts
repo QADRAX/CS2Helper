@@ -1,4 +1,4 @@
-import type { CoreEngineEventsPort, CoreEngineEvent } from "../../../domain/gsiProcessor";
+import type { GsiProcessorEventsPort, GsiProcessorEvent } from "../../../domain/gsiProcessor";
 
 /**
  * Creates an in-memory pub/sub bus for processor domain events.
@@ -6,8 +6,8 @@ import type { CoreEngineEventsPort, CoreEngineEvent } from "../../../domain/gsiP
  * This adapter is intentionally tiny: events are delivered synchronously to all
  * current listeners in subscription order.
  */
-export function createInMemoryGsiProcessorEventsBus(): CoreEngineEventsPort {
-  let listeners: Array<(event: CoreEngineEvent) => void> = [];
+export function createInMemoryGsiProcessorEventsBus(): GsiProcessorEventsPort {
+  let listeners: Array<(event: GsiProcessorEvent) => void> = [];
 
   return {
     publish(event) {

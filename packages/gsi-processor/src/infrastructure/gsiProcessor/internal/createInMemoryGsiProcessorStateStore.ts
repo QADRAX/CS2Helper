@@ -1,4 +1,4 @@
-import type { CoreEngineStatePort, CoreEngineState } from "../../../domain/gsiProcessor";
+import type { GsiProcessorStatePort, GsiProcessorState } from "../../../domain/gsiProcessor";
 
 /**
  * Creates an in-memory state store for aggregate processor state.
@@ -7,10 +7,10 @@ import type { CoreEngineStatePort, CoreEngineState } from "../../../domain/gsiPr
  * the shared state object outside the reducer pipeline.
  */
 export function createInMemoryGsiProcessorStateStore(
-  initialState: CoreEngineState
-): CoreEngineStatePort {
-  let state: Readonly<CoreEngineState> = Object.freeze({ ...initialState });
-  let listeners: Array<(state: Readonly<CoreEngineState>) => void> = [];
+  initialState: GsiProcessorState
+): GsiProcessorStatePort {
+  let state: Readonly<GsiProcessorState> = Object.freeze({ ...initialState });
+  let listeners: Array<(state: Readonly<GsiProcessorState>) => void> = [];
 
   return {
     getState() {

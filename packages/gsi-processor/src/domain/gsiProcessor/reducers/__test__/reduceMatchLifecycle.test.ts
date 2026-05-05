@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { NormalizedSnapshot } from "../../../csgo";
 import { minimalClientTick } from "../../../../__test__/fixtures/minimalWatcherTick";
-import { createInitialCoreEngineMemory, createInitialCoreEngineState } from "../../initialState";
+import { createInitialGsiProcessorMemory, createInitialGsiProcessorState } from "../../initialState";
 import { normalizeWatcherPayload } from "../../normalizeWatcherPayload";
 import { reduceMatchLifecycle } from "../reduceMatchLifecycle";
 import type { ReducerContext } from "../reducerTypes";
 
 function ctxWithSnapshot(snapshot: NormalizedSnapshot): ReducerContext {
   return {
-    state: createInitialCoreEngineState(),
-    memory: createInitialCoreEngineMemory(),
+    state: createInitialGsiProcessorState(),
+    memory: createInitialGsiProcessorMemory(),
     snapshot,
     timestamp: 1000,
     events: [],

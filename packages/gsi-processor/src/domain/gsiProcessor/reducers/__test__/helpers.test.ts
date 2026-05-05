@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createInitialCoreEngineState } from "../../initialState";
+import { createInitialGsiProcessorState } from "../../initialState";
 import { cloneState, findRound } from "../helpers";
 
 describe("reducer helpers", () => {
   it("cloneState deep-clones rounds and player map", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.playersBySteamId["x"] = {
       steamid: "x",
       name: "n",
@@ -44,7 +44,7 @@ describe("reducer helpers", () => {
   });
 
   it("findRound returns the round with matching number", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.currentMatch = {
       mapName: "m",
       mode: "comp",

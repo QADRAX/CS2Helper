@@ -1,4 +1,4 @@
-import type { CoreEngineMemoryPort, CoreEngineMemory } from "../../../domain/gsiProcessor";
+import type { GsiProcessorMemoryPort, GsiProcessorMemory } from "../../../domain/gsiProcessor";
 
 /**
  * Creates an in-memory store for rolling processor memory.
@@ -7,9 +7,9 @@ import type { CoreEngineMemoryPort, CoreEngineMemory } from "../../../domain/gsi
  * delta context between ticks for reducers such as kill/flash/economy inference.
  */
 export function createInMemoryGsiProcessorMemoryStore(
-  initialMemory: CoreEngineMemory
-): CoreEngineMemoryPort {
-  let memory: Readonly<CoreEngineMemory> = Object.freeze(initialMemory);
+  initialMemory: GsiProcessorMemory
+): GsiProcessorMemoryPort {
+  let memory: Readonly<GsiProcessorMemory> = Object.freeze(initialMemory);
 
   return {
     getMemory() {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { NormalizedSnapshot } from "../../../csgo";
 import { minimalClientTick } from "../../../../__test__/fixtures/minimalWatcherTick";
-import { createInitialCoreEngineMemory, createInitialCoreEngineState } from "../../initialState";
+import { createInitialGsiProcessorMemory, createInitialGsiProcessorState } from "../../initialState";
 import { normalizeWatcherPayload } from "../../normalizeWatcherPayload";
 import { reducePlayerEvents } from "../reducePlayerEvents";
 import type { ReducerContext } from "../reducerTypes";
@@ -55,8 +55,8 @@ function snapshotWithPlayer(player: ReturnType<typeof baseSnapshotPlayer>): Norm
 describe("reducePlayerEvents", () => {
   it("sets skipReason when critical reducers are disabled", () => {
     const ctx: ReducerContext = {
-      state: createInitialCoreEngineState(),
-      memory: createInitialCoreEngineMemory(),
+      state: createInitialGsiProcessorState(),
+      memory: createInitialGsiProcessorMemory(),
       snapshot: snapshotWithPlayer(baseSnapshotPlayer()),
       timestamp: 2000,
       events: [],
@@ -68,8 +68,8 @@ describe("reducePlayerEvents", () => {
 
   it("returns early when there is no current match", () => {
     const ctx: ReducerContext = {
-      state: createInitialCoreEngineState(),
-      memory: createInitialCoreEngineMemory(),
+      state: createInitialGsiProcessorState(),
+      memory: createInitialGsiProcessorMemory(),
       snapshot: snapshotWithPlayer(baseSnapshotPlayer({ kills: 1 })),
       timestamp: 2000,
       events: [],
@@ -80,9 +80,9 @@ describe("reducePlayerEvents", () => {
   });
 
   it("emits kill and appends to round when kills increase", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.currentMatch = liveMatchWithRound(1);
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     memory.lastGameRound = 1;
     memory.players["self-steamid"] = {
       health: 100,
@@ -107,9 +107,9 @@ describe("reducePlayerEvents", () => {
   });
 
   it("emits death when deaths increase", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.currentMatch = liveMatchWithRound(1);
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     memory.lastGameRound = 1;
     memory.players["self-steamid"] = {
       health: 100,
@@ -133,9 +133,9 @@ describe("reducePlayerEvents", () => {
   });
 
   it("emits damage_received when health drops", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.currentMatch = liveMatchWithRound(1);
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     memory.lastGameRound = 1;
     memory.players["self-steamid"] = {
       health: 100,
@@ -160,9 +160,9 @@ describe("reducePlayerEvents", () => {
   });
 
   it("tracks flash start and end", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.currentMatch = liveMatchWithRound(1);
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     memory.lastGameRound = 1;
     memory.players["self-steamid"] = {
       health: 100,
@@ -198,9 +198,9 @@ describe("reducePlayerEvents", () => {
   });
 
   it("records weapon refund transaction when money increases and a weapon disappears", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.currentMatch = liveMatchWithRound(1);
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     memory.lastGameRound = 1;
     memory.players["self-steamid"] = {
       health: 100,
@@ -232,9 +232,9 @@ describe("reducePlayerEvents", () => {
   });
 
   it("records weapon purchase transaction when money drops and new weapon appears", () => {
-    const state = createInitialCoreEngineState();
+    const state = createInitialGsiProcessorState();
     state.currentMatch = liveMatchWithRound(1);
-    const memory = createInitialCoreEngineMemory();
+    const memory = createInitialGsiProcessorMemory();
     memory.lastGameRound = 1;
     memory.players["self-steamid"] = {
       health: 100,

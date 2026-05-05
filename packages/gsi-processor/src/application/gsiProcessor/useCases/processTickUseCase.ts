@@ -1,13 +1,13 @@
 import { processTickDomain } from "../../../domain/gsiProcessor";
 import type {
-  CoreEngineUseCaseContext,
+  GsiProcessorUseCaseContext,
   ProcessTickUseCase,
   UseCaseFactory,
 } from "../../../domain/gsiProcessor";
 
 export const createProcessTickUseCase: UseCaseFactory<
   ProcessTickUseCase,
-  CoreEngineUseCaseContext
+  GsiProcessorUseCaseContext
 > = (deps) => {
   return {
     execute(gameState, timestamp = deps.clock.now()) {

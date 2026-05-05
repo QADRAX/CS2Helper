@@ -1,6 +1,6 @@
 import type {
-  CoreEngineEvent,
-  CoreEngineState,
+  GsiProcessorEvent,
+  GsiProcessorState,
   GSIProcessor,
 } from "@cs2helper/gsi-processor";
 
@@ -18,6 +18,6 @@ export interface GsiGatewayContext {
 }
 
 /** Listener signature for aggregate state updates. */
-export type StateListener = (state: Readonly<CoreEngineState>) => void;
+export type StateListener = (state: Readonly<GsiProcessorState>) => void;
 /** Listener signature for domain events produced by the processor. */
-export type EventListener = (event: CoreEngineEvent) => void;
+export type EventListener = (event: GsiProcessorEvent) => void;

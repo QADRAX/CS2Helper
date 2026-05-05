@@ -1,7 +1,7 @@
 import type { MatchData, RoundData } from "../../match/matchTypes";
-import type { CoreEngineState } from "../gsiProcessorTypes";
+import type { GsiProcessorState } from "../gsiProcessorTypes";
 
-export function cloneState(state: CoreEngineState): CoreEngineState {
+export function cloneState(state: GsiProcessorState): GsiProcessorState {
   return {
     ...state,
     playersBySteamId: { ...state.playersBySteamId },

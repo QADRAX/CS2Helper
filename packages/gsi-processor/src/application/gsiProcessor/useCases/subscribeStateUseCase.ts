@@ -1,12 +1,12 @@
 import type {
-  CoreEngineUseCaseContext,
+  GsiProcessorUseCaseContext,
   SubscribeStateUseCase,
   UseCaseFactory,
 } from "../../../domain/gsiProcessor";
 
 export const createSubscribeStateUseCase: UseCaseFactory<
   SubscribeStateUseCase,
-  CoreEngineUseCaseContext
+  GsiProcessorUseCaseContext
 > = ({ state }) => {
   return {
     execute(listener) {
