@@ -1,6 +1,6 @@
 import { request } from "http";
 import { afterEach, describe, expect, it } from "vitest";
-import { createGsiGatewayService } from "../gsiGateway/createGsiGatewayService";
+import { GsiGatewayService } from "../gsiGateway/GsiGatewayService";
 
 function postJson(url: { host: string; port: number; path: string }, body: string) {
   return new Promise<{ statusCode?: number; body: string }>((resolve, reject) => {
@@ -33,7 +33,7 @@ function postJson(url: { host: string; port: number; path: string }, body: strin
   });
 }
 
-describe("createGsiGatewayService", () => {
+describe("GsiGatewayService", () => {
   const startedServices: { stop: () => Promise<void> }[] = [];
 
   afterEach(async () => {
@@ -45,8 +45,8 @@ describe("createGsiGatewayService", () => {
     }
   });
 
-  it("accepts valid POST /gsi payloads", async () => {
-    const service = createGsiGatewayService({ port: 0 });
+  it("accepts valid POST / payloads", async () => {
+    const service = new GsiGatewayService({ port: 0 });
     startedServices.push(service);
     const address = await service.start();
 
@@ -120,7 +120,7 @@ describe("createGsiGatewayService", () => {
   });
 
   it("returns 400 for invalid payload JSON", async () => {
-    const service = createGsiGatewayService({ port: 0 });
+    const service = new GsiGatewayService({ port: 0 });
     startedServices.push(service);
     const address = await service.start();
 

@@ -1,4 +1,4 @@
-import type { CreateGsiGatewayServiceOptions } from "../../../domain/gsiGateway";
+import type { GsiGatewayOptions } from "../../../domain/gsiGateway";
 import type { HttpServerConfig } from "../../../domain/gsiGateway/httpContracts";
 
 /**
@@ -6,7 +6,7 @@ import type { HttpServerConfig } from "../../../domain/gsiGateway/httpContracts"
  * Port is configurable, but path is fixed for simplicity.
  */
 export function createDefaultHttpConfig(
-  options: CreateGsiGatewayServiceOptions = {}
+  options: GsiGatewayOptions = {}
 ): HttpServerConfig {
   return {
     port: options.port ?? 3001,

@@ -1,7 +1,7 @@
 import type { GsiProcessorEvent, GsiProcessorState } from "@cs2helper/gsi-processor";
 
-/** Optional runtime overrides for the gateway composition root. */
-export interface CreateGsiGatewayServiceOptions {
+/** Optional runtime overrides for the gateway. */
+export interface GsiGatewayOptions {
   port?: number;
   getTimestamp?: () => number;
 }
@@ -11,8 +11,8 @@ export interface GsiGatewayStartInfo {
   port: number;
 }
 
-/** Public service API exposed by `createGsiGatewayService()`. */
-export interface GsiGatewayService {
+/** Public service API contract for the GSI Gateway. */
+export interface GsiGateway {
   start: () => Promise<GsiGatewayStartInfo>;
   stop: () => Promise<void>;
   getState: () => Readonly<GsiProcessorState>;

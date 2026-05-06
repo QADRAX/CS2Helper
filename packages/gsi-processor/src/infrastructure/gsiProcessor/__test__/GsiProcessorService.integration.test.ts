@@ -5,7 +5,7 @@ import {
   bumpPrimaryPlayerKills,
   midMatchAttachTick,
 } from "../../../__test__/fixtures/midMatchTicks";
-import { createGsiProcessor } from "../createGsiProcessor";
+import { GsiProcessorService } from "../GsiProcessorService";
 import {
   createBaseTick,
   withDisconnectGap,
@@ -14,17 +14,17 @@ import {
 } from "./factories/gsiPollingFactory";
 import { replayPollingFrames } from "./factories/pollingReplayDriver";
 
-describe("createGsiProcessor integration", () => {
+describe("GsiProcessorService integration", () => {
   it("isolates state per engine instance", () => {
-    const engineA = createGsiProcessor({ getTimestamp: () => 1000 });
-    const engineB = createGsiProcessor({ getTimestamp: () => 1000 });
+    const engineA = new GsiProcessorService({ getTimestamp: () => 1000 });
+    const engineB = new GsiProcessorService({ getTimestamp: () => 1000 });
     engineA.processTick(createBaseTick(), 1000);
     expect(engineA.getState().currentMatch).not.toBeNull();
     expect(engineB.getState().currentMatch).toBeNull();
   });
 
   it("tracks aggregation and state updates", () => {
-    const engine = createGsiProcessor({ getTimestamp: () => 1000 });
+    const engine = new GsiProcessorService({ getTimestamp: () => 1000 });
     const events: GsiProcessorEvent[] = [];
     let stateUpdates = 0;
     engine.subscribeEvents((event) => events.push(event));
@@ -71,7 +71,7 @@ describe("createGsiProcessor integration", () => {
   });
 
   it("cold start mid-match does not emit retroactive critical events", () => {
-    const engine = createGsiProcessor({ getTimestamp: () => 3000 });
+    const engine = new GsiProcessorService({ getTimestamp: () => 3000 });
     const events: GsiProcessorEvent[] = [];
     engine.subscribeEvents((event) => events.push(event));
 
@@ -92,7 +92,7 @@ describe("createGsiProcessor integration", () => {
   });
 
   it("transitions healthy -> gap -> recovering -> healthy", () => {
-    const engine = createGsiProcessor({ getTimestamp: () => 2000 });
+    const engine = new GsiProcessorService({ getTimestamp: () => 2000 });
     const events: GsiProcessorEvent[] = [];
     engine.subscribeEvents((event) => events.push(event));
 
@@ -126,7 +126,7 @@ describe("createGsiProcessor integration", () => {
   });
 
   it("starts gap and requires resync on null tick", () => {
-    const engine = createGsiProcessor({ getTimestamp: () => 2500 });
+    const engine = new GsiProcessorService({ getTimestamp: () => 2500 });
     engine.processTick(
       withRoundPhase(createBaseTick(), {
         mapPhase: "live",
@@ -146,7 +146,7 @@ describe("createGsiProcessor integration", () => {
   it.each(watcherModes)(
     "mid-match attach (%s): sets watcherMode, goes healthy, aggregates players, no retro kill/death",
     (mode) => {
-      const engine = createGsiProcessor({ getTimestamp: () => 8000 });
+      const engine = new GsiProcessorService({ getTimestamp: () => 8000 });
       const events: GsiProcessorEvent[] = [];
       engine.subscribeEvents((event) => events.push(event));
 
@@ -166,7 +166,7 @@ describe("createGsiProcessor integration", () => {
   it.each(watcherModes)(
     "mid-match attach (%s): kill delta emits kill after first live attach creates currentMatch",
     (mode) => {
-      const engine = createGsiProcessor({ getTimestamp: () => 9000 });
+      const engine = new GsiProcessorService({ getTimestamp: () => 9000 });
       const events: GsiProcessorEvent[] = [];
       engine.subscribeEvents((event) => events.push(event));
 
@@ -181,7 +181,7 @@ describe("createGsiProcessor integration", () => {
   );
 
   it("gates critical reducers while stream is not healthy", () => {
-    const engine = createGsiProcessor({ getTimestamp: () => 3000 });
+    const engine = new GsiProcessorService({ getTimestamp: () => 3000 });
     const events: GsiProcessorEvent[] = [];
     engine.subscribeEvents((event) => events.push(event));
 

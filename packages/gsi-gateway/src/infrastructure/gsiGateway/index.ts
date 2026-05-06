@@ -1,1 +1,1 @@
-export * from "./createGsiGatewayService";
+export * from "./GsiGatewayService";

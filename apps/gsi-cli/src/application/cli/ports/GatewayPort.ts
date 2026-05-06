@@ -1,7 +1,7 @@
-import type { GsiGatewayService } from "@cs2helper/gsi-gateway";
+import type { GsiGateway } from "@cs2helper/gsi-gateway";
 
 export interface GatewayPort {
-  getGateway: () => GsiGatewayService | null;
-  setGateway: (gateway: GsiGatewayService | null) => void;
+  getGateway: () => GsiGateway | null;
+  setGateway: (gateway: GsiGateway | null) => void;
   subscribeRawTicks: (listener: (raw: string) => void) => (() => void) | null;
 }

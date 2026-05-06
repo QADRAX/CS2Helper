@@ -1,4 +1,4 @@
-import type { GsiGatewayStartInfo, GsiGatewayService } from "@cs2helper/gsi-gateway";
+import type { GsiGatewayStartInfo, GsiGateway } from "@cs2helper/gsi-gateway";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import { getConfig } from "../../application/cli/useCases/getConfig";
 import { saveConfig } from "../../application/cli/useCases/saveConfig";
@@ -26,7 +26,7 @@ export interface CliAppService {
 
 export function createCliAppService(): CliAppService {
   // --- Infrastructure State & Adapters ---
-  let activeGateway: GsiGatewayService | null = null;
+  let activeGateway: GsiGateway | null = null;
   
   const gatewayAdapter: GatewayPort = {
     getGateway: () => activeGateway,

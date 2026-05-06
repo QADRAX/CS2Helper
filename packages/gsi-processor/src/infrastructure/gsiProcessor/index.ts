@@ -1,1 +1,1 @@
-export * from "./createGsiProcessor";
+export { GsiProcessorService, type GsiProcessorOptions } from "./GsiProcessorService";

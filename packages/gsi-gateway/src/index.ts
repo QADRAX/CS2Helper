@@ -1,12 +1,13 @@
 /**
  * @packageDocumentation
- * Node HTTP gateway that ingests CS2 GSI ticks and wraps @cs2helper/gsi-processor.
+ * Node HTTP gateway that ingests CS2 GSI ticks.
  */
 
-export { createGsiGatewayService } from "./infrastructure/gsiGateway/createGsiGatewayService";
+export { GsiGatewayService } from "./infrastructure/gsiGateway/GsiGatewayService";
 export type {
-  CreateGsiGatewayServiceOptions,
-  GsiGatewayService,
+  GsiGatewayOptions,
+  GsiGateway,
+  GsiGatewayStartInfo,
 } from "./domain/gsiGateway/serviceContracts";
 
 export type * from "./domain/gsiGateway";

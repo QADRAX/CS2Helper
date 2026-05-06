@@ -1,4 +1,4 @@
-import { createGsiGatewayService } from "@cs2helper/gsi-gateway";
+import { GsiGatewayService } from "@cs2helper/gsi-gateway";
 import type { GatewayPort } from "../ports/GatewayPort";
 import type { ConfigPort } from "../ports/ConfigPort";
 
@@ -9,7 +9,7 @@ export const startGateway = async (gatewayPort: GatewayPort, configPort: ConfigP
   }
 
   const config = await configPort.getConfig();
-  const gateway = createGsiGatewayService({
+  const gateway = new GsiGatewayService({
     port: config.port,
   });
 
