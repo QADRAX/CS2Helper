@@ -1,9 +1,9 @@
 import type { UseCase } from "@cs2helper/shared";
-import type { ProcessorPort } from "../ports";
+import type { ProcessorPort, RawTickDispatchPort } from "../ports";
 
 export interface IngestGsiTickPorts {
   processor: ProcessorPort;
-  rawTickListeners: Set<(raw: string) => void>;
+  rawTickHub: RawTickDispatchPort;
 }
 
 /**
@@ -11,7 +11,7 @@ export interface IngestGsiTickPorts {
  * Orchestrates domain processing and notifies raw observers.
  */
 export const ingestGsiTick: UseCase<IngestGsiTickPorts, [tick: any, raw: string], void> = (
-  { processor, rawTickListeners },
+  { processor, rawTickHub },
   tick,
   raw
 ) => {
@@ -19,5 +19,5 @@ export const ingestGsiTick: UseCase<IngestGsiTickPorts, [tick: any, raw: string]
   processor.processTick(tick);
 
   // 2. Notify raw tick subscribers
-  rawTickListeners.forEach((listener) => listener(raw));
+  rawTickHub.dispatchRawTick(raw);
 };

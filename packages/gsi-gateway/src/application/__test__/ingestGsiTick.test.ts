@@ -10,18 +10,17 @@ describe("ingestGsiTick use case", () => {
       subscribeState: vi.fn(),
       subscribeEvents: vi.fn(),
     };
-    const rawListeners = new Set<(raw: string) => void>();
-    const listener = vi.fn();
-    rawListeners.add(listener);
+    const rawTickHub = {
+      dispatchRawTick: vi.fn(),
+    };
 
     const payload = { provider: { name: "CS2" } } as any;
     const rawBody = JSON.stringify(payload);
-    
-    // Injected as an object { processor, rawTickListeners }
-    ingestGsiTick({ processor: processorMock as any, rawTickListeners: rawListeners }, payload, rawBody);
+
+    ingestGsiTick({ processor: processorMock as any, rawTickHub }, payload, rawBody);
 
     expect(processTick).toHaveBeenCalledTimes(1);
     expect(processTick).toHaveBeenCalledWith(payload);
-    expect(listener).toHaveBeenCalledWith(rawBody);
+    expect(rawTickHub.dispatchRawTick).toHaveBeenCalledWith(rawBody);
   });
 });

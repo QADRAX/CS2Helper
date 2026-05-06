@@ -11,6 +11,7 @@ import {
   type GsiGatewayOptions,
   parseIncomingTick,
 } from "../../domain/gsiGateway";
+import { InMemoryRawTicksAdapter } from "./adapters/InMemoryRawTicksAdapter";
 import { NodeHttpServerAdapter } from "./adapters/NodeHttpServerAdapter";
 import { createDefaultHttpConfig } from "./adapters/createDefaultHttpConfig";
 
@@ -20,7 +21,7 @@ import { createDefaultHttpConfig } from "./adapters/createDefaultHttpConfig";
 export class GsiGatewayService implements GsiGateway {
   private readonly processor: GsiProcessorService;
   private readonly httpServer: NodeHttpServerAdapter;
-  private readonly rawTickListeners = new Set<(raw: string) => void>();
+  private readonly rawTickHub = new InMemoryRawTicksAdapter();
 
   constructor(options: GsiGatewayOptions = {}) {
     const config = createDefaultHttpConfig(options);
@@ -35,7 +36,7 @@ export class GsiGatewayService implements GsiGateway {
         try {
           const tick = parseIncomingTick(rawBody);
           ingestGsiTick(
-            { processor: this.processor, rawTickListeners: this.rawTickListeners },
+            { processor: this.processor, rawTickHub: this.rawTickHub },
             tick,
             rawBody
           );
@@ -68,6 +69,6 @@ export class GsiGatewayService implements GsiGateway {
   }
 
   subscribeRawTicks(listener: (raw: string) => void) {
-    return subscribeRawTicks({ rawTickListeners: this.rawTickListeners }, listener);
+    return subscribeRawTicks({ rawTickHub: this.rawTickHub }, listener);
   }
 }

@@ -1,7 +1,8 @@
 import type { UseCase } from "@cs2helper/shared";
+import type { RawTicksSubscriptionPort } from "../ports";
 
 export interface SubscribeRawTicksPorts {
-  rawTickListeners: Set<(raw: string) => void>;
+  rawTickHub: RawTicksSubscriptionPort;
 }
 
 /**
@@ -11,9 +12,4 @@ export const subscribeRawTicks: UseCase<
   SubscribeRawTicksPorts,
   [listener: (raw: string) => void],
   () => void
-> = ({ rawTickListeners }, listener) => {
-  rawTickListeners.add(listener);
-  return () => {
-    rawTickListeners.delete(listener);
-  };
-};
+> = ({ rawTickHub }, listener) => rawTickHub.subscribe(listener);
