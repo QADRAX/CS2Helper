@@ -41,13 +41,13 @@ export function createCliAppService(): CliAppService {
 
   // --- Public API Surface ---
   return {
-    startGateway: () => startGateway(gatewayAdapter, configAdapter),
-    stopGateway: () => stopGateway(gatewayAdapter),
-    getGatewayState: () => getGatewayState(gatewayAdapter),
-    subscribeGatewayState: (listener) => subscribeGatewayState(gatewayAdapter, listener),
-    getConfig: () => getConfig(configAdapter),
-    saveConfig: (config) => saveConfig(configAdapter, config),
-    startRecording: (filename) => startRecording(gatewayAdapter, recorderAdapter, filename),
-    stopRecording: () => stopRecording(recorderAdapter),
+    startGateway: () => startGateway({ gateway: gatewayAdapter, config: configAdapter }),
+    stopGateway: () => stopGateway({ gateway: gatewayAdapter }),
+    getGatewayState: () => getGatewayState({ gateway: gatewayAdapter }),
+    subscribeGatewayState: (listener) => subscribeGatewayState({ gateway: gatewayAdapter }, listener),
+    getConfig: () => getConfig({ config: configAdapter }),
+    saveConfig: (config) => saveConfig({ config: configAdapter }, config),
+    startRecording: (filename) => startRecording({ gateway: gatewayAdapter, recorder: recorderAdapter }, filename),
+    stopRecording: () => stopRecording({ recorder: recorderAdapter }),
   };
 }

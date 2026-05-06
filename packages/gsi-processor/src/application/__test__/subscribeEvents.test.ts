@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { subscribeEvents } from "../gsiProcessor/useCases/subscribeEventsUseCase";
+import { subscribeEvents } from "../gsiProcessor";
 
 describe("subscribeEvents use case", () => {
   it("delegates to eventsPort.subscribe", () => {
@@ -10,7 +10,8 @@ describe("subscribeEvents use case", () => {
     };
     const listener = vi.fn();
     
-    const result = subscribeEvents(eventsPort as any, listener);
+    // Injected as an object { events }
+    const result = subscribeEvents({ events: eventsPort as any }, listener);
     
     expect(eventsPort.subscribe).toHaveBeenCalledWith(listener);
     expect(result).toBe(unsub);

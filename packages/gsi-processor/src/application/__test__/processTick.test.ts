@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { processTick } from "../gsiProcessor/useCases/processTickUseCase";
+import { processTick } from "../gsiProcessor";
 import { createInitialGsiProcessorState, createInitialGsiProcessorMemory } from "../../domain/gsiProcessor";
 
 describe("processTick use case", () => {
@@ -23,11 +23,14 @@ describe("processTick use case", () => {
 
     const tick = { provider: { name: "test" } };
     
+    // Injected as an object { state, memory, events, clock }
     processTick(
-      statePort as any,
-      memoryPort as any,
-      eventsPort as any,
-      clockPort as any,
+      {
+        state: statePort as any,
+        memory: memoryPort as any,
+        events: eventsPort as any,
+        clock: clockPort as any
+      },
       tick
     );
 

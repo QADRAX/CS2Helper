@@ -10,7 +10,8 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run typecheck && npm run build --workspaces",
     "lint": "eslint packages/",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

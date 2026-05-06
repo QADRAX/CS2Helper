@@ -34,9 +34,12 @@ export class GsiGatewayService implements GsiGateway {
       onGsiRequest: async (rawBody) => {
         try {
           const tick = parseIncomingTick(rawBody);
-          ingestGsiTick(this.processor, this.rawTickListeners, tick, rawBody);
+          ingestGsiTick(
+            { processor: this.processor, rawTickListeners: this.rawTickListeners },
+            tick,
+            rawBody
+          );
         } catch (err) {
-          // Re-throw so the server can return 400
           throw err;
         }
       },
@@ -53,18 +56,18 @@ export class GsiGatewayService implements GsiGateway {
   }
 
   getState() {
-    return getState(this.processor);
+    return getState({ processor: this.processor });
   }
 
   subscribeState(listener: (state: any) => void) {
-    return subscribeState(this.processor, listener);
+    return subscribeState({ processor: this.processor }, listener);
   }
 
   subscribeEvents(listener: (event: any) => void) {
-    return subscribeEvents(this.processor, listener);
+    return subscribeEvents({ processor: this.processor }, listener);
   }
 
   subscribeRawTicks(listener: (raw: string) => void) {
-    return subscribeRawTicks(this.rawTickListeners, listener);
+    return subscribeRawTicks({ rawTickListeners: this.rawTickListeners }, listener);
   }
 }

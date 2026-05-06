@@ -21,6 +21,7 @@ export interface GsiProcessorOptions {
 
 /**
  * Composition root that assembles a GSI processor using class-based adapters.
+ * Implements the domain contract by delegating to standardized application use cases.
  */
 export class GsiProcessorService implements GSIProcessor {
   private readonly statePort: InMemoryStateAdapter;
@@ -39,24 +40,26 @@ export class GsiProcessorService implements GSIProcessor {
 
   processTick(tick: any, timestamp?: number): void {
     processTick(
-      this.statePort,
-      this.memoryPort,
-      this.eventsPort,
-      this.clockPort,
+      {
+        state: this.statePort,
+        memory: this.memoryPort,
+        events: this.eventsPort,
+        clock: this.clockPort,
+      },
       tick,
       timestamp
     );
   }
 
   getState() {
-    return getState(this.statePort);
+    return getState({ state: this.statePort });
   }
 
   subscribeState(listener: (state: any) => void) {
-    return subscribeState(this.statePort, listener);
+    return subscribeState({ state: this.statePort }, listener);
   }
 
   subscribeEvents(listener: (event: any) => void) {
-    return subscribeEvents(this.eventsPort, listener);
+    return subscribeEvents({ events: this.eventsPort }, listener);
   }
 }
