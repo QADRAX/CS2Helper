@@ -1,15 +1,27 @@
-import fs from "fs/promises";
+import fs from "fs";
 import type { RecorderPort } from "../../../application/cli/ports/RecorderPort";
 
 export class FileRecorderAdapter implements RecorderPort {
-  private fileHandle: any = null;
+  private stream: fs.WriteStream | null = null;
   private cleanup: (() => void) | null = null;
+  private isFirstTick = true;
 
   async start(path: string): Promise<void> {
-    if (this.fileHandle) {
+    if (this.stream) {
       await this.stop();
     }
-    this.fileHandle = await fs.open(path, "a");
+    
+    this.isFirstTick = true;
+    this.stream = fs.createWriteStream(path, { flags: 'w', encoding: 'utf-8' }); // 'w' to overwrite/start fresh
+    
+    return new Promise((resolve, reject) => {
+      this.stream?.on('open', () => {
+        // Start the JSON array
+        this.stream?.write("[\n");
+        resolve();
+      });
+      this.stream?.on('error', reject);
+    });
   }
 
   async stop(): Promise<void> {
@@ -17,15 +29,29 @@ export class FileRecorderAdapter implements RecorderPort {
       this.cleanup();
       this.cleanup = null;
     }
-    if (this.fileHandle) {
-      await this.fileHandle.close();
-      this.fileHandle = null;
+    
+    if (this.stream) {
+      const streamToClose = this.stream;
+      this.stream = null;
+      
+      await new Promise<void>((resolve) => {
+        // Close the JSON array
+        streamToClose.write("\n]");
+        streamToClose.end(() => {
+          resolve();
+        });
+      });
     }
   }
 
   async write(data: string): Promise<void> {
-    if (this.fileHandle) {
-      await this.fileHandle.write(data + "\n");
+    if (this.stream) {
+      const prefix = this.isFirstTick ? "" : ",\n";
+      this.isFirstTick = false;
+      
+      // Indent data slightly for readability
+      const indentedData = data.split('\n').map(line => "  " + line).join('\n');
+      this.stream.write(prefix + indentedData);
     }
   }
 
@@ -34,6 +60,6 @@ export class FileRecorderAdapter implements RecorderPort {
   }
 
   isRecording(): boolean {
-    return this.fileHandle !== null;
+    return this.stream !== null;
   }
 }

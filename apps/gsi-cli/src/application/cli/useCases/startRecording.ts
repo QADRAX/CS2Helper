@@ -9,8 +9,17 @@ export const startRecording = async (gatewayPort: GatewayPort, recorderPort: Rec
 
   await recorderPort.start(filename);
 
-  const unsubscribe = gatewayPort.subscribeRawTicks((raw) => {
-    recorderPort.write(raw).catch(console.error);
+  // 1. Capture the CURRENT state immediately to ensure the recording has full context from the start.
+  const initialState = gateway.getState();
+  if (initialState) {
+    await recorderPort.write(JSON.stringify(initialState, null, 2)).catch(console.error);
+  }
+
+  // 2. Subscribe to subsequent full state snapshots (processed and merged by the Gateway).
+  const unsubscribe = gateway.subscribeState((state) => {
+    if (state) {
+      recorderPort.write(JSON.stringify(state, null, 2)).catch(console.error);
+    }
   });
 
   if (unsubscribe) {
