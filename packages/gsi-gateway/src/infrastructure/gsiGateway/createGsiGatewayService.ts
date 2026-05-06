@@ -1,69 +1,50 @@
-import type {
-  GSIProcessor,
-} from "@cs2helper/gsi-processor";
-import { createGsiProcessor } from "@cs2helper/gsi-processor";
 import {
-  createGetStateUseCase,
-  createIngestGsiTickUseCase,
-  createSubscribeEventsUseCase,
-  createSubscribeStateUseCase,
-  createSubscribeRawTicksUseCase,
+  createGsiProcessor,
+} from "@cs2helper/gsi-processor";
+import {
+  getState,
+  ingestGsiTick,
+  subscribeEvents,
+  subscribeState,
+  subscribeRawTicks,
 } from "../../application/gsiGateway";
 import {
   type CreateGsiGatewayServiceOptions,
   type GsiGatewayService,
   parseIncomingTick,
 } from "../../domain/gsiGateway";
-import { createNodeHttpServer } from "./internal/createNodeHttpServer";
-import { createDefaultHttpConfig } from "./internal/createDefaultHttpConfig";
+import { NodeHttpServerAdapter } from "./adapters/NodeHttpServerAdapter";
+import { createDefaultHttpConfig } from "./adapters/createDefaultHttpConfig";
 
 /**
- * Composes a gateway service that:
- * - hosts a local HTTP endpoint for incoming CS2 GSI ticks
- * - delegates tick processing to `@cs2helper/gsi-processor`
- * - exposes in-process `getState` and subscription APIs
+ * Composes a gateway service using class-based infrastructure adapters.
  */
 export function createGsiGatewayService(
   options: CreateGsiGatewayServiceOptions = {}
 ): GsiGatewayService {
   const config = createDefaultHttpConfig(options);
-  const processor: GSIProcessor = createGsiProcessor({
+  const processor = createGsiProcessor({
     getTimestamp: options.getTimestamp,
   });
 
-  const useCaseContext: any = { 
-    processor,
-    rawTickListeners: new Set(),
-  };
-  const ingestTickUseCase = createIngestGsiTickUseCase(useCaseContext);
-  const getStateUseCase = createGetStateUseCase(useCaseContext);
-  const subscribeStateUseCase = createSubscribeStateUseCase(useCaseContext);
-  const subscribeEventsUseCase = createSubscribeEventsUseCase(useCaseContext);
-  const subscribeRawTicksUseCase = createSubscribeRawTicksUseCase(useCaseContext);
+  const rawTickListeners = new Set<(raw: string) => void>();
 
-  const httpServer = createNodeHttpServer({
+  const httpServer = new NodeHttpServerAdapter({
     config,
     onGsiRequest: async (rawBody) => {
-      try {
-        const tick = parseIncomingTick(rawBody);
-        ingestTickUseCase.execute(tick, rawBody);
-      } catch (err) {
-        // Fallback for malformed but readable JSON if needed
-        // For now, only ingest valid ticks
-      }
+      const tick = parseIncomingTick(rawBody);
+      ingestGsiTick(processor, rawTickListeners, tick, rawBody);
     },
   });
 
   return {
-    getState: getStateUseCase.execute,
-    subscribeState: subscribeStateUseCase.execute,
-    subscribeEvents: subscribeEventsUseCase.execute,
-    subscribeRawTicks: subscribeRawTicksUseCase.execute,
+    getState: () => getState(processor),
+    subscribeState: (listener) => subscribeState(processor, listener),
+    subscribeEvents: (listener) => subscribeEvents(processor, listener),
+    subscribeRawTicks: (listener) => subscribeRawTicks(rawTickListeners, listener),
     async start() {
       const address = await httpServer.start();
-      return {
-        port: address.port,
-      };
+      return { port: address.port };
     },
     async stop() {
       await httpServer.stop();

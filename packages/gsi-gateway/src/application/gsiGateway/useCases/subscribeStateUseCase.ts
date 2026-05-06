@@ -1,15 +1,9 @@
-import type { GsiGatewayContext } from "../../../domain/gsiGateway/contracts";
-import type { SubscribeStateUseCase } from "../../../domain/gsiGateway/useCases";
+import type { ProcessorPort } from "../ports";
+import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 
-/**
- * Creates the use case that subscribes listeners to processor state updates.
- */
-export function createSubscribeStateUseCase(
-  context: GsiGatewayContext
-): SubscribeStateUseCase {
-  return {
-    execute(listener) {
-      return context.processor.subscribeState(listener);
-    },
-  };
-}
+export const subscribeState = (
+  processorPort: ProcessorPort,
+  listener: (state: Readonly<GsiProcessorState>) => void
+) => {
+  return processorPort.subscribeState(listener);
+};

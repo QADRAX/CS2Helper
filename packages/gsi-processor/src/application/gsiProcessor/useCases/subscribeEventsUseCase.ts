@@ -1,16 +1,9 @@
-import type {
-  GsiProcessorUseCaseContext,
-  SubscribeEventsUseCase,
-  UseCaseFactory,
-} from "../../../domain/gsiProcessor";
+import type { EventsPort } from "../ports";
+import type { GsiProcessorEvent } from "../../../domain/gsiProcessor/gsiProcessorTypes";
 
-export const createSubscribeEventsUseCase: UseCaseFactory<
-  SubscribeEventsUseCase,
-  GsiProcessorUseCaseContext
-> = ({ events }) => {
-  return {
-    execute(listener) {
-      return events.subscribe(listener);
-    },
-  };
+export const subscribeEvents = (
+  eventsPort: EventsPort,
+  listener: (event: GsiProcessorEvent) => void
+) => {
+  return eventsPort.subscribe(listener);
 };

@@ -1,19 +1,18 @@
 import {
-  createGetStateUseCase,
-  createProcessTickUseCase,
-  createSubscribeEventsUseCase,
-  createSubscribeStateUseCase,
+  getState,
+  processTick,
+  subscribeEvents,
+  subscribeState,
 } from "../../application/gsiProcessor";
 import {
-  type GsiProcessorUseCaseContext,
   type GSIProcessor,
   createInitialGsiProcessorMemory,
   createInitialGsiProcessorState,
 } from "../../domain/gsiProcessor";
-import { createInMemoryGsiProcessorEventsBus } from "./internal/createInMemoryGsiProcessorEventsBus";
-import { createInMemoryGsiProcessorMemoryStore } from "./internal/createInMemoryGsiProcessorMemoryStore";
-import { createInMemoryGsiProcessorStateStore } from "./internal/createInMemoryGsiProcessorStateStore";
-import { createSystemClock } from "./internal/createSystemClock";
+import { InMemoryEventsAdapter } from "./adapters/InMemoryEventsAdapter";
+import { InMemoryMemoryAdapter } from "./adapters/InMemoryMemoryAdapter";
+import { InMemoryStateAdapter } from "./adapters/InMemoryStateAdapter";
+import { SystemClockAdapter } from "./adapters/SystemClockAdapter";
 
 /** Optional infrastructure overrides when creating a processor instance. */
 export interface CreateGsiProcessorOptions {
@@ -22,35 +21,20 @@ export interface CreateGsiProcessorOptions {
 }
 
 /**
- * Assembles a fully wired GSI processor instance from in-memory adapters.
- *
- * Infrastructure is the composition root: it chooses concrete state/memory/event
- * adapters, creates the application use cases, and exposes them as a public API.
+ * Assembles a fully wired GSI processor instance using class-based adapters.
  */
 export function createGsiProcessor(options: CreateGsiProcessorOptions = {}): GSIProcessor {
-  const stateStore = createInMemoryGsiProcessorStateStore(createInitialGsiProcessorState());
-  const memoryStore = createInMemoryGsiProcessorMemoryStore(createInitialGsiProcessorMemory());
-  const eventsBus = createInMemoryGsiProcessorEventsBus();
-  const clock = options.getTimestamp
+  const statePort = new InMemoryStateAdapter(createInitialGsiProcessorState());
+  const memoryPort = new InMemoryMemoryAdapter(createInitialGsiProcessorMemory());
+  const eventsPort = new InMemoryEventsAdapter();
+  const clockPort = options.getTimestamp
     ? { now: options.getTimestamp }
-    : createSystemClock();
-
-  const useCaseContext: GsiProcessorUseCaseContext = {
-    state: stateStore,
-    memory: memoryStore,
-    events: eventsBus,
-    clock,
-  };
-
-  const processTickUseCase = createProcessTickUseCase(useCaseContext);
-  const getStateUseCase = createGetStateUseCase(useCaseContext);
-  const subscribeStateUseCase = createSubscribeStateUseCase(useCaseContext);
-  const subscribeEventsUseCase = createSubscribeEventsUseCase(useCaseContext);
+    : new SystemClockAdapter();
 
   return {
-    processTick: processTickUseCase.execute,
-    getState: getStateUseCase.execute,
-    subscribeState: subscribeStateUseCase.execute,
-    subscribeEvents: subscribeEventsUseCase.execute,
+    processTick: (tick, timestamp) => processTick(statePort, memoryPort, eventsPort, clockPort, tick, timestamp),
+    getState: () => getState(statePort),
+    subscribeState: (listener) => subscribeState(statePort, listener),
+    subscribeEvents: (listener) => subscribeEvents(eventsPort, listener),
   };
 }

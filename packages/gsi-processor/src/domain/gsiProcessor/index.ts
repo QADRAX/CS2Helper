@@ -1,6 +1,5 @@
 export * from "./gsiProcessorTypes";
 export * from "./initialState";
-export * from "./contracts";
 export * from "./useCases";
 export * from "./api";
 export * from "./processTick";

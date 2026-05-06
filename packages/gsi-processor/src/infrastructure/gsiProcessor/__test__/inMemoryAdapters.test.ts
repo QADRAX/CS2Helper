@@ -3,13 +3,13 @@ import {
   createInitialGsiProcessorMemory,
   createInitialGsiProcessorState,
 } from "../../../domain/gsiProcessor";
-import { createInMemoryGsiProcessorEventsBus } from "../internal/createInMemoryGsiProcessorEventsBus";
-import { createInMemoryGsiProcessorMemoryStore } from "../internal/createInMemoryGsiProcessorMemoryStore";
-import { createInMemoryGsiProcessorStateStore } from "../internal/createInMemoryGsiProcessorStateStore";
+import { InMemoryEventsAdapter } from "../adapters/InMemoryEventsAdapter";
+import { InMemoryMemoryAdapter } from "../adapters/InMemoryMemoryAdapter";
+import { InMemoryStateAdapter } from "../adapters/InMemoryStateAdapter";
 
 describe("in-memory GSI processor adapters", () => {
   it("state store notifies subscribers until unsubscribed", () => {
-    const store = createInMemoryGsiProcessorStateStore(createInitialGsiProcessorState());
+    const store = new InMemoryStateAdapter(createInitialGsiProcessorState());
     const listener = vi.fn();
     const off = store.subscribeState(listener);
     store.setState({ ...createInitialGsiProcessorState(), totalTicks: 1 });
@@ -20,7 +20,7 @@ describe("in-memory GSI processor adapters", () => {
   });
 
   it("events bus stops delivering after unsubscribe", () => {
-    const bus = createInMemoryGsiProcessorEventsBus();
+    const bus = new InMemoryEventsAdapter();
     const listener = vi.fn();
     const off = bus.subscribe(listener);
     bus.publish({ type: "gap_started", timestamp: 1 });
@@ -31,7 +31,7 @@ describe("in-memory GSI processor adapters", () => {
   });
 
   it("memory store holds latest value", () => {
-    const store = createInMemoryGsiProcessorMemoryStore(createInitialGsiProcessorMemory());
+    const store = new InMemoryMemoryAdapter(createInitialGsiProcessorMemory());
     const next = { ...createInitialGsiProcessorMemory(), lastGameRound: 5 };
     store.setMemory(next);
     expect(store.getMemory().lastGameRound).toBe(5);

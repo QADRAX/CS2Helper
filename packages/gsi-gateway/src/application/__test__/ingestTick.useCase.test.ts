@@ -1,24 +1,26 @@
 import { describe, expect, it, vi } from "vitest";
-import { createIngestGsiTickUseCase } from "../gsiGateway/useCases/ingestGsiTickUseCase";
+import { ingestGsiTick } from "../gsiGateway/useCases/ingestGsiTickUseCase";
 
-describe("createIngestGsiTickUseCase", () => {
-  it("delegates to processor.processTick", () => {
+describe("ingestGsiTick use case", () => {
+  it("delegates to processor.processTick and notifies raw listeners", () => {
     const processTick = vi.fn();
-    const useCase = createIngestGsiTickUseCase({
-      processor: {
-        processTick,
-        getState: vi.fn(),
-        subscribeState: vi.fn(),
-        subscribeEvents: vi.fn(),
-      },
-      rawTickListeners: new Set(),
-    });
+    const processorMock = {
+      processTick,
+      getState: vi.fn(),
+      subscribeState: vi.fn(),
+      subscribeEvents: vi.fn(),
+    };
+    const rawListeners = new Set<(raw: string) => void>();
+    const listener = vi.fn();
+    rawListeners.add(listener);
 
     const payload = { provider: { name: "CS2" } } as any;
     const rawBody = JSON.stringify(payload);
-    useCase.execute(payload, rawBody);
+    
+    ingestGsiTick(processorMock, rawListeners, payload, rawBody);
 
     expect(processTick).toHaveBeenCalledTimes(1);
     expect(processTick).toHaveBeenCalledWith(payload);
+    expect(listener).toHaveBeenCalledWith(rawBody);
   });
 });

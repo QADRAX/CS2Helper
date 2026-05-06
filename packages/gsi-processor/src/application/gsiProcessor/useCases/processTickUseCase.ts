@@ -1,27 +1,26 @@
-import { processTickDomain } from "../../../domain/gsiProcessor";
-import type {
-  GsiProcessorUseCaseContext,
-  ProcessTickUseCase,
-  UseCaseFactory,
-} from "../../../domain/gsiProcessor";
+import type { StatePort, MemoryPort, EventsPort, ClockPort } from "../ports";
+import { processTickDomain } from "../../../domain/gsiProcessor/processTick";
 
-export const createProcessTickUseCase: UseCaseFactory<
-  ProcessTickUseCase,
-  GsiProcessorUseCaseContext
-> = (deps) => {
-  return {
-    execute(gameState, timestamp = deps.clock.now()) {
-      const result = processTickDomain(
-        deps.state.getState(),
-        deps.memory.getMemory(),
-        gameState,
-        timestamp
-      );
-      deps.state.setState(result.state);
-      deps.memory.setMemory(result.memory);
-      for (const event of result.events) {
-        deps.events.publish(event);
-      }
-    },
-  };
+export const processTick = (
+  statePort: StatePort,
+  memoryPort: MemoryPort,
+  eventsPort: EventsPort,
+  clockPort: ClockPort,
+  tick: any,
+  timestamp?: number
+) => {
+  const currentState = statePort.getState();
+  const currentMemory = memoryPort.getMemory();
+  const now = timestamp ?? clockPort.now();
+
+  const { state, memory, events } = processTickDomain(
+    currentState,
+    currentMemory,
+    tick,
+    now
+  );
+
+  statePort.setState(state);
+  memoryPort.setMemory(memory);
+  events.forEach((event) => eventsPort.publish(event));
 };

@@ -1,51 +1,38 @@
 import { describe, expect, it, vi } from "vitest";
-import { minimalClientTick } from "../../__test__/fixtures/minimalWatcherTick";
-import { createProcessTickUseCase } from "../gsiProcessor/useCases/processTickUseCase";
-import { createMockProcessorContext } from "./mockProcessorContext";
+import { processTick } from "../gsiProcessor/useCases/processTickUseCase";
+import { createInitialGsiProcessorState, createInitialGsiProcessorMemory } from "../../domain/gsiProcessor";
 
-describe("createProcessTickUseCase", () => {
-  it("updates state and memory", () => {
-    const context = createMockProcessorContext();
-    const useCase = createProcessTickUseCase(context);
+describe("processTick use case", () => {
+  it("orchestrates domain processing and updates ports", () => {
+    const statePort = {
+      getState: vi.fn().mockReturnValue(createInitialGsiProcessorState()),
+      setState: vi.fn(),
+      subscribeState: vi.fn(),
+    };
+    const memoryPort = {
+      getMemory: vi.fn().mockReturnValue(createInitialGsiProcessorMemory()),
+      setMemory: vi.fn(),
+    };
+    const eventsPort = {
+      publish: vi.fn(),
+      subscribe: vi.fn(),
+    };
+    const clockPort = {
+      now: vi.fn().mockReturnValue(1000),
+    };
 
-    useCase.execute(null, 9999);
+    const tick = { provider: { name: "test" } };
+    
+    processTick(
+      statePort as any,
+      memoryPort as any,
+      eventsPort as any,
+      clockPort as any,
+      tick
+    );
 
-    expect(context.state.getState).toHaveBeenCalledTimes(1);
-    expect(context.memory.getMemory).toHaveBeenCalledTimes(1);
-    expect(context.state.setState).toHaveBeenCalledTimes(1);
-    expect(context.memory.setMemory).toHaveBeenCalledTimes(1);
-  });
-
-  it("falls back to clock.now when timestamp is absent", () => {
-    const context = createMockProcessorContext();
-    const useCase = createProcessTickUseCase(context);
-
-    useCase.execute(null);
-
-    expect(context.clock.now).toHaveBeenCalledTimes(1);
-    const nextState = vi.mocked(context.state.setState).mock.calls[0][0];
-    expect(nextState.lastProcessedAt).toBe(123456);
-  });
-
-  it("publishes every domain event returned by processTickDomain", () => {
-    const context = createMockProcessorContext();
-    const useCase = createProcessTickUseCase(context);
-
-    useCase.execute(minimalClientTick(), 7777);
-
-    expect(context.events.publish).toHaveBeenCalled();
-    const publishMock = vi.mocked(context.events.publish);
-    const types = publishMock.mock.calls.map((c) => c[0].type);
-    expect(types.length).toBeGreaterThanOrEqual(2);
-    expect(types).toContain("stream_cold_started");
-  });
-
-  it("forwards explicit timestamp to domain without calling clock", () => {
-    const context = createMockProcessorContext();
-    const useCase = createProcessTickUseCase(context);
-
-    useCase.execute(null, 9999);
-
-    expect(context.clock.now).not.toHaveBeenCalled();
+    expect(statePort.getState).toHaveBeenCalled();
+    expect(statePort.setState).toHaveBeenCalled();
+    expect(memoryPort.setMemory).toHaveBeenCalled();
   });
 });

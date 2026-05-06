@@ -1,15 +1,9 @@
-import type { GsiGatewayContext } from "../../../domain/gsiGateway/contracts";
-import type { SubscribeEventsUseCase } from "../../../domain/gsiGateway/useCases";
+import type { ProcessorPort } from "../ports";
+import type { GsiProcessorEvent } from "@cs2helper/gsi-processor";
 
-/**
- * Creates the use case that subscribes listeners to processor event emissions.
- */
-export function createSubscribeEventsUseCase(
-  context: GsiGatewayContext
-): SubscribeEventsUseCase {
-  return {
-    execute(listener) {
-      return context.processor.subscribeEvents(listener);
-    },
-  };
-}
+export const subscribeEvents = (
+  processorPort: ProcessorPort,
+  listener: (event: GsiProcessorEvent) => void
+) => {
+  return processorPort.subscribeEvents(listener);
+};

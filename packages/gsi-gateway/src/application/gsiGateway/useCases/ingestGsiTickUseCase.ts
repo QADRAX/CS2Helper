@@ -1,21 +1,15 @@
-import type { GsiGatewayContext } from "../../../domain/gsiGateway/contracts";
-import type { IngestGsiTickUseCase } from "../../../domain/gsiGateway/useCases";
+import type { ProcessorPort } from "../ports";
 
-/**
- * Creates the use case that forwards raw GSI ticks to the wrapped processor.
- */
-export function createIngestGsiTickUseCase(
-  context: GsiGatewayContext
-): IngestGsiTickUseCase {
-  return {
-    execute(gameState, rawBody) {
-      // 1. Process for domain state
-      context.processor.processTick(gameState);
+export const ingestGsiTick = (
+  processorPort: ProcessorPort,
+  rawTickListeners: Set<(raw: string) => void>,
+  tick: any,
+  raw: string
+) => {
+  // 1. Process the tick through the domain engine. 
+  // We don't pass 'raw' here as the processor only needs the parsed tick.
+  processorPort.processTick(tick);
 
-      // 2. Notify raw listeners (for recording/debugging)
-      for (const listener of context.rawTickListeners) {
-        listener(rawBody);
-      }
-    },
-  };
-}
+  // 2. Notify raw tick subscribers (usually for recorders or debuggers)
+  rawTickListeners.forEach((listener) => listener(raw));
+};

@@ -1,16 +1,5 @@
-import type {
-  GsiProcessorUseCaseContext,
-  GetStateUseCase,
-  UseCaseFactory,
-} from "../../../domain/gsiProcessor";
+import type { StatePort } from "../ports";
 
-export const createGetStateUseCase: UseCaseFactory<
-  GetStateUseCase,
-  GsiProcessorUseCaseContext
-> = ({ state }) => {
-  return {
-    execute() {
-      return state.getState();
-    },
-  };
+export const getState = (statePort: StatePort) => {
+  return statePort.getState();
 };
