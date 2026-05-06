@@ -4,19 +4,18 @@ import { Prompt } from "./Prompt";
 import {
   exitCli,
   saveCliConfig,
+  selectUiState,
   setError,
   startGateway,
   startRecording,
   stopGateway,
   stopRecording,
-} from "../store/cliSlice";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+} from "../store";
+import { useAppDispatch, useAppSelector } from "../hooks/redux";
 
 export function App() {
   const dispatch = useAppDispatch();
-  const { status, port, errorMessage, recordingPath, config, gsiState } = useAppSelector(
-    (s) => s.cli
-  );
+  const { status, port, errorMessage, recordingPath, config, gsiState } = useAppSelector(selectUiState);
 
   const handleCommand = async (cmd: string) => {
     const parts = cmd.trim().split(" ").filter(Boolean);

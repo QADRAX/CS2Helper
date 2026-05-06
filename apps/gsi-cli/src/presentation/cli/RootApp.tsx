@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 import { Provider } from "react-redux";
 import type { CliApp } from "../../infrastructure/cli/CliAppService";
-import { createAppStore } from "../store/appStore";
-import { loadConfig } from "../store/cliSlice";
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch } from "../hooks/redux";
+import { createAppStore, loadConfig } from "../store";
 import { App } from "./App";
 import { GatewayStateSync } from "./GatewayStateSync";
 

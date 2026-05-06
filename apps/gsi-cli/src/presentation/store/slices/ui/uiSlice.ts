@@ -1,0 +1,69 @@
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import { uiInitialState } from "./types";
+import {
+  loadConfig,
+  saveCliConfig,
+  startGateway,
+  startRecording,
+  stopGateway,
+  stopRecording,
+} from "./uiThunks";
+
+const uiSlice = createSlice({
+  name: "ui",
+  initialState: uiInitialState,
+  reducers: {
+    gsiStateUpdated: (state, action: PayloadAction<Readonly<GsiProcessorState> | null>) => {
+      state.gsiState = action.payload;
+    },
+    setError: (state, action: PayloadAction<string>) => {
+      state.errorMessage = action.payload;
+    },
+    clearError: (state) => {
+      state.errorMessage = undefined;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadConfig.fulfilled, (state, action) => {
+        state.config = action.payload;
+      })
+      .addCase(startGateway.pending, (state) => {
+        state.errorMessage = undefined;
+      })
+      .addCase(startGateway.fulfilled, (state, action) => {
+        state.status = "LISTENING";
+        state.port = action.payload.port;
+        state.errorMessage = undefined;
+      })
+      .addCase(startGateway.rejected, (state, action) => {
+        state.status = "ERROR";
+        state.errorMessage = action.error.message ?? "Failed to start gateway";
+      })
+      .addCase(stopGateway.fulfilled, (state) => {
+        state.status = "IDLE";
+        state.port = undefined;
+      })
+      .addCase(saveCliConfig.fulfilled, (state, action) => {
+        state.config = action.payload;
+        state.errorMessage = undefined;
+      })
+      .addCase(saveCliConfig.rejected, (state, action) => {
+        state.errorMessage = action.error.message ?? "Config save failed";
+      })
+      .addCase(startRecording.fulfilled, (state, action) => {
+        state.recordingPath = action.meta.arg;
+        state.errorMessage = undefined;
+      })
+      .addCase(startRecording.rejected, (state, action) => {
+        state.errorMessage = action.error.message ?? "Recording failed";
+      })
+      .addCase(stopRecording.fulfilled, (state) => {
+        state.recordingPath = undefined;
+      });
+  },
+});
+
+export const { gsiStateUpdated, setError, clearError } = uiSlice.actions;
+export const uiReducer = uiSlice.reducer;
