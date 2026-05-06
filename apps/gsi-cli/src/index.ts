@@ -1,12 +1,12 @@
 import React from 'react';
 import { render } from 'ink';
 import { CliAppService } from './infrastructure/cli/CliAppService.js';
-import { App } from './presentation/cli/App.js';
+import { RootApp } from './presentation/cli/RootApp.js';
 
 function main() {
   const cliApp = new CliAppService();
 
-  const { clear } = render(React.createElement(App, { cliApp }));
+  const { clear } = render(React.createElement(RootApp, { cliApp }));
 
   // handle process exit
   process.on('SIGINT', async () => {

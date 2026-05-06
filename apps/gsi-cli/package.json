@@ -16,9 +16,11 @@
     "@cs2helper/gsi-gateway": "1.0.0",
     "@cs2helper/gsi-processor": "1.0.0",
     "@cs2helper/shared": "1.0.0",
+    "@reduxjs/toolkit": "^2.11.2",
     "ink": "^4.4.1",
     "ink-text-input": "^5.0.1",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
