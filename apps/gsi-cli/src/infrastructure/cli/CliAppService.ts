@@ -1,4 +1,3 @@
-import type { GsiGatewayStartInfo } from "@cs2helper/gsi-gateway";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import { getConfig } from "../../application/cli/useCases/getConfig";
 import { saveConfig } from "../../application/cli/useCases/saveConfig";
@@ -12,9 +11,10 @@ import { FileConfigAdapter } from "./adapters/FileConfigAdapter";
 import { FileRecorderAdapter } from "./adapters/FileRecorderAdapter";
 import { InMemoryGatewayAdapter } from "./adapters/InMemoryGatewayAdapter";
 import type { CliConfig } from "../../domain/cli/config";
+import type { GatewayStartInfo } from "../../application/cli/ports/GatewayPort";
 
 export interface CliApp {
-  startGateway: () => Promise<GsiGatewayStartInfo>;
+  startGateway: () => Promise<GatewayStartInfo>;
   stopGateway: () => Promise<void>;
   getGatewayState: () => Readonly<GsiProcessorState> | null;
   subscribeGatewayState: (listener: (state: Readonly<GsiProcessorState>) => void) => () => void;
@@ -39,7 +39,7 @@ export class CliAppService implements CliApp {
     this.recorderPort = new FileRecorderAdapter();
   }
 
-  startGateway(): Promise<GsiGatewayStartInfo> {
+  startGateway(): Promise<GatewayStartInfo> {
     return startGateway({ gateway: this.gatewayPort, config: this.configPort });
   }
 

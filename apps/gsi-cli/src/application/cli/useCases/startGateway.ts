@@ -1,6 +1,5 @@
-import { GsiGatewayService, type GsiGatewayStartInfo } from "@cs2helper/gsi-gateway";
 import type { AsyncUseCase } from "@cs2helper/shared";
-import type { GatewayPort } from "../ports/GatewayPort";
+import type { GatewayPort, GatewayStartInfo } from "../ports/GatewayPort";
 import type { ConfigPort } from "../ports/ConfigPort";
 
 export interface StartGatewayPorts {
@@ -11,22 +10,14 @@ export interface StartGatewayPorts {
 /**
  * Initializes and starts the GSI Gateway service.
  */
-export const startGateway: AsyncUseCase<StartGatewayPorts, [], GsiGatewayStartInfo> = async ({
-  gateway: gatewayPort,
-  config: configPort,
+export const startGateway: AsyncUseCase<StartGatewayPorts, [], GatewayStartInfo> = async ({
+  gateway,
+  config,
 }) => {
-  const existing = gatewayPort.getGateway();
-  if (existing) {
-    await existing.stop();
+  if (gateway.isRunning()) {
+    await gateway.stop();
   }
 
-  const config = await configPort.getConfig();
-  const gateway = new GsiGatewayService({
-    port: config.port,
-  });
-
-  const info = await gateway.start();
-  gatewayPort.setGateway(gateway);
-  
-  return info;
+  const currentConfig = await config.getConfig();
+  return gateway.start({ port: currentConfig.port });
 };

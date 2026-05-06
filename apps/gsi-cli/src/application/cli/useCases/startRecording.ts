@@ -8,28 +8,22 @@ export interface StartRecordingPorts {
 }
 
 /**
- * Begins recording processed GSI ticks to a file.
+ * Begins recording raw CS2 GSI payloads to a file.
+ * Each tick is the unprocessed JSON body sent by CS2 via HTTP POST.
  */
 export const startRecording: AsyncUseCase<
   StartRecordingPorts,
   [filename: string],
   void
 > = async ({ gateway, recorder }, filename) => {
-  const activeGateway = gateway.getGateway();
-  if (!activeGateway) {
+  if (!gateway.isRunning()) {
     throw new Error("Cannot start recording: GSI Gateway is not running.");
   }
 
-  // 1. Prepare the recorder
   await recorder.open(filename);
 
-  // 2. Write initial state as the first snapshot for context
-  const initialState = activeGateway.getState();
-  await recorder.writeTick(JSON.stringify(initialState));
-
-  // 3. Subscribe to subsequent ticks
-  const unsub = gateway.subscribeRawTicks(async (raw) => {
-    await recorder.writeTick(raw);
+  const unsub = gateway.subscribeRawTicks((raw) => {
+    recorder.writeTick(raw).catch(() => {});
   });
 
   if (unsub) {

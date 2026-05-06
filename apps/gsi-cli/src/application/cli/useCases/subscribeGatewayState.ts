@@ -13,10 +13,6 @@ export const subscribeGatewayState: UseCase<
   SubscribeGatewayStatePorts,
   [listener: (state: Readonly<GsiProcessorState>) => void],
   () => void
-> = ({ gateway: gatewayPort }, listener) => {
-  const active = gatewayPort.getGateway();
-  if (active) {
-    return active.subscribeState(listener);
-  }
-  return () => {};
+> = ({ gateway }, listener) => {
+  return gateway.subscribeState(listener);
 };

@@ -9,11 +9,9 @@ export interface StopGatewayPorts {
  * Stops the currently active GSI Gateway service.
  */
 export const stopGateway: AsyncUseCase<StopGatewayPorts, [], void> = async ({
-  gateway: gatewayPort,
+  gateway,
 }) => {
-  const active = gatewayPort.getGateway();
-  if (active) {
-    await active.stop();
-    gatewayPort.setGateway(null);
+  if (gateway.isRunning()) {
+    await gateway.stop();
   }
 };

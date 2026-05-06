@@ -13,7 +13,6 @@ export const getGatewayState: UseCase<
   GetGatewayStatePorts,
   [],
   Readonly<GsiProcessorState> | null
-> = ({ gateway: gatewayPort }) => {
-  const active = gatewayPort.getGateway();
-  return active ? active.getState() : null;
+> = ({ gateway }) => {
+  return gateway.getState();
 };
