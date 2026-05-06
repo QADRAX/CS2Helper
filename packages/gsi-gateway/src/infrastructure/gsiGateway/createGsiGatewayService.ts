@@ -51,9 +51,7 @@ export function createGsiGatewayService(
     async start() {
       const address = await httpServer.start();
       return {
-        host: address.host,
         port: address.port,
-        gsiPath: config.gsiPath,
       };
     },
     async stop() {

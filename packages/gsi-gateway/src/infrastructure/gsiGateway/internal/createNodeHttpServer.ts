@@ -17,26 +17,19 @@ interface CreateNodeHttpServerOptions {
  */
 export function createNodeHttpServer(options: CreateNodeHttpServerOptions) {
   const { config, onGsiRequest } = options;
+  const HARDCODED_HOST = "127.0.0.1";
 
   const server = createServer(async (req, res) => {
     const reqUrl = req.url ?? "";
-    if (req.method !== "POST" || reqUrl !== config.gsiPath) {
+    if (req.method !== "POST" || reqUrl !== "/") {
       res.statusCode = 404;
       res.end();
       return;
     }
 
     const chunks: Buffer[] = [];
-    let totalBytes = 0;
 
     req.on("data", (chunk: Buffer) => {
-      totalBytes += chunk.length;
-      if (totalBytes > config.maxBodyBytes) {
-        res.statusCode = 413;
-        res.end("Payload too large");
-        req.destroy();
-        return;
-      }
       chunks.push(chunk);
     });
 
@@ -53,7 +46,7 @@ export function createNodeHttpServer(options: CreateNodeHttpServerOptions) {
       try {
         const rawBody = Buffer.concat(chunks).toString("utf-8");
         await onGsiRequest(rawBody);
-        res.statusCode = 204;
+        res.statusCode = 200;
         res.end();
       } catch {
         res.statusCode = 400;
@@ -66,14 +59,14 @@ export function createNodeHttpServer(options: CreateNodeHttpServerOptions) {
     start: () =>
       new Promise<HttpListenAddress>((resolve, reject) => {
         server.once("error", reject);
-        server.listen(config.port, config.host, () => {
+        server.listen(config.port, HARDCODED_HOST, () => {
           server.off("error", reject);
           const address = server.address();
           if (!address || typeof address === "string") {
-            resolve({ host: config.host, port: config.port });
+            resolve({ port: config.port });
             return;
           }
-          resolve({ host: config.host, port: address.port });
+          resolve({ port: address.port });
         });
       }),
     stop: () =>

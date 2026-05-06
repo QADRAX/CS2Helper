@@ -2,18 +2,13 @@ import type { GsiProcessorEvent, GsiProcessorState } from "@cs2helper/gsi-proces
 
 /** Optional runtime overrides for the gateway composition root. */
 export interface CreateGsiGatewayServiceOptions {
-  host?: string;
   port?: number;
-  gsiPath?: string;
-  maxBodyBytes?: number;
   getTimestamp?: () => number;
 }
 
 /** Address metadata returned once the HTTP server starts listening. */
 export interface GsiGatewayStartInfo {
-  host: string;
   port: number;
-  gsiPath: string;
 }
 
 /** Public service API exposed by `createGsiGatewayService()`. */

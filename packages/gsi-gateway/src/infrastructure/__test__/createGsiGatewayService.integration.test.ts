@@ -111,7 +111,7 @@ describe("createGsiGatewayService", () => {
     });
 
     const response = await postJson(
-      { host: address.host, port: address.port, path: address.gsiPath },
+      { host: "127.0.0.1", port: address.port, path: "/" },
       payload
     );
 
@@ -125,7 +125,7 @@ describe("createGsiGatewayService", () => {
     const address = await service.start();
 
     const response = await postJson(
-      { host: address.host, port: address.port, path: address.gsiPath },
+      { host: "127.0.0.1", port: address.port, path: "/" },
       "{not-json}"
     );
 
