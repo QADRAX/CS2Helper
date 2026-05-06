@@ -14,3 +14,6 @@ export type SubscribeGatewayStateUseCase = UseCase<
 export type GetConfigUseCase = UseCase<[], Promise<CliConfig>>;
 export type SaveConfigUseCase = UseCase<[config: Partial<CliConfig>], Promise<CliConfig>>;
 
+export type StartRecordingUseCase = UseCase<[filename: string], Promise<void>>;
+export type StopRecordingUseCase = UseCase<[], Promise<void>>;
+

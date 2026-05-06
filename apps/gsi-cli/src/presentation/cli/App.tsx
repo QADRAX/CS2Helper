@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
-import { Dashboard } from './Dashboard.js';
-import { Prompt } from './Prompt.js';
-import type { CliState } from '../../domain/cli/index.js';
-import type { CliConfig } from '../../domain/cli/config.js';
-import type { CliAppService } from '../../infrastructure/cli/createCliAppService.js';
+import { Dashboard } from './Dashboard';
+import { Prompt } from './Prompt';
+import type { CliState } from '../../domain/cli/index';
+import type { CliConfig } from '../../domain/cli/config';
+import type { CliAppService } from '../../infrastructure/cli/createCliAppService';
 
 export interface AppProps {
   cliApp: CliAppService;
@@ -85,8 +85,29 @@ export function App({ cliApp }: AppProps) {
         }
         break;
       }
+      case 'record': {
+        const subCmd = parts[1]?.toLowerCase();
+        if (subCmd === 'start') {
+          const filename = parts[2];
+          if (!filename) {
+            setCliState(prev => ({ ...prev, errorMessage: 'Usage: record start <filename>' }));
+            break;
+          }
+          try {
+            await cliApp.startRecording(filename);
+            setCliState(prev => ({ ...prev, recordingPath: filename, errorMessage: undefined }));
+          } catch (e: any) {
+            setCliState(prev => ({ ...prev, errorMessage: e.message }));
+          }
+        } else if (subCmd === 'stop') {
+          await cliApp.stopRecording();
+          setCliState(prev => ({ ...prev, recordingPath: undefined }));
+        }
+        break;
+      }
       case 'exit':
       case 'quit':
+        await cliApp.stopRecording();
         await cliApp.stopGateway();
         process.exit(0);
         break;
@@ -101,7 +122,12 @@ export function App({ cliApp }: AppProps) {
   return (
     <Box flexDirection="column" width="100%">
       <Box borderStyle="single" padding={1} flexDirection="column">
-        <Text bold color="green">CS2 GSI Gateway CLI</Text>
+        <Box justifyContent="space-between">
+          <Text bold color="green">CS2 GSI Gateway CLI</Text>
+          {cliState.recordingPath && (
+            <Text color="red" bold> ● RECORDING: {cliState.recordingPath}</Text>
+          )}
+        </Box>
         <Text>Status: {cliState.status} {cliState.port ? `(Port: ${cliState.port})` : ''}</Text>
         <Text color="gray">
           Config: Port={cliConfig.port || 'unset'}

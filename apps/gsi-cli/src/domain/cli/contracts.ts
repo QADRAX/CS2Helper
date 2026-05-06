@@ -11,7 +11,13 @@ export interface CliGatewayManager {
   setGateway: (gateway: GsiGatewayService | null) => void;
 }
 
+export interface RecorderManager {
+  start: (filename: string) => Promise<void>;
+  stop: () => Promise<void>;
+}
+
 export interface CliGatewayContext {
   gatewayManager: CliGatewayManager;
   configStore: ConfigStore;
+  recorderManager: RecorderManager;
 }

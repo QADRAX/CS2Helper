@@ -7,4 +7,5 @@ export interface CliState {
   errorMessage?: string;
   gsiState?: Readonly<GsiProcessorState> | null;
   port?: number;
+  recordingPath?: string;
 }

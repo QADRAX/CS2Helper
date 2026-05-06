@@ -11,10 +11,12 @@ describe("createIngestGsiTickUseCase", () => {
         subscribeState: vi.fn(),
         subscribeEvents: vi.fn(),
       },
+      rawTickListeners: new Set(),
     });
 
-    const payload = { provider: { name: "CS2" } } as never;
-    useCase.execute(payload);
+    const payload = { provider: { name: "CS2" } } as any;
+    const rawBody = JSON.stringify(payload);
+    useCase.execute(payload, rawBody);
 
     expect(processTick).toHaveBeenCalledTimes(1);
     expect(processTick).toHaveBeenCalledWith(payload);

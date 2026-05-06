@@ -8,8 +8,14 @@ export function createIngestGsiTickUseCase(
   context: GsiGatewayContext
 ): IngestGsiTickUseCase {
   return {
-    execute(gameState) {
+    execute(gameState, rawBody) {
+      // 1. Process for domain state
       context.processor.processTick(gameState);
+
+      // 2. Notify raw listeners (for recording/debugging)
+      for (const listener of context.rawTickListeners) {
+        listener(rawBody);
+      }
     },
   };
 }

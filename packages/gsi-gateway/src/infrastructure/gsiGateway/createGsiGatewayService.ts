@@ -7,6 +7,7 @@ import {
   createIngestGsiTickUseCase,
   createSubscribeEventsUseCase,
   createSubscribeStateUseCase,
+  createSubscribeRawTicksUseCase,
 } from "../../application/gsiGateway";
 import {
   type CreateGsiGatewayServiceOptions,
@@ -30,17 +31,26 @@ export function createGsiGatewayService(
     getTimestamp: options.getTimestamp,
   });
 
-  const useCaseContext = { processor };
+  const useCaseContext: any = { 
+    processor,
+    rawTickListeners: new Set(),
+  };
   const ingestTickUseCase = createIngestGsiTickUseCase(useCaseContext);
   const getStateUseCase = createGetStateUseCase(useCaseContext);
   const subscribeStateUseCase = createSubscribeStateUseCase(useCaseContext);
   const subscribeEventsUseCase = createSubscribeEventsUseCase(useCaseContext);
+  const subscribeRawTicksUseCase = createSubscribeRawTicksUseCase(useCaseContext);
 
   const httpServer = createNodeHttpServer({
     config,
     onGsiRequest: async (rawBody) => {
-      const tick = parseIncomingTick(rawBody);
-      ingestTickUseCase.execute(tick);
+      try {
+        const tick = parseIncomingTick(rawBody);
+        ingestTickUseCase.execute(tick, rawBody);
+      } catch (err) {
+        // Fallback for malformed but readable JSON if needed
+        // For now, only ingest valid ticks
+      }
     },
   });
 
@@ -48,6 +58,7 @@ export function createGsiGatewayService(
     getState: getStateUseCase.execute,
     subscribeState: subscribeStateUseCase.execute,
     subscribeEvents: subscribeEventsUseCase.execute,
+    subscribeRawTicks: subscribeRawTicksUseCase.execute,
     async start() {
       const address = await httpServer.start();
       return {

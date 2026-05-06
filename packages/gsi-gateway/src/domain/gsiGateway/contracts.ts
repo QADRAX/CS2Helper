@@ -15,6 +15,7 @@ export interface GsiProcessorPort {
 /** Shared application context injected into gateway use-case factories. */
 export interface GsiGatewayContext {
   processor: GsiProcessorPort;
+  rawTickListeners: Set<(raw: string) => void>;
 }
 
 /** Listener signature for aggregate state updates. */

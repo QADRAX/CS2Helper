@@ -20,4 +20,5 @@ export interface GsiGatewayService {
     listener: (state: Readonly<GsiProcessorState>) => void
   ) => () => void;
   subscribeEvents: (listener: (event: GsiProcessorEvent) => void) => () => void;
+  subscribeRawTicks: (listener: (raw: string) => void) => () => void;
 }
