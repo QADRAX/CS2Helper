@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
 
@@ -17,6 +17,7 @@ export function Prompt({ onCommand }: PromptProps) {
   const [query, setQuery] = useState('');
   const [suggestionIndex, setSuggestionIndex] = useState(-1);
   const [lastBaseQuery, setLastBaseQuery] = useState('');
+  const [inputKey, setInputKey] = useState(0);
 
   // Determine the context and the part being filtered
   const { context, filter, parts } = useMemo(() => {
@@ -69,6 +70,8 @@ export function Prompt({ onCommand }: PromptProps) {
       if (selected) {
         const prefix = context ? context + ' ' : '';
         setQuery(prefix + selected);
+        // Force TextInput remount so cursor moves to end of text
+        setInputKey(k => k + 1);
       }
     }
 
@@ -109,6 +112,7 @@ export function Prompt({ onCommand }: PromptProps) {
           <Text color="yellow">{'>'}</Text>
         </Box>
         <TextInput 
+          key={inputKey}
           value={query} 
           onChange={handleQueryChange} 
           onSubmit={handleSubmit} 
