@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import { uiInitialState } from "./types";
+import { promptInitialState, uiInitialState, type PromptUiState } from "./types";
 import {
   loadConfig,
   saveCliConfig,
@@ -22,6 +22,15 @@ const uiSlice = createSlice({
     },
     clearError: (state) => {
       state.errorMessage = undefined;
+    },
+    promptPatched: (state, action: PayloadAction<Partial<PromptUiState>>) => {
+      Object.assign(state.prompt, action.payload);
+    },
+    promptReset: (state) => {
+      state.prompt = { ...promptInitialState };
+    },
+    promptInputKeyBumped: (state) => {
+      state.prompt.inputKey += 1;
     },
   },
   extraReducers: (builder) => {
@@ -65,5 +74,12 @@ const uiSlice = createSlice({
   },
 });
 
-export const { gsiStateUpdated, setError, clearError } = uiSlice.actions;
+export const {
+  gsiStateUpdated,
+  setError,
+  clearError,
+  promptPatched,
+  promptReset,
+  promptInputKeyBumped,
+} = uiSlice.actions;
 export const uiReducer = uiSlice.reducer;

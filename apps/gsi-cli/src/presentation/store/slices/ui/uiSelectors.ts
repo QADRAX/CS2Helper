@@ -1,7 +1,7 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { CliConfig } from "../../../../domain/cli/config";
 import type { CliStatus } from "../../../../domain/cli";
-import type { UiState } from "./types";
+import type { PromptUiState, UiState } from "./types";
 import type { RootState } from "../../rootState";
 
 export function selectUiState(state: RootState): UiState {
@@ -30,4 +30,8 @@ export function selectCliConfig(state: RootState): CliConfig {
 
 export function selectGsiState(state: RootState): Readonly<GsiProcessorState> | null {
   return state.ui.gsiState;
+}
+
+export function selectPromptState(state: RootState): PromptUiState {
+  return state.ui.prompt;
 }

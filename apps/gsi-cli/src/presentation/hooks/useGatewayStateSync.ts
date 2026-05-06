@@ -1,12 +1,10 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import type { CliApp } from "../../infrastructure/cli/CliAppService";
-import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { gsiStateUpdated, selectUiStatus } from "../store";
+import { useAppDispatch, useAppSelector } from "./redux";
 
-/**
- * Bridges gateway processor state into Redux whenever the CLI is listening.
- */
-export function GatewayStateSync({ cliApp }: { cliApp: CliApp }) {
+/** Mirrors gateway processor state into Redux while status is LISTENING. */
+export function useGatewayStateSync(cliApp: CliApp): void {
   const dispatch = useAppDispatch();
   const status = useAppSelector(selectUiStatus);
 
@@ -24,6 +22,4 @@ export function GatewayStateSync({ cliApp }: { cliApp: CliApp }) {
 
     return unsubscribe;
   }, [cliApp, dispatch, status]);
-
-  return null;
 }
