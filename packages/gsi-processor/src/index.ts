@@ -4,4 +4,4 @@
  */
 
 export { GsiProcessorService, type GsiProcessorOptions } from "./infrastructure/gsiProcessor/GsiProcessorService";
-export type * from "./domain/gsiProcessor";
+export type * from "./domain";

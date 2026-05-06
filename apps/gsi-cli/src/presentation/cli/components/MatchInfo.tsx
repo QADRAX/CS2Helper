@@ -1,34 +1,21 @@
 import React from 'react';
 import { Box, Text } from 'ink';
+import type { MatchData } from '@cs2helper/gsi-processor';
 
 interface MatchInfoProps {
-  map?: {
-    name: string;
-    mode: string;
-    phase: string;
-    round: number;
-    team_ct: { score: number };
-    team_t: { score: number };
-  };
+  match: MatchData;
 }
 
-export function MatchInfo({ map }: MatchInfoProps) {
-  if (!map?.name) return null;
+export function MatchInfo({ match }: MatchInfoProps) {
 
   return (
-    <Box flexDirection="column" marginBottom={1}>
+    <Box flexDirection="column">
       <Box>
-        <Text bold color="yellow">📍 {map.name}</Text>
+        <Text bold color="yellow">📍 {match.mapName}</Text>
         <Text color="gray"> • </Text>
-        <Text color="white">{map.mode}</Text>
+        <Text color="white">{match.mode}</Text>
         <Text color="gray"> • </Text>
-        <Text color="magenta">{map.phase}</Text>
-      </Box>
-      <Box>
-        <Text color="blue" bold>CT {map.team_ct?.score || 0}</Text>
-        <Text color="white"> - </Text>
-        <Text color="red" bold>{map.team_t?.score || 0} T</Text>
-        <Text color="gray"> (Round {map.round})</Text>
+        <Text color="cyan">{match.rounds.length} rounds</Text>
       </Box>
     </Box>
   );

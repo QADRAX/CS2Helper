@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import type { GsiProcessorState } from '@cs2helper/gsi-processor';
-import { GameInfo } from './components/GameInfo';
 import { MatchInfo } from './components/MatchInfo';
+import { RoundInfo } from './components/RoundInfo';
 import { PlayerInfo } from './components/PlayerInfo';
 
 interface DashboardProps {
@@ -18,13 +18,25 @@ export function Dashboard({ gsiState }: DashboardProps) {
     );
   }
 
-  const payload = gsiState.lastGameState as any;
+  const { currentMatch, playersBySteamId, totalTicks } = gsiState;
+
+  if (!currentMatch) {
+    return (
+      <Box flexDirection="column">
+        <Text color="gray" italic>Connected — waiting for match...</Text>
+        <Text color="gray" dimColor>Ticks: {totalTicks}</Text>
+      </Box>
+    );
+  }
+
+  const lastRound = currentMatch.rounds[currentMatch.rounds.length - 1];
 
   return (
-    <Box flexDirection="column" gap={0}>
-      <GameInfo provider={payload?.provider} />
-      <MatchInfo map={payload?.map} />
-      <PlayerInfo player={payload?.player} />
+    <Box flexDirection="column" gap={1}>
+      <MatchInfo match={currentMatch} />
+      <RoundInfo round={lastRound} />
+      <PlayerInfo players={playersBySteamId} />
+      <Text color="gray" dimColor>Ticks: {totalTicks}</Text>
     </Box>
   );
 }
