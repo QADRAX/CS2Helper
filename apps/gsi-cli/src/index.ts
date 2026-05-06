@@ -1,10 +1,10 @@
 import React from 'react';
 import { render } from 'ink';
-import { createCliAppService } from './infrastructure/cli/createCliAppService.js';
+import { CliAppService } from './infrastructure/cli/CliAppService.js';
 import { App } from './presentation/cli/App.js';
 
 function main() {
-  const cliApp = createCliAppService();
+  const cliApp = new CliAppService();
 
   const { clear } = render(React.createElement(App, { cliApp }));
 

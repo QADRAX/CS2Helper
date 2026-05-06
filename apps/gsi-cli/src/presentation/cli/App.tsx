@@ -4,10 +4,10 @@ import { Dashboard } from './Dashboard';
 import { Prompt } from './Prompt';
 import type { CliState } from '../../domain/cli/index';
 import type { CliConfig } from '../../domain/cli/config';
-import type { CliAppService } from '../../infrastructure/cli/createCliAppService';
+import type { CliApp } from '../../infrastructure/cli/CliAppService';
 
 export interface AppProps {
-  cliApp: CliAppService;
+  cliApp: CliApp;
 }
 
 export function App({ cliApp }: AppProps) {
