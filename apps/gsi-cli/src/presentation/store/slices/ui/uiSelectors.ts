@@ -3,6 +3,7 @@ import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2Proc
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import type { CliConfig } from "../../../../domain/cli/config";
 import type { CliStatus } from "../../../../domain/cli";
+import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
 import type { PromptUiState, UiState } from "./types";
 import type { RootState } from "../../rootState";
 
@@ -36,6 +37,10 @@ export function selectCliConfig(state: RootState): CliConfig {
 
 export function selectGsiState(state: RootState): Readonly<GsiProcessorState> | null {
   return state.ui.gsiState;
+}
+
+export function selectGatewayDiagnostics(state: RootState): GatewayDiagnostics {
+  return state.ui.gatewayDiagnostics;
 }
 
 export function selectPromptState(state: RootState): PromptUiState {

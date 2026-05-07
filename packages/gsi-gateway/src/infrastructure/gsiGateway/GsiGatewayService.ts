@@ -8,6 +8,7 @@ import {
 } from "../../application/gsiGateway";
 import {
   type GsiGateway,
+  type GsiGatewayDiagnostics,
   type GsiGatewayOptions,
   parseIncomingTick,
 } from "../../domain/gsiGateway";
@@ -22,6 +23,10 @@ export class GsiGatewayService implements GsiGateway {
   private readonly processor: GsiProcessorService;
   private readonly httpServer: NodeHttpServerAdapter;
   private readonly rawTickHub = new InMemoryRawTicksAdapter();
+  private diagnostics: GsiGatewayDiagnostics = {
+    receivedRequests: 0,
+    rejectedRequests: 0,
+  };
 
   constructor(options: GsiGatewayOptions = {}) {
     const config = createDefaultHttpConfig(options);
@@ -33,6 +38,7 @@ export class GsiGatewayService implements GsiGateway {
     this.httpServer = new NodeHttpServerAdapter({
       config,
       onGsiRequest: async (rawBody) => {
+        this.diagnostics.receivedRequests += 1;
         try {
           const tick = parseIncomingTick(rawBody);
           ingestGsiTick(
@@ -41,6 +47,9 @@ export class GsiGatewayService implements GsiGateway {
             rawBody
           );
         } catch (err) {
+          this.diagnostics.rejectedRequests += 1;
+          this.diagnostics.lastRejectReason =
+            err instanceof Error ? err.message : "Unknown request error";
           throw err;
         }
       },
@@ -58,6 +67,10 @@ export class GsiGatewayService implements GsiGateway {
 
   getState() {
     return getState({ processor: this.processor });
+  }
+
+  getDiagnostics() {
+    return { ...this.diagnostics };
   }
 
   subscribeState(listener: (state: any) => void) {

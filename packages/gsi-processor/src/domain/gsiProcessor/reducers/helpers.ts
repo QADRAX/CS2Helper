@@ -4,6 +4,8 @@ import type { GsiProcessorState } from "../gsiProcessorTypes";
 export function cloneState(state: GsiProcessorState): GsiProcessorState {
   return {
     ...state,
+    streamMetrics: { ...state.streamMetrics },
+    streamWatermarks: { ...state.streamWatermarks },
     playersBySteamId: { ...state.playersBySteamId },
     currentMatch: state.currentMatch
       ? {

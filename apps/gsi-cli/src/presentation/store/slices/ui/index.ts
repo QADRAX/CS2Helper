@@ -5,6 +5,7 @@ export { executeCliCommand } from "./uiCommandThunks";
 export {
   clearError,
   cs2StatusUpdated,
+  gatewayDiagnosticsUpdated,
   gsiStateUpdated,
   promptInputKeyBumped,
   promptPatched,

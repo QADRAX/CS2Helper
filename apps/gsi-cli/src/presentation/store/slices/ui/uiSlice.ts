@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
+import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import { promptInitialState, uiInitialState, type PromptUiState } from "./types";
 import {
@@ -19,6 +20,9 @@ const uiSlice = createSlice({
   reducers: {
     gsiStateUpdated: (state, action: PayloadAction<Readonly<GsiProcessorState> | null>) => {
       state.gsiState = action.payload;
+    },
+    gatewayDiagnosticsUpdated: (state, action: PayloadAction<GatewayDiagnostics>) => {
+      state.gatewayDiagnostics = action.payload;
     },
     setError: (state, action: PayloadAction<string>) => {
       state.errorMessage = action.payload;
@@ -65,6 +69,7 @@ const uiSlice = createSlice({
         state.status = "IDLE";
         state.port = undefined;
         state.gatewayWarning = undefined;
+        state.gatewayDiagnostics = { receivedRequests: 0, rejectedRequests: 0 };
       })
       .addCase(saveCliConfig.fulfilled, (state, action) => {
         state.config = action.payload;
@@ -94,6 +99,7 @@ const uiSlice = createSlice({
 
 export const {
   gsiStateUpdated,
+  gatewayDiagnosticsUpdated,
   setError,
   clearError,
   promptPatched,

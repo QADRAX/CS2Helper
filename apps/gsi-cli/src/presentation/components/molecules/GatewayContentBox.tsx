@@ -1,16 +1,23 @@
 import { Box, Text } from "ink";
 import { useEffect, useState } from "react";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import type { GatewayDiagnostics } from "../../../application/cli/ports/GatewayPort";
 
 interface GatewayContentBoxProps {
   gsiState: Readonly<GsiProcessorState> | null;
+  gatewayDiagnostics: GatewayDiagnostics;
   cs2Running: boolean;
   gatewayWarning?: string;
 }
 
 const SPINNER_FRAMES = ["|", "/", "-", "\\"];
 
-export function GatewayContentBox({ gsiState, cs2Running, gatewayWarning }: GatewayContentBoxProps) {
+export function GatewayContentBox({
+  gsiState,
+  gatewayDiagnostics,
+  cs2Running,
+  gatewayWarning,
+}: GatewayContentBoxProps) {
   const [spinnerIndex, setSpinnerIndex] = useState(0);
   const payload = gsiState?.lastGameState;
   const watcherMode = gsiState?.watcherMode ?? payload?.watcherMode ?? null;
@@ -46,6 +53,9 @@ export function GatewayContentBox({ gsiState, cs2Running, gatewayWarning }: Gate
       <Text>streamState: {streamState}</Text>
       <Text>ticksReceived: {totalTicks}</Text>
       <Text>lastTickAt: {lastProcessedAt ? new Date(lastProcessedAt).toLocaleTimeString() : "-"}</Text>
+      <Text>httpRequests: {gatewayDiagnostics.receivedRequests}</Text>
+      <Text>httpRejected: {gatewayDiagnostics.rejectedRequests}</Text>
+      <Text>lastRejectReason: {gatewayDiagnostics.lastRejectReason ?? "-"}</Text>
       <Text>watcherMode: {watcherMode ?? "-"}</Text>
       <Text>lastGameState: {payload ? "available" : "null"}</Text>
       <Text>player: {hasPlayer ? localPlayerName : "none"}</Text>

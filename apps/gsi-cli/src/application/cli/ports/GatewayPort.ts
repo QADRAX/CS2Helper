@@ -6,6 +6,12 @@ export interface GatewayStartInfo {
   gsiWarning?: string;
 }
 
+export interface GatewayDiagnostics {
+  receivedRequests: number;
+  rejectedRequests: number;
+  lastRejectReason?: string;
+}
+
 /**
  * Application-layer abstraction for the GSI Gateway lifecycle.
  * Hides the concrete gateway implementation behind a port contract.
@@ -22,6 +28,7 @@ export interface GatewayPort {
 
   /** Returns the current processor state, or null if not running. */
   getState: () => Readonly<GsiProcessorState> | null;
+  getDiagnostics: () => Readonly<GatewayDiagnostics>;
 
   /** Subscribes to processor state changes. No-op unsubscribe if not running. */
   subscribeState: (listener: (state: Readonly<GsiProcessorState>) => void) => () => void;

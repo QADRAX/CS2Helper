@@ -8,6 +8,7 @@ import { saveConfig } from "../../application/cli/useCases/saveConfig";
 import { launchCs2 } from "../../application/cli/useCases/launchCs2";
 import { startGateway } from "../../application/cli/useCases/startGateway";
 import { stopGateway } from "../../application/cli/useCases/stopGateway";
+import { getGatewayDiagnostics } from "../../application/cli/useCases/getGatewayDiagnostics";
 import {
   verifyGsiConfig,
   type VerifyGsiConfigResult,
@@ -40,12 +41,14 @@ import { TasklistSteamProcessAdapter } from "./adapters/TasklistSteamProcessAdap
 import { SteamRegistrySteamInstallAdapter } from "./adapters/SteamRegistrySteamInstallAdapter";
 import type { CliConfig } from "../../domain/cli/config";
 import type { GatewayStartInfo } from "../../application/cli/ports/GatewayPort";
+import type { GatewayDiagnostics } from "../../application/cli/ports/GatewayPort";
 import type { Cs2ProcessStatus } from "../../application/cli/ports/Cs2ProcessPort";
 
 export interface CliApp {
   startGateway: () => Promise<GatewayStartInfo>;
   stopGateway: () => Promise<void>;
   getGatewayState: () => Readonly<GsiProcessorState> | null;
+  getGatewayDiagnostics: () => Readonly<GatewayDiagnostics>;
   subscribeGatewayState: (listener: (state: Readonly<GsiProcessorState>) => void) => () => void;
   getConfig: () => Promise<CliConfig>;
   saveConfig: (config: Partial<CliConfig>) => Promise<CliConfig>;
@@ -108,6 +111,10 @@ export class CliAppService implements CliApp {
 
   getGatewayState(): Readonly<GsiProcessorState> | null {
     return getGatewayState({ gateway: this.gatewayPort });
+  }
+
+  getGatewayDiagnostics(): Readonly<GatewayDiagnostics> {
+    return getGatewayDiagnostics({ gateway: this.gatewayPort });
   }
 
   subscribeGatewayState(listener: (state: Readonly<GsiProcessorState>) => void): () => void {

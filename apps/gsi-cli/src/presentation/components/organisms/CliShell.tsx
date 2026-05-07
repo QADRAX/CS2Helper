@@ -10,6 +10,7 @@ import {
   selectNotifications,
   selectCliConfig,
   selectCs2Status,
+  selectGatewayDiagnostics,
   selectGatewayWarning,
   selectGsiState,
   selectSteamStatus,
@@ -34,6 +35,7 @@ export function CliShell() {
   const steamStatus = useAppSelector(selectSteamStatus);
   const cs2Status = useAppSelector(selectCs2Status);
   const errorMessage = useAppSelector(selectUiError);
+  const gatewayDiagnostics = useAppSelector(selectGatewayDiagnostics);
   const gatewayWarning = useAppSelector(selectGatewayWarning);
   const gsiState = useAppSelector(selectGsiState);
   const notifications = useAppSelector(selectNotifications);
@@ -111,6 +113,7 @@ export function CliShell() {
       {gatewayOnline ? (
         <GatewayContentBox
           gsiState={gsiState}
+          gatewayDiagnostics={gatewayDiagnostics}
           cs2Running={cs2Status.running}
           gatewayWarning={gatewayWarning}
         />

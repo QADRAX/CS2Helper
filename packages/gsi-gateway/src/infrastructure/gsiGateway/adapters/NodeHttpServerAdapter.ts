@@ -36,8 +36,9 @@ export class NodeHttpServerAdapter {
             res.writeHead(204, { "Content-Type": "text/plain" });
             res.end();
           } catch (err) {
+            const message = err instanceof Error ? err.message : "Bad Request";
             res.writeHead(400, { "Content-Type": "text/plain" });
-            res.end("Bad Request");
+            res.end(message);
           }
         });
       } else {

@@ -11,11 +11,18 @@ export interface GsiGatewayStartInfo {
   port: number;
 }
 
+export interface GsiGatewayDiagnostics {
+  receivedRequests: number;
+  rejectedRequests: number;
+  lastRejectReason?: string;
+}
+
 /** Public service API contract for the GSI Gateway. */
 export interface GsiGateway {
   start: () => Promise<GsiGatewayStartInfo>;
   stop: () => Promise<void>;
   getState: () => Readonly<GsiProcessorState>;
+  getDiagnostics: () => Readonly<GsiGatewayDiagnostics>;
   subscribeState: (
     listener: (state: Readonly<GsiProcessorState>) => void
   ) => () => void;
