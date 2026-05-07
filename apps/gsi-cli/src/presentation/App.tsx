@@ -1,22 +1,12 @@
 import { useMemo } from "react";
-import { Box } from "ink";
 import { Provider } from "react-redux";
 import type { CliApp } from "../infrastructure/cli/CliAppService";
-import { CliShell } from "./components/organisms/CliShell";
-import { useConfigBootstrap } from "./hooks/useConfigBootstrap";
-import { useGatewayStateSync } from "./hooks/useGatewayStateSync";
-import { useSystemStatusSync } from "./hooks/useSystemStatusSync";
 import { createAppStore } from "./store";
+import { AppEffects } from "./components/organisms/AppEffects";
+import { CliShell } from "./components/organisms/CliShell";
 
 export interface AppProps {
   cliApp: CliApp;
-}
-
-function AppEffects({ cliApp }: { cliApp: CliApp }) {
-  useConfigBootstrap();
-  useGatewayStateSync(cliApp);
-  useSystemStatusSync(cliApp);
-  return null;
 }
 
 /**
@@ -27,10 +17,8 @@ export function App({ cliApp }: AppProps) {
 
   return (
     <Provider store={store}>
-      <Box flexDirection="column">
-        <AppEffects cliApp={cliApp} />
-        <CliShell />
-      </Box>
+      <AppEffects cliApp={cliApp} />
+      <CliShell />
     </Provider>
   );
 }

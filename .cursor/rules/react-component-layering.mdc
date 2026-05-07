@@ -1,0 +1,34 @@
+---
+description: Enforce single-layout App.tsx architecture for gsi-cli UI
+globs: apps/gsi-cli/src/presentation/**/*.tsx
+alwaysApply: false
+---
+
+# gsi-cli Presentation Architecture
+
+The CLI UI uses a single layout root in `App.tsx` instead of atomic component layering.
+
+## 1) Layout Ownership
+
+- `App.tsx` owns persistent header + switchable body.
+- `AppEffects` is preserved for bootstrap and sync hooks.
+- Do not reintroduce `atoms`, `molecules`, or `organisms` folders for gsi-cli.
+
+## 2) State Boundaries
+
+- Redux selectors/thunks remain the source of truth for app/system state.
+- Local React state in `App.tsx` controls screen mode and cursor positions.
+- Config editing must use a local draft and dispatch save only on explicit confirmation.
+
+## 3) Interaction Model
+
+- Header always shows Steam status, CS2 status, and Gateway status.
+- Body mode behavior:
+  - Idle gateway: `start`, `config`, `exit`
+  - Online gateway: `stop`, `exit`
+- Config mode supports up/down field navigation plus save/cancel.
+
+## 4) Implementation Guardrails
+
+- Reuse existing store contracts (`startGateway`, `stopGateway`, `saveCliConfig`, `exitCli`).
+- Keep the UI terminal-first and keyboard-driven (`ink` + clear focus state).
