@@ -27,6 +27,8 @@ import { NotificationsStack } from "../molecules/NotificationsStack";
 
 interface ConfigDraft {
   port: string;
+  gsiThrottleSec: string;
+  gsiHeartbeatSec: string;
 }
 
 export function CliShell() {
@@ -44,7 +46,11 @@ export function CliShell() {
   const [mode, setMode] = useState<ScreenMode>("menu");
   const [menuIndex, setMenuIndex] = useState(0);
   const [configCursor, setConfigCursor] = useState(0);
-  const [draft, setDraft] = useState<ConfigDraft>({ port: config.port?.toString() ?? "" });
+  const [draft, setDraft] = useState<ConfigDraft>({
+    port: config.port?.toString() ?? "",
+    gsiThrottleSec: config.gsiThrottleSec?.toString() ?? "0.1",
+    gsiHeartbeatSec: config.gsiHeartbeatSec?.toString() ?? "10",
+  });
 
   const gatewayOnline = uiStatus === "LISTENING";
   const menuOptions: MenuOption[] = gatewayOnline
@@ -61,9 +67,13 @@ export function CliShell() {
 
   useEffect(() => {
     if (mode !== "config") return;
-    setDraft({ port: config.port?.toString() ?? "" });
+    setDraft({
+      port: config.port?.toString() ?? "",
+      gsiThrottleSec: config.gsiThrottleSec?.toString() ?? "0.1",
+      gsiHeartbeatSec: config.gsiHeartbeatSec?.toString() ?? "10",
+    });
     setConfigCursor(0);
-  }, [mode, config.port]);
+  }, [mode, config.port, config.gsiThrottleSec, config.gsiHeartbeatSec]);
 
   const goMenu = () => {
     setMode("menu");
@@ -72,8 +82,18 @@ export function CliShell() {
 
   const saveDraft = () => {
     const parsedPort = Number.parseInt(draft.port, 10);
+    const parsedThrottle = Number.parseFloat(draft.gsiThrottleSec);
+    const parsedHeartbeat = Number.parseFloat(draft.gsiHeartbeatSec);
     if (!Number.isFinite(parsedPort) || parsedPort <= 0) return;
-    void dispatch(saveCliConfig({ port: parsedPort }));
+    if (!Number.isFinite(parsedThrottle) || parsedThrottle <= 0) return;
+    if (!Number.isFinite(parsedHeartbeat) || parsedHeartbeat <= 0) return;
+    void dispatch(
+      saveCliConfig({
+        port: parsedPort,
+        gsiThrottleSec: parsedThrottle,
+        gsiHeartbeatSec: parsedHeartbeat,
+      })
+    );
     void dispatch(clearError());
     goMenu();
   };
@@ -94,12 +114,12 @@ export function CliShell() {
 
     if (mode === "config") {
       if (key.escape) return goMenu();
-      if (key.upArrow) return setConfigCursor((prev) => (prev <= 0 ? 3 : prev - 1));
-      if (key.downArrow || key.tab) return setConfigCursor((prev) => (prev + 1) % 4);
+      if (key.upArrow) return setConfigCursor((prev) => (prev <= 0 ? 5 : prev - 1));
+      if (key.downArrow || key.tab) return setConfigCursor((prev) => (prev + 1) % 6);
       if (!key.return) return;
-      if (configCursor === 1) return saveDraft();
-      if (configCursor === 2) return void dispatch(createOrUpdateGsiCfg());
-      if (configCursor === 3) return goMenu();
+      if (configCursor === 3) return saveDraft();
+      if (configCursor === 4) return void dispatch(createOrUpdateGsiCfg());
+      if (configCursor === 5) return goMenu();
       return;
     }
 
@@ -124,7 +144,11 @@ export function CliShell() {
         menuIndex={menuIndex}
         configCursor={configCursor}
         configPortDraft={draft.port}
+        configThrottleDraft={draft.gsiThrottleSec}
+        configHeartbeatDraft={draft.gsiHeartbeatSec}
         onConfigPortChange={(value) => setDraft((prev) => ({ ...prev, port: value }))}
+        onConfigThrottleChange={(value) => setDraft((prev) => ({ ...prev, gsiThrottleSec: value }))}
+        onConfigHeartbeatChange={(value) => setDraft((prev) => ({ ...prev, gsiHeartbeatSec: value }))}
         errorMessage={errorMessage}
       />
       <NotificationsStack notifications={notifications} />

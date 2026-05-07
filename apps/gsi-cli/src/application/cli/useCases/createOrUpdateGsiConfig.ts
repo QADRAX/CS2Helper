@@ -32,6 +32,8 @@ export const createOrUpdateGsiConfig: AsyncUseCase<
     throw new Error("Set a valid port before creating CS2 cfg.");
   }
   const port = Number(configuredPort);
+  const throttle = clampPositive(cliConfig.gsiThrottleSec, 0.1);
+  const heartbeat = clampPositive(cliConfig.gsiHeartbeatSec, 10);
 
   const cs2Location = await cs2Install.detect();
   if (!cs2Location) {
@@ -45,8 +47,8 @@ export const createOrUpdateGsiConfig: AsyncUseCase<
     endpointUrl,
     timeout: 5,
     buffer: 0.1,
-    throttle: 0.1,
-    heartbeat: 60,
+    throttle,
+    heartbeat,
     data: {
       provider: true,
       map: true,
@@ -66,4 +68,9 @@ export const createOrUpdateGsiConfig: AsyncUseCase<
 
   const written = await gsiConfigFile.write(cs2Location.cfgPath, payload);
   return { filePath: written.filePath, endpointUrl, port };
+};
+
+const clampPositive = (value: number | undefined, fallback: number): number => {
+  if (!Number.isFinite(value) || (value ?? 0) <= 0) return fallback;
+  return Number(value);
 };

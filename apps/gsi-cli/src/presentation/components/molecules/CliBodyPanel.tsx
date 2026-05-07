@@ -11,7 +11,11 @@ interface CliBodyPanelProps {
   menuIndex: number;
   configCursor: number;
   configPortDraft: string;
+  configThrottleDraft: string;
+  configHeartbeatDraft: string;
   onConfigPortChange: (value: string) => void;
+  onConfigThrottleChange: (value: string) => void;
+  onConfigHeartbeatChange: (value: string) => void;
   errorMessage?: string;
 }
 
@@ -21,7 +25,11 @@ export function CliBodyPanel({
   menuIndex,
   configCursor,
   configPortDraft,
+  configThrottleDraft,
+  configHeartbeatDraft,
   onConfigPortChange,
+  onConfigThrottleChange,
+  onConfigHeartbeatChange,
   errorMessage,
 }: CliBodyPanelProps) {
   return (
@@ -31,7 +39,11 @@ export function CliBodyPanel({
         <ConfigScreen
           configCursor={configCursor}
           configPortDraft={configPortDraft}
+          configThrottleDraft={configThrottleDraft}
+          configHeartbeatDraft={configHeartbeatDraft}
           onConfigPortChange={onConfigPortChange}
+          onConfigThrottleChange={onConfigThrottleChange}
+          onConfigHeartbeatChange={onConfigHeartbeatChange}
         />
       ) : null}
       {mode === "exitConfirm" ? <ExitConfirmScreen /> : null}
