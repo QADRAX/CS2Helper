@@ -21,6 +21,7 @@ export const promptInitialState: PromptUiState = {
 export interface UiState {
   status: CliStatus;
   errorMessage?: string;
+  gatewayWarning?: string;
   gsiState: Readonly<GsiProcessorState> | null;
   port?: number;
   recordingPath?: string;

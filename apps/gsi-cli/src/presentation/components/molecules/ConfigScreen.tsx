@@ -26,7 +26,8 @@ export function ConfigScreen({
         />
       </Box>
       <MenuOptionLine label="save" focused={configCursor === 1} activeColor="green" />
-      <MenuOptionLine label="cancel" focused={configCursor === 2} activeColor="yellow" />
+      <MenuOptionLine label="create cfg" focused={configCursor === 2} activeColor="cyan" />
+      <MenuOptionLine label="cancel" focused={configCursor === 3} activeColor="yellow" />
       <Text color="gray">Up/Down to navigate, Enter to confirm, Esc to cancel</Text>
     </>
   );

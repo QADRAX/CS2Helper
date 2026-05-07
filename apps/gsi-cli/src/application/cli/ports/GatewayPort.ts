@@ -3,6 +3,7 @@ import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 /** Address metadata returned once the gateway starts listening. */
 export interface GatewayStartInfo {
   port: number;
+  gsiWarning?: string;
 }
 
 /**

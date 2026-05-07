@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { CliConfig } from "../../../../domain/cli/config";
 import type { CliApp } from "../../../../infrastructure/cli/CliAppService";
 import type { CliThunkExtra } from "../../thunkExtra";
+import { enqueueNotification } from "../notifications";
 
 export const loadConfig = createAsyncThunk<
   CliConfig,
@@ -27,6 +28,36 @@ export const saveCliConfig = createAsyncThunk<
   Partial<CliConfig>,
   { extra: CliThunkExtra }
 >("ui/saveConfig", async (partial, { extra }) => extra.cliApp.saveConfig(partial));
+
+export const createOrUpdateGsiCfg = createAsyncThunk<
+  Awaited<ReturnType<CliApp["createOrUpdateGsiConfig"]>>,
+  void,
+  { extra: CliThunkExtra }
+>("ui/createOrUpdateGsiCfg", async (_, { dispatch, extra }) => {
+  const result = await extra.cliApp.createOrUpdateGsiConfig();
+  dispatch(
+    enqueueNotification({
+      message: `CS2 cfg updated at ${result.filePath}`,
+      kind: "success",
+      durationMs: 7000,
+    })
+  );
+  return result;
+});
+
+export const launchCs2 = createAsyncThunk<void, void, { extra: CliThunkExtra }>(
+  "ui/launchCs2",
+  async (_, { dispatch, extra }) => {
+    await extra.cliApp.launchCs2();
+    dispatch(
+      enqueueNotification({
+        message: "Launch command sent to Steam for CS2.",
+        kind: "info",
+        durationMs: 5000,
+      })
+    );
+  }
+);
 
 export const startRecording = createAsyncThunk<void, string, { extra: CliThunkExtra }>(
   "ui/startRecording",

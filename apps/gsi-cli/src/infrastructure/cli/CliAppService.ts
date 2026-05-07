@@ -1,8 +1,17 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import { getConfig } from "../../application/cli/useCases/getConfig";
+import {
+  createOrUpdateGsiConfig,
+  type CreateOrUpdateGsiConfigResult,
+} from "../../application/cli/useCases/createOrUpdateGsiConfig";
 import { saveConfig } from "../../application/cli/useCases/saveConfig";
+import { launchCs2 } from "../../application/cli/useCases/launchCs2";
 import { startGateway } from "../../application/cli/useCases/startGateway";
 import { stopGateway } from "../../application/cli/useCases/stopGateway";
+import {
+  verifyGsiConfig,
+  type VerifyGsiConfigResult,
+} from "../../application/cli/useCases/verifyGsiConfig";
 import { getGatewayState } from "../../application/cli/useCases/getGatewayState";
 import { subscribeGatewayState } from "../../application/cli/useCases/subscribeGatewayState";
 import { startRecording } from "../../application/cli/useCases/startRecording";
@@ -22,7 +31,10 @@ import {
 } from "../../application/cli/useCases/subscribeSteamStatus";
 import { FileConfigAdapter } from "./adapters/FileConfigAdapter";
 import { FileRecorderAdapter } from "./adapters/FileRecorderAdapter";
+import { FsGsiConfigFileAdapter } from "./adapters/FsGsiConfigFileAdapter";
 import { InMemoryGatewayAdapter } from "./adapters/InMemoryGatewayAdapter";
+import { SteamCs2LauncherAdapter } from "./adapters/SteamCs2LauncherAdapter";
+import { SteamRegistryCs2LocatorAdapter } from "./adapters/SteamRegistryCs2LocatorAdapter";
 import { TasklistCs2ProcessAdapter } from "./adapters/TasklistCs2ProcessAdapter";
 import { TasklistSteamProcessAdapter } from "./adapters/TasklistSteamProcessAdapter";
 import { SteamRegistrySteamInstallAdapter } from "./adapters/SteamRegistrySteamInstallAdapter";
@@ -37,6 +49,9 @@ export interface CliApp {
   subscribeGatewayState: (listener: (state: Readonly<GsiProcessorState>) => void) => () => void;
   getConfig: () => Promise<CliConfig>;
   saveConfig: (config: Partial<CliConfig>) => Promise<CliConfig>;
+  launchCs2: () => Promise<void>;
+  verifyGsiConfig: () => Promise<VerifyGsiConfigResult>;
+  createOrUpdateGsiConfig: () => Promise<CreateOrUpdateGsiConfigResult>;
   startRecording: (filename: string) => Promise<void>;
   stopRecording: () => Promise<void>;
   getCs2Status: () => Promise<Cs2ProcessStatus>;
@@ -59,6 +74,9 @@ export class CliAppService implements CliApp {
   private readonly gatewayPort: InMemoryGatewayAdapter;
   private readonly configPort: FileConfigAdapter;
   private readonly recorderPort: FileRecorderAdapter;
+  private readonly cs2InstallPort: SteamRegistryCs2LocatorAdapter;
+  private readonly gsiConfigFilePort: FsGsiConfigFileAdapter;
+  private readonly cs2LauncherPort: SteamCs2LauncherAdapter;
   private readonly cs2ProcessPort: TasklistCs2ProcessAdapter;
   private readonly steamProcessPort: TasklistSteamProcessAdapter;
   private readonly steamInstallPort: SteamRegistrySteamInstallAdapter;
@@ -67,13 +85,21 @@ export class CliAppService implements CliApp {
     this.gatewayPort = new InMemoryGatewayAdapter();
     this.configPort = new FileConfigAdapter();
     this.recorderPort = new FileRecorderAdapter();
+    this.cs2InstallPort = new SteamRegistryCs2LocatorAdapter();
+    this.gsiConfigFilePort = new FsGsiConfigFileAdapter();
+    this.cs2LauncherPort = new SteamCs2LauncherAdapter();
     this.cs2ProcessPort = new TasklistCs2ProcessAdapter();
     this.steamProcessPort = new TasklistSteamProcessAdapter();
     this.steamInstallPort = new SteamRegistrySteamInstallAdapter();
   }
 
   startGateway(): Promise<GatewayStartInfo> {
-    return startGateway({ gateway: this.gatewayPort, config: this.configPort });
+    return startGateway({
+      gateway: this.gatewayPort,
+      config: this.configPort,
+      cs2Install: this.cs2InstallPort,
+      gsiConfigFile: this.gsiConfigFilePort,
+    });
   }
 
   stopGateway(): Promise<void> {
@@ -94,6 +120,29 @@ export class CliAppService implements CliApp {
 
   saveConfig(config: Partial<CliConfig>): Promise<CliConfig> {
     return saveConfig({ config: this.configPort }, config);
+  }
+
+  launchCs2(): Promise<void> {
+    return launchCs2({
+      steamInstall: this.steamInstallPort,
+      cs2Launcher: this.cs2LauncherPort,
+    });
+  }
+
+  verifyGsiConfig(): Promise<VerifyGsiConfigResult> {
+    return verifyGsiConfig({
+      config: this.configPort,
+      cs2Install: this.cs2InstallPort,
+      gsiConfigFile: this.gsiConfigFilePort,
+    });
+  }
+
+  createOrUpdateGsiConfig(): Promise<CreateOrUpdateGsiConfigResult> {
+    return createOrUpdateGsiConfig({
+      config: this.configPort,
+      cs2Install: this.cs2InstallPort,
+      gsiConfigFile: this.gsiConfigFilePort,
+    });
   }
 
   startRecording(filename: string): Promise<void> {

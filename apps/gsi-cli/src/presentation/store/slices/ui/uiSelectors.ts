@@ -22,6 +22,10 @@ export function selectUiError(state: RootState): string | undefined {
   return state.ui.errorMessage;
 }
 
+export function selectGatewayWarning(state: RootState): string | undefined {
+  return state.ui.gatewayWarning;
+}
+
 export function selectRecordingPath(state: RootState): string | undefined {
   return state.ui.recordingPath;
 }

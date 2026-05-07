@@ -3,10 +3,15 @@ import { Box, useInput } from "ink";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import {
   clearError,
+  createOrUpdateGsiCfg,
   exitCli,
+  launchCs2,
   saveCliConfig,
+  selectNotifications,
   selectCliConfig,
   selectCs2Status,
+  selectGatewayWarning,
+  selectGsiState,
   selectSteamStatus,
   selectUiError,
   selectUiStatus,
@@ -16,6 +21,8 @@ import {
 import type { MenuOption, ScreenMode } from "../types";
 import { CliHeaderPanel } from "../molecules/CliHeaderPanel";
 import { CliBodyPanel } from "../molecules/CliBodyPanel";
+import { GatewayContentBox } from "../molecules/GatewayContentBox";
+import { NotificationsStack } from "../molecules/NotificationsStack";
 
 interface ConfigDraft {
   port: string;
@@ -27,6 +34,9 @@ export function CliShell() {
   const steamStatus = useAppSelector(selectSteamStatus);
   const cs2Status = useAppSelector(selectCs2Status);
   const errorMessage = useAppSelector(selectUiError);
+  const gatewayWarning = useAppSelector(selectGatewayWarning);
+  const gsiState = useAppSelector(selectGsiState);
+  const notifications = useAppSelector(selectNotifications);
   const config = useAppSelector(selectCliConfig);
 
   const [mode, setMode] = useState<ScreenMode>("menu");
@@ -35,7 +45,11 @@ export function CliShell() {
   const [draft, setDraft] = useState<ConfigDraft>({ port: config.port?.toString() ?? "" });
 
   const gatewayOnline = uiStatus === "LISTENING";
-  const menuOptions: MenuOption[] = gatewayOnline ? ["stop", "exit"] : ["start", "config", "exit"];
+  const menuOptions: MenuOption[] = gatewayOnline
+    ? cs2Status.running
+      ? ["stop", "exit"]
+      : ["launch_cs2", "stop", "exit"]
+    : ["start", "config", "exit"];
 
   useEffect(() => {
     if (menuIndex >= menuOptions.length) {
@@ -71,17 +85,19 @@ export function CliShell() {
       const selected = menuOptions[menuIndex];
       if (selected === "start") return void dispatch(startGateway());
       if (selected === "stop") return void dispatch(stopGateway());
+      if (selected === "launch_cs2") return void dispatch(launchCs2());
       if (selected === "config") return setMode("config");
       return setMode("exitConfirm");
     }
 
     if (mode === "config") {
       if (key.escape) return goMenu();
-      if (key.upArrow) return setConfigCursor((prev) => (prev <= 0 ? 2 : prev - 1));
-      if (key.downArrow || key.tab) return setConfigCursor((prev) => (prev + 1) % 3);
+      if (key.upArrow) return setConfigCursor((prev) => (prev <= 0 ? 3 : prev - 1));
+      if (key.downArrow || key.tab) return setConfigCursor((prev) => (prev + 1) % 4);
       if (!key.return) return;
       if (configCursor === 1) return saveDraft();
-      if (configCursor === 2) return goMenu();
+      if (configCursor === 2) return void dispatch(createOrUpdateGsiCfg());
+      if (configCursor === 3) return goMenu();
       return;
     }
 
@@ -92,6 +108,13 @@ export function CliShell() {
   return (
     <Box flexDirection="column" width="100%">
       <CliHeaderPanel steamStatus={steamStatus} cs2Status={cs2Status} gatewayStatus={uiStatus} />
+      {gatewayOnline ? (
+        <GatewayContentBox
+          gsiState={gsiState}
+          cs2Running={cs2Status.running}
+          gatewayWarning={gatewayWarning}
+        />
+      ) : null}
       <CliBodyPanel
         mode={mode}
         menuOptions={menuOptions}
@@ -101,6 +124,7 @@ export function CliShell() {
         onConfigPortChange={(value) => setDraft((prev) => ({ ...prev, port: value }))}
         errorMessage={errorMessage}
       />
+      <NotificationsStack notifications={notifications} />
     </Box>
   );
 }

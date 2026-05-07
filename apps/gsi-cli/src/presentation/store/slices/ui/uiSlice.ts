@@ -5,6 +5,7 @@ import type { SteamStatus } from "../../../../application/cli/useCases/getSteamS
 import { promptInitialState, uiInitialState, type PromptUiState } from "./types";
 import {
   loadConfig,
+  launchCs2,
   saveCliConfig,
   startGateway,
   startRecording,
@@ -48,11 +49,13 @@ const uiSlice = createSlice({
       })
       .addCase(startGateway.pending, (state) => {
         state.errorMessage = undefined;
+        state.gatewayWarning = undefined;
       })
       .addCase(startGateway.fulfilled, (state, action) => {
         state.status = "LISTENING";
         state.port = action.payload.port;
         state.errorMessage = undefined;
+        state.gatewayWarning = action.payload.gsiWarning;
       })
       .addCase(startGateway.rejected, (state, action) => {
         state.status = "ERROR";
@@ -61,6 +64,7 @@ const uiSlice = createSlice({
       .addCase(stopGateway.fulfilled, (state) => {
         state.status = "IDLE";
         state.port = undefined;
+        state.gatewayWarning = undefined;
       })
       .addCase(saveCliConfig.fulfilled, (state, action) => {
         state.config = action.payload;
@@ -68,6 +72,12 @@ const uiSlice = createSlice({
       })
       .addCase(saveCliConfig.rejected, (state, action) => {
         state.errorMessage = action.error.message ?? "Config save failed";
+      })
+      .addCase(launchCs2.pending, (state) => {
+        state.errorMessage = undefined;
+      })
+      .addCase(launchCs2.rejected, (state, action) => {
+        state.errorMessage = action.error.message ?? "Failed to launch CS2";
       })
       .addCase(startRecording.fulfilled, (state, action) => {
         state.recordingPath = action.meta.arg;
