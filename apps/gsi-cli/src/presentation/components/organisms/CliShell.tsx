@@ -6,6 +6,7 @@ import {
   createOrUpdateGsiCfg,
   exitCli,
   launchCs2,
+  openDataFolder,
   saveCliConfig,
   selectNotifications,
   selectCliConfig,
@@ -29,6 +30,7 @@ interface ConfigDraft {
   port: string;
   gsiThrottleSec: string;
   gsiHeartbeatSec: string;
+  autoRecordRawGsiOnStart: boolean;
 }
 
 export function CliShell() {
@@ -50,6 +52,7 @@ export function CliShell() {
     port: config.port?.toString() ?? "",
     gsiThrottleSec: config.gsiThrottleSec?.toString() ?? "0.1",
     gsiHeartbeatSec: config.gsiHeartbeatSec?.toString() ?? "10",
+    autoRecordRawGsiOnStart: config.autoRecordRawGsiOnStart ?? false,
   });
 
   const gatewayOnline = uiStatus === "LISTENING";
@@ -71,9 +74,10 @@ export function CliShell() {
       port: config.port?.toString() ?? "",
       gsiThrottleSec: config.gsiThrottleSec?.toString() ?? "0.1",
       gsiHeartbeatSec: config.gsiHeartbeatSec?.toString() ?? "10",
+      autoRecordRawGsiOnStart: config.autoRecordRawGsiOnStart ?? false,
     });
     setConfigCursor(0);
-  }, [mode, config.port, config.gsiThrottleSec, config.gsiHeartbeatSec]);
+  }, [mode, config.port, config.gsiThrottleSec, config.gsiHeartbeatSec, config.autoRecordRawGsiOnStart]);
 
   const goMenu = () => {
     setMode("menu");
@@ -92,6 +96,7 @@ export function CliShell() {
         port: parsedPort,
         gsiThrottleSec: parsedThrottle,
         gsiHeartbeatSec: parsedHeartbeat,
+        autoRecordRawGsiOnStart: draft.autoRecordRawGsiOnStart,
       })
     );
     void dispatch(clearError());
@@ -114,12 +119,17 @@ export function CliShell() {
 
     if (mode === "config") {
       if (key.escape) return goMenu();
-      if (key.upArrow) return setConfigCursor((prev) => (prev <= 0 ? 5 : prev - 1));
-      if (key.downArrow || key.tab) return setConfigCursor((prev) => (prev + 1) % 6);
+      if (key.upArrow) return setConfigCursor((prev) => (prev <= 0 ? 7 : prev - 1));
+      if (key.downArrow || key.tab) return setConfigCursor((prev) => (prev + 1) % 8);
       if (!key.return) return;
-      if (configCursor === 3) return saveDraft();
-      if (configCursor === 4) return void dispatch(createOrUpdateGsiCfg());
-      if (configCursor === 5) return goMenu();
+      if (configCursor === 3) {
+        setDraft((prev) => ({ ...prev, autoRecordRawGsiOnStart: !prev.autoRecordRawGsiOnStart }));
+        return;
+      }
+      if (configCursor === 4) return saveDraft();
+      if (configCursor === 5) return void dispatch(createOrUpdateGsiCfg());
+      if (configCursor === 6) return void dispatch(openDataFolder());
+      if (configCursor === 7) return goMenu();
       return;
     }
 
@@ -146,6 +156,7 @@ export function CliShell() {
         configPortDraft={draft.port}
         configThrottleDraft={draft.gsiThrottleSec}
         configHeartbeatDraft={draft.gsiHeartbeatSec}
+        autoRecordEnabled={draft.autoRecordRawGsiOnStart}
         onConfigPortChange={(value) => setDraft((prev) => ({ ...prev, port: value }))}
         onConfigThrottleChange={(value) => setDraft((prev) => ({ ...prev, gsiThrottleSec: value }))}
         onConfigHeartbeatChange={(value) => setDraft((prev) => ({ ...prev, gsiHeartbeatSec: value }))}

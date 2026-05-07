@@ -6,14 +6,14 @@ import {
   type CliConfig,
 } from "../../../domain/cli/config";
 import type { ConfigPort } from "../../../application/cli/ports/ConfigPort";
+import { getAppDataDir } from "./appDataPaths";
 
 export class FileConfigAdapter implements ConfigPort {
   private readonly configPath: string;
   private readonly legacyConfigPaths: string[];
 
   constructor() {
-    const appDataRoot = process.env.APPDATA || process.cwd();
-    this.configPath = path.join(appDataRoot, "CS2Helper", "gsi-cli", "config.json");
+    this.configPath = path.join(getAppDataDir(), "config.json");
     this.legacyConfigPaths = [
       path.join(process.cwd(), "gsi-cli.config.json"),
       path.join(process.cwd(), "apps", "gsi-cli", "gsi-cli.config.json"),

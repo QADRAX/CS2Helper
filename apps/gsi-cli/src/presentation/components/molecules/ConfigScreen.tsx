@@ -7,6 +7,7 @@ interface ConfigScreenProps {
   configPortDraft: string;
   configThrottleDraft: string;
   configHeartbeatDraft: string;
+  autoRecordEnabled: boolean;
   onConfigPortChange: (value: string) => void;
   onConfigThrottleChange: (value: string) => void;
   onConfigHeartbeatChange: (value: string) => void;
@@ -17,6 +18,7 @@ export function ConfigScreen({
   configPortDraft,
   configThrottleDraft,
   configHeartbeatDraft,
+  autoRecordEnabled,
   onConfigPortChange,
   onConfigThrottleChange,
   onConfigHeartbeatChange,
@@ -51,9 +53,14 @@ export function ConfigScreen({
           focus={configCursor === 2}
         />
       </Box>
-      <MenuOptionLine label="save" focused={configCursor === 3} activeColor="green" />
-      <MenuOptionLine label="create cfg" focused={configCursor === 4} activeColor="cyan" />
-      <MenuOptionLine label="cancel" focused={configCursor === 5} activeColor="yellow" />
+      <MenuOptionLine
+        label={`auto record on start: ${autoRecordEnabled ? "true" : "false"}`}
+        focused={configCursor === 3}
+      />
+      <MenuOptionLine label="save" focused={configCursor === 4} activeColor="green" />
+      <MenuOptionLine label="create cfg" focused={configCursor === 5} activeColor="cyan" />
+      <MenuOptionLine label="open data folder" focused={configCursor === 6} activeColor="cyan" />
+      <MenuOptionLine label="cancel" focused={configCursor === 7} activeColor="yellow" />
       <Text color="gray">Up/Down to navigate, Enter to confirm, Esc to cancel</Text>
     </>
   );

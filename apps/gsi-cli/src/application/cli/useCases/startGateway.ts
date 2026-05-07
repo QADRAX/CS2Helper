@@ -3,6 +3,9 @@ import type { GatewayPort, GatewayStartInfo } from "../ports/GatewayPort";
 import type { ConfigPort } from "../ports/ConfigPort";
 import type { Cs2InstallLocatorPort } from "../ports/Cs2InstallLocatorPort";
 import type { GsiConfigFilePort } from "../ports/GsiConfigFilePort";
+import type { RecorderPort } from "../ports/RecorderPort";
+import { buildRecordingFilePath } from "../../../infrastructure/cli/adapters/appDataPaths";
+import { startRecording } from "./startRecording";
 import { verifyGsiConfig } from "./verifyGsiConfig";
 
 export interface StartGatewayPorts {
@@ -10,6 +13,7 @@ export interface StartGatewayPorts {
   config: ConfigPort;
   cs2Install: Cs2InstallLocatorPort;
   gsiConfigFile: GsiConfigFilePort;
+  recorder: RecorderPort;
 }
 
 /**
@@ -20,6 +24,7 @@ export const startGateway: AsyncUseCase<StartGatewayPorts, [], GatewayStartInfo>
   config,
   cs2Install,
   gsiConfigFile,
+  recorder,
 }) => {
   if (gateway.isRunning()) {
     await gateway.stop();
@@ -36,5 +41,8 @@ export const startGateway: AsyncUseCase<StartGatewayPorts, [], GatewayStartInfo>
 
   const currentConfig = await config.getConfig();
   const startInfo = await gateway.start({ port: currentConfig.port });
+  if (currentConfig.autoRecordRawGsiOnStart) {
+    await startRecording({ gateway, recorder }, buildRecordingFilePath());
+  }
   return { ...startInfo, gsiWarning };
 };

@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import type { RecorderPort } from "../../../application/cli/ports/RecorderPort";
 
 /**
@@ -8,20 +9,17 @@ import type { RecorderPort } from "../../../application/cli/ports/RecorderPort";
 export class FileRecorderAdapter implements RecorderPort {
   private stream: fs.WriteStream | null = null;
   private unsubscribe: (() => void) | null = null;
-  private isFirstTick = true;
 
   async open(path: string): Promise<void> {
     if (this.stream) {
       await this.close();
     }
-    
-    this.isFirstTick = true;
+
+    await fs.promises.mkdir(pathModuleDirname(path), { recursive: true });
     this.stream = fs.createWriteStream(path, { flags: 'w', encoding: 'utf-8' });
     
     return new Promise((resolve, reject) => {
       this.stream?.on('open', () => {
-        // Start the JSON array
-        this.stream?.write("[\n");
         resolve();
       });
       this.stream?.on('error', reject);
@@ -37,10 +35,8 @@ export class FileRecorderAdapter implements RecorderPort {
     if (this.stream) {
       const streamToClose = this.stream;
       this.stream = null;
-      
+
       await new Promise<void>((resolve) => {
-        // Close the JSON array
-        streamToClose.write("\n]");
         streamToClose.end(() => {
           resolve();
         });
@@ -50,12 +46,7 @@ export class FileRecorderAdapter implements RecorderPort {
 
   async writeTick(data: string): Promise<void> {
     if (this.stream) {
-      const prefix = this.isFirstTick ? "" : ",\n";
-      this.isFirstTick = false;
-      
-      // Indent data slightly for readability
-      const indentedData = data.split('\n').map(line => "  " + line).join('\n');
-      this.stream.write(prefix + indentedData);
+      this.stream.write(`${data}\n`);
     }
   }
 
@@ -66,4 +57,8 @@ export class FileRecorderAdapter implements RecorderPort {
   isRecording(): boolean {
     return this.stream !== null;
   }
+}
+
+function pathModuleDirname(filePath: string): string {
+  return path.dirname(filePath);
 }

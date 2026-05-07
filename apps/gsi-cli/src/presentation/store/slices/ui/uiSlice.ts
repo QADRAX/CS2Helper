@@ -6,6 +6,7 @@ import type { SteamStatus } from "../../../../application/cli/useCases/getSteamS
 import { promptInitialState, uiInitialState, type PromptUiState } from "./types";
 import {
   loadConfig,
+  openDataFolder,
   launchCs2,
   saveCliConfig,
   startGateway,
@@ -83,6 +84,12 @@ const uiSlice = createSlice({
       })
       .addCase(launchCs2.rejected, (state, action) => {
         state.errorMessage = action.error.message ?? "Failed to launch CS2";
+      })
+      .addCase(openDataFolder.pending, (state) => {
+        state.errorMessage = undefined;
+      })
+      .addCase(openDataFolder.rejected, (state, action) => {
+        state.errorMessage = action.error.message ?? "Failed to open data folder";
       })
       .addCase(startRecording.fulfilled, (state, action) => {
         state.recordingPath = action.meta.arg;

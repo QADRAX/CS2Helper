@@ -2,12 +2,14 @@ export interface CliConfig {
   port?: number;
   gsiThrottleSec?: number;
   gsiHeartbeatSec?: number;
+  autoRecordRawGsiOnStart?: boolean;
 }
 
 export const DEFAULT_CLI_CONFIG: Required<CliConfig> = {
   port: 3000,
   gsiThrottleSec: 0.1,
   gsiHeartbeatSec: 1,
+  autoRecordRawGsiOnStart: false,
 };
 
 export function normalizeCliConfig(value: unknown): CliConfig {
@@ -16,6 +18,10 @@ export function normalizeCliConfig(value: unknown): CliConfig {
     port: asPositiveInt(raw.port, DEFAULT_CLI_CONFIG.port),
     gsiThrottleSec: asPositiveNumber(raw.gsiThrottleSec, DEFAULT_CLI_CONFIG.gsiThrottleSec),
     gsiHeartbeatSec: asPositiveNumber(raw.gsiHeartbeatSec, DEFAULT_CLI_CONFIG.gsiHeartbeatSec),
+    autoRecordRawGsiOnStart: asBoolean(
+      raw.autoRecordRawGsiOnStart,
+      DEFAULT_CLI_CONFIG.autoRecordRawGsiOnStart
+    ),
   };
   return normalized;
 }
@@ -43,6 +49,16 @@ function asPositiveNumber(value: unknown, fallback: number): number {
   if (typeof value === "string") {
     const parsed = Number.parseFloat(value);
     if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  return fallback;
+}
+
+function asBoolean(value: unknown, fallback: boolean): boolean {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true") return true;
+    if (normalized === "false") return false;
   }
   return fallback;
 }

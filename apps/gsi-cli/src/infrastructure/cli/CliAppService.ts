@@ -6,6 +6,7 @@ import {
 } from "../../application/cli/useCases/createOrUpdateGsiConfig";
 import { saveConfig } from "../../application/cli/useCases/saveConfig";
 import { launchCs2 } from "../../application/cli/useCases/launchCs2";
+import { openDataFolder } from "../../application/cli/useCases/openDataFolder";
 import { startGateway } from "../../application/cli/useCases/startGateway";
 import { stopGateway } from "../../application/cli/useCases/stopGateway";
 import { getGatewayDiagnostics } from "../../application/cli/useCases/getGatewayDiagnostics";
@@ -39,6 +40,7 @@ import { SteamRegistryCs2LocatorAdapter } from "./adapters/SteamRegistryCs2Locat
 import { TasklistCs2ProcessAdapter } from "./adapters/TasklistCs2ProcessAdapter";
 import { TasklistSteamProcessAdapter } from "./adapters/TasklistSteamProcessAdapter";
 import { SteamRegistrySteamInstallAdapter } from "./adapters/SteamRegistrySteamInstallAdapter";
+import { WindowsDataFolderOpenerAdapter } from "./adapters/WindowsDataFolderOpenerAdapter";
 import type { CliConfig } from "../../domain/cli/config";
 import type { GatewayStartInfo } from "../../application/cli/ports/GatewayPort";
 import type { GatewayDiagnostics } from "../../application/cli/ports/GatewayPort";
@@ -53,6 +55,7 @@ export interface CliApp {
   getConfig: () => Promise<CliConfig>;
   saveConfig: (config: Partial<CliConfig>) => Promise<CliConfig>;
   launchCs2: () => Promise<void>;
+  openDataFolder: () => Promise<void>;
   verifyGsiConfig: () => Promise<VerifyGsiConfigResult>;
   createOrUpdateGsiConfig: () => Promise<CreateOrUpdateGsiConfigResult>;
   startRecording: (filename: string) => Promise<void>;
@@ -80,6 +83,7 @@ export class CliAppService implements CliApp {
   private readonly cs2InstallPort: SteamRegistryCs2LocatorAdapter;
   private readonly gsiConfigFilePort: FsGsiConfigFileAdapter;
   private readonly cs2LauncherPort: SteamCs2LauncherAdapter;
+  private readonly dataFolderOpenerPort: WindowsDataFolderOpenerAdapter;
   private readonly cs2ProcessPort: TasklistCs2ProcessAdapter;
   private readonly steamProcessPort: TasklistSteamProcessAdapter;
   private readonly steamInstallPort: SteamRegistrySteamInstallAdapter;
@@ -91,6 +95,7 @@ export class CliAppService implements CliApp {
     this.cs2InstallPort = new SteamRegistryCs2LocatorAdapter();
     this.gsiConfigFilePort = new FsGsiConfigFileAdapter();
     this.cs2LauncherPort = new SteamCs2LauncherAdapter();
+    this.dataFolderOpenerPort = new WindowsDataFolderOpenerAdapter();
     this.cs2ProcessPort = new TasklistCs2ProcessAdapter();
     this.steamProcessPort = new TasklistSteamProcessAdapter();
     this.steamInstallPort = new SteamRegistrySteamInstallAdapter();
@@ -102,11 +107,12 @@ export class CliAppService implements CliApp {
       config: this.configPort,
       cs2Install: this.cs2InstallPort,
       gsiConfigFile: this.gsiConfigFilePort,
+      recorder: this.recorderPort,
     });
   }
 
   stopGateway(): Promise<void> {
-    return stopGateway({ gateway: this.gatewayPort });
+    return stopGateway({ gateway: this.gatewayPort, recorder: this.recorderPort });
   }
 
   getGatewayState(): Readonly<GsiProcessorState> | null {
@@ -133,6 +139,12 @@ export class CliAppService implements CliApp {
     return launchCs2({
       steamInstall: this.steamInstallPort,
       cs2Launcher: this.cs2LauncherPort,
+    });
+  }
+
+  openDataFolder(): Promise<void> {
+    return openDataFolder({
+      folderOpener: this.dataFolderOpenerPort,
     });
   }
 

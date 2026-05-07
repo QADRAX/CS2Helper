@@ -13,6 +13,7 @@ interface CliBodyPanelProps {
   configPortDraft: string;
   configThrottleDraft: string;
   configHeartbeatDraft: string;
+  autoRecordEnabled: boolean;
   onConfigPortChange: (value: string) => void;
   onConfigThrottleChange: (value: string) => void;
   onConfigHeartbeatChange: (value: string) => void;
@@ -27,6 +28,7 @@ export function CliBodyPanel({
   configPortDraft,
   configThrottleDraft,
   configHeartbeatDraft,
+  autoRecordEnabled,
   onConfigPortChange,
   onConfigThrottleChange,
   onConfigHeartbeatChange,
@@ -41,6 +43,7 @@ export function CliBodyPanel({
           configPortDraft={configPortDraft}
           configThrottleDraft={configThrottleDraft}
           configHeartbeatDraft={configHeartbeatDraft}
+          autoRecordEnabled={autoRecordEnabled}
           onConfigPortChange={onConfigPortChange}
           onConfigThrottleChange={onConfigThrottleChange}
           onConfigHeartbeatChange={onConfigHeartbeatChange}

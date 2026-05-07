@@ -1,4 +1,5 @@
 export * from "./ConfigPort";
+export * from "./DataFolderOpenerPort";
 export * from "./GatewayPort";
 export * from "./RecorderPort";
 export * from "./Cs2ProcessPort";

@@ -59,6 +59,20 @@ export const launchCs2 = createAsyncThunk<void, void, { extra: CliThunkExtra }>(
   }
 );
 
+export const openDataFolder = createAsyncThunk<void, void, { extra: CliThunkExtra }>(
+  "ui/openDataFolder",
+  async (_, { dispatch, extra }) => {
+    await extra.cliApp.openDataFolder();
+    dispatch(
+      enqueueNotification({
+        message: "Opened app data folder.",
+        kind: "info",
+        durationMs: 4000,
+      })
+    );
+  }
+);
+
 export const startRecording = createAsyncThunk<void, string, { extra: CliThunkExtra }>(
   "ui/startRecording",
   async (filename, { extra }) => {
