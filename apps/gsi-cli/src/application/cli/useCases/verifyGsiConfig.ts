@@ -1,4 +1,5 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
+import { DEFAULT_CLI_CONFIG } from "../../../domain/cli/config";
 import type { ConfigPort } from "../ports/ConfigPort";
 import type { Cs2InstallLocatorPort } from "../ports/Cs2InstallLocatorPort";
 import type { GsiConfigFilePort } from "../ports/GsiConfigFilePort";
@@ -29,6 +30,8 @@ export const verifyGsiConfig: AsyncUseCase<
 > = async ({ config, cs2Install, gsiConfigFile }) => {
   const cliConfig = await config.getConfig();
   const expectedPort = cliConfig.port;
+  const expectedThrottle = cliConfig.gsiThrottleSec ?? DEFAULT_CLI_CONFIG.gsiThrottleSec;
+  const expectedHeartbeat = cliConfig.gsiHeartbeatSec ?? DEFAULT_CLI_CONFIG.gsiHeartbeatSec;
   if (!Number.isFinite(expectedPort) || (expectedPort ?? 0) <= 0) {
     return {
       ok: false,
@@ -75,6 +78,24 @@ export const verifyGsiConfig: AsyncUseCase<
     };
   }
 
+  const cfgThrottle = installed.payload?.throttle;
+  const cfgHeartbeat = installed.payload?.heartbeat;
+  const mismatches: string[] = [];
+
+  if (!nearlyEqual(cfgThrottle, expectedThrottle)) {
+    mismatches.push(`throttle(cfg=${formatNum(cfgThrottle)}, app=${formatNum(expectedThrottle)})`);
+  }
+  if (!nearlyEqual(cfgHeartbeat, expectedHeartbeat)) {
+    mismatches.push(`heartbeat(cfg=${formatNum(cfgHeartbeat)}, app=${formatNum(expectedHeartbeat)})`);
+  }
+
+  if (mismatches.length > 0) {
+    return {
+      ok: false,
+      warningMessage: `CS2 cfg timing mismatch: ${mismatches.join(", ")}.`,
+    };
+  }
+
   return { ok: true };
 };
 
@@ -91,4 +112,14 @@ const tryReadPort = (endpointUrl: string): number | null => {
   } catch {
     return null;
   }
+};
+
+const nearlyEqual = (left: number | undefined, right: number, epsilon = 0.0001): boolean => {
+  if (!Number.isFinite(left)) return false;
+  return Math.abs((left as number) - right) <= epsilon;
+};
+
+const formatNum = (value: number | undefined): string => {
+  if (!Number.isFinite(value)) return "-";
+  return Number(value).toString();
 };
