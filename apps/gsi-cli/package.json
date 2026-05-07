@@ -16,6 +16,7 @@
     "@cs2helper/gsi-gateway": "1.0.0",
     "@cs2helper/gsi-processor": "1.0.0",
     "@cs2helper/shared": "1.0.0",
+    "@node-steam/vdf": "^2.2.0",
     "@reduxjs/toolkit": "^2.11.2",
     "ink": "^4.4.1",
     "ink-text-input": "^5.0.1",
