@@ -15,7 +15,7 @@ interface CliHeaderPanelProps {
 export function CliHeaderPanel({ steamStatus, cs2Status, gatewayStatus }: CliHeaderPanelProps) {
   const { t } = useTranslation();
   return (
-    <Box borderStyle="single" paddingX={1} flexDirection="column" width="100%">
+    <Box flexDirection="column" width="100%">
       <Text bold color="cyan">
         {t(msgKeys.cli.header.title)}
       </Text>

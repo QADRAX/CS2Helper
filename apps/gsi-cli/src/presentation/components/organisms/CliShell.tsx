@@ -4,6 +4,7 @@ import type { Cs2ProcessStatus } from "../../../application/cli/ports/Cs2Process
 import type { SteamStatus } from "../../../application/cli/useCases/getSteamStatus";
 import type { CliStatus } from "../../../domain/cli";
 import type { NotificationItem } from "../../store";
+import { CliSectionDivider } from "../atoms/CliSectionDivider";
 import { CliHeaderPanel } from "../molecules/CliHeaderPanel";
 import { NotificationsStack } from "../molecules/NotificationsStack";
 
@@ -16,13 +17,37 @@ interface CliShellProps {
   notifications: NotificationItem[];
 }
 
-export function CliShell({ steamStatus, cs2Status, gatewayStatus, gatewaySlot, primarySlot, notifications }: CliShellProps) {
+export function CliShell({
+  steamStatus,
+  cs2Status,
+  gatewayStatus,
+  gatewaySlot,
+  primarySlot,
+  notifications,
+}: CliShellProps) {
+  const hasNotifications = notifications.length > 0;
+
   return (
-    <Box flexDirection="column" width="100%">
-      <CliHeaderPanel steamStatus={steamStatus} cs2Status={cs2Status} gatewayStatus={gatewayStatus} />
-      {gatewaySlot}
+    <Box borderStyle="single" flexDirection="column" width="100%">
+      <Box paddingX={1}>
+        <CliHeaderPanel steamStatus={steamStatus} cs2Status={cs2Status} gatewayStatus={gatewayStatus} />
+      </Box>
+      <CliSectionDivider />
+      {gatewaySlot ? (
+        <>
+          <Box paddingX={1}>{gatewaySlot}</Box>
+          <CliSectionDivider />
+        </>
+      ) : null}
       {primarySlot}
-      <NotificationsStack notifications={notifications} />
+      {hasNotifications ? (
+        <>
+          <CliSectionDivider />
+          <Box paddingX={1}>
+            <NotificationsStack notifications={notifications} />
+          </Box>
+        </>
+      ) : null}
     </Box>
   );
 }

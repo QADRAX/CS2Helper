@@ -9,9 +9,13 @@ interface PrimaryPanelProps {
 
 export function PrimaryPanel({ children, errorMessage }: PrimaryPanelProps) {
   return (
-    <Box marginTop={1} borderStyle="single" paddingX={1} flexDirection="column" width="100%">
+    <Box flexDirection="column" width="100%">
       {children}
-      {errorMessage ? <ErrorMessageLine message={errorMessage} /> : null}
+      {errorMessage ? (
+        <Box paddingX={1}>
+          <ErrorMessageLine message={errorMessage} />
+        </Box>
+      ) : null}
     </Box>
   );
 }

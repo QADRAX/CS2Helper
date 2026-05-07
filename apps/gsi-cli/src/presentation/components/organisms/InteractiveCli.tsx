@@ -112,12 +112,15 @@ export function InteractiveCli() {
 
   useInput((input, key) => {
     if (mode === "menu") {
-      if (key.upArrow) {
+      if (
+        key.leftArrow ||
+        key.upArrow
+      ) {
         return void dispatch(
           interactiveMenuIndexMoved({ optionCount: menuOptions.length, direction: "prev" })
         );
       }
-      if (key.downArrow) {
+      if (key.rightArrow || key.downArrow) {
         return void dispatch(
           interactiveMenuIndexMoved({ optionCount: menuOptions.length, direction: "next" })
         );

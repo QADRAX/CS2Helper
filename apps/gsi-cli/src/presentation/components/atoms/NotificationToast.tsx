@@ -25,7 +25,7 @@ export function NotificationToast({ notification, nowMs }: NotificationToastProp
           : "cyan";
 
   return (
-    <Box flexDirection="column" borderStyle="single" paddingX={1}>
+    <Box flexDirection="column">
       <Text color={color}>
         {notification.kind.toUpperCase()}: {notification.message}
       </Text>

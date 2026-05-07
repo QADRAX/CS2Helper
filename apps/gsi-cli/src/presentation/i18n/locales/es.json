@@ -15,7 +15,7 @@
     },
     "menu": {
       "title": "Menú",
-      "hint": "↑/↓ y Enter",
+      "hint": "←/→ o ↑/↓, luego Enter",
       "start": "iniciar",
       "stop": "detener",
       "launchCs2": "abrir cs2",

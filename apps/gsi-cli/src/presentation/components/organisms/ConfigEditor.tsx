@@ -1,5 +1,7 @@
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
+import { MenuFootnote } from "../atoms/MenuFootnote";
+import { MenuHeading } from "../atoms/MenuHeading";
 import { MenuOptionLine } from "../atoms/MenuOptionLine";
 import {
   configDraftPatched,
@@ -20,54 +22,48 @@ export function ConfigEditor() {
 
   return (
     <>
-      <Box flexDirection="column" paddingTop={1} paddingBottom={1}>
-        <Text bold>{t(msgKeys.cli.config.title)}</Text>
-      </Box>
-      <MenuOptionLine label={t(msgKeys.cli.config.port)} focused={configCursor === 0} />
-      <Box marginLeft={2}>
-        <TextInput
-          value={draft.port}
-          onChange={(value) => dispatch(configDraftPatched({ port: value }))}
-          placeholder="27015"
-          focus={configCursor === 0}
+      <MenuHeading title={t(msgKeys.cli.config.title)} />
+      <Box flexDirection="column" paddingX={1}>
+        <MenuOptionLine label={t(msgKeys.cli.config.port)} focused={configCursor === 0} />
+        <Box marginLeft={2}>
+          <TextInput
+            value={draft.port}
+            onChange={(value) => dispatch(configDraftPatched({ port: value }))}
+            placeholder="27015"
+            focus={configCursor === 0}
+          />
+        </Box>
+        <MenuOptionLine label={t(msgKeys.cli.config.throttle)} focused={configCursor === 1} />
+        <Box marginLeft={2}>
+          <TextInput
+            value={draft.gsiThrottleSec}
+            onChange={(value) => dispatch(configDraftPatched({ gsiThrottleSec: value }))}
+            placeholder="0.1"
+            focus={configCursor === 1}
+          />
+        </Box>
+        <MenuOptionLine label={t(msgKeys.cli.config.heartbeat)} focused={configCursor === 2} />
+        <Box marginLeft={2}>
+          <TextInput
+            value={draft.gsiHeartbeatSec}
+            onChange={(value) => dispatch(configDraftPatched({ gsiHeartbeatSec: value }))}
+            placeholder="10"
+            focus={configCursor === 2}
+          />
+        </Box>
+        <MenuOptionLine label={`${t(msgKeys.cli.config.locale)} ${localeLabel}`} focused={configCursor === 3} />
+        <MenuOptionLine
+          label={`${t(msgKeys.cli.config.autoRecord)} ${draft.autoRecordRawGsiOnStart ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
+          focused={configCursor === 4}
         />
-      </Box>
-      <MenuOptionLine label={t(msgKeys.cli.config.throttle)} focused={configCursor === 1} />
-      <Box marginLeft={2}>
-        <TextInput
-          value={draft.gsiThrottleSec}
-          onChange={(value) => dispatch(configDraftPatched({ gsiThrottleSec: value }))}
-          placeholder="0.1"
-          focus={configCursor === 1}
-        />
-      </Box>
-      <MenuOptionLine label={t(msgKeys.cli.config.heartbeat)} focused={configCursor === 2} />
-      <Box marginLeft={2}>
-        <TextInput
-          value={draft.gsiHeartbeatSec}
-          onChange={(value) => dispatch(configDraftPatched({ gsiHeartbeatSec: value }))}
-          placeholder="10"
-          focus={configCursor === 2}
-        />
-      </Box>
-      <MenuOptionLine label={`${t(msgKeys.cli.config.locale)} ${localeLabel}`} focused={configCursor === 3} />
-      <MenuOptionLine
-        label={`${t(msgKeys.cli.config.autoRecord)} ${draft.autoRecordRawGsiOnStart ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
-        focused={configCursor === 4}
-      />
-      <Box flexDirection="column" marginTop={1} paddingTop={1} paddingBottom={1}>
-        <MenuOptionLine label={t(msgKeys.cli.config.save)} focused={configCursor === 5} activeColor="green" />
-        <Box marginTop={1}>
+        <Box flexDirection="column" marginTop={1}>
+          <MenuOptionLine label={t(msgKeys.cli.config.save)} focused={configCursor === 5} activeColor="green" />
           <MenuOptionLine label={t(msgKeys.cli.config.createCfg)} focused={configCursor === 6} activeColor="cyan" />
-        </Box>
-        <Box marginTop={1}>
           <MenuOptionLine label={t(msgKeys.cli.config.openDataFolder)} focused={configCursor === 7} activeColor="cyan" />
-        </Box>
-        <Box marginTop={1}>
           <MenuOptionLine label={t(msgKeys.cli.config.cancel)} focused={configCursor === 8} activeColor="yellow" />
         </Box>
       </Box>
-      <Text color="gray">{t(msgKeys.cli.config.navHint)}</Text>
+      <MenuFootnote>{t(msgKeys.cli.config.navHint)}</MenuFootnote>
     </>
   );
 }

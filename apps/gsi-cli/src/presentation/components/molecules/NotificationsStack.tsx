@@ -24,7 +24,7 @@ export function NotificationsStack({ notifications }: NotificationsStackProps) {
   if (notifications.length === 0) return null;
 
   return (
-    <Box marginTop={1} flexDirection="column" gap={1} width="100%">
+    <Box flexDirection="column" gap={1} width="100%">
       {notifications.map((item) => (
         <NotificationToast key={item.id} notification={item} nowMs={nowMs} />
       ))}

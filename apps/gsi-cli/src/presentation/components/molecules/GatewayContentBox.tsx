@@ -32,7 +32,7 @@ export function GatewayContentBox({
   const waitingForCs2 = !payload && !cs2Running;
 
   return (
-    <Box marginTop={1} borderStyle="single" paddingX={1} flexDirection="column" width="100%">
+    <Box flexDirection="column" width="100%">
       <Text bold color="cyan">
         {t(msgKeys.cli.gateway.title)}
       </Text>
