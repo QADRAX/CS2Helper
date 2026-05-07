@@ -8,7 +8,7 @@ interface StatusLineProps {
 
 export function StatusLine({ status, port }: StatusLineProps) {
   return (
-    <Text>
+    <Text wrap="wrap">
       Status: {status} {port ? `(Port: ${port})` : ""}
     </Text>
   );

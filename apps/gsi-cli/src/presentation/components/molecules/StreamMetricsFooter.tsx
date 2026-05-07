@@ -1,30 +1,33 @@
 import { Box } from "ink";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import { StreamStateBadge } from "../atoms/StreamStateBadge";
 import { MutedText } from "../atoms/MutedText";
+import { StreamStateBadge } from "../atoms/StreamStateBadge";
 
 interface StreamMetricsFooterProps {
   gsiState: Readonly<GsiProcessorState>;
+  contentWidth: number;
 }
 
-export function StreamMetricsFooter({ gsiState }: StreamMetricsFooterProps) {
+export function StreamMetricsFooter({ gsiState, contentWidth }: StreamMetricsFooterProps) {
   const { totalTicks, streamState } = gsiState;
   const streamOk = streamState === "healthy";
 
   return (
-    <Box flexDirection="column">
-      <Box gap={1}>
-        <MutedText>
+    <Box flexDirection="column" width={contentWidth} gap={1}>
+      <Box flexDirection="row" flexWrap="wrap" width={contentWidth} gap={1}>
+        <MutedText wrap="wrap">
           Ticks: {totalTicks}
         </MutedText>
-        <MutedText>(GSI POSTs received)</MutedText>
+        <MutedText wrap="wrap">(GSI POSTs received)</MutedText>
       </Box>
       <StreamStateBadge state={streamState} />
       {!streamOk ? (
-        <MutedText>
-          Round stats (K/D/damage/flashes) only update when stream is healthy — partial or incomplete
-          snapshots skip critical reducers.
-        </MutedText>
+        <Box width={contentWidth}>
+          <MutedText wrap="wrap">
+            Round stats (K/D/damage/flashes) only update when stream is healthy — partial or incomplete
+            snapshots skip critical reducers.
+          </MutedText>
+        </Box>
       ) : null}
     </Box>
   );

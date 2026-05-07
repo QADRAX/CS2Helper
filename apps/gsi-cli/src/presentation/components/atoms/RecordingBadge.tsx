@@ -1,14 +1,16 @@
-import { Text } from "ink";
+import { Box, Text } from "ink";
 
 interface RecordingBadgeProps {
   path: string;
+  maxWidth: number;
 }
 
-export function RecordingBadge({ path }: RecordingBadgeProps) {
+export function RecordingBadge({ path, maxWidth }: RecordingBadgeProps) {
   return (
-    <Text color="red" bold>
-      {" "}
-      ● RECORDING: {path}
-    </Text>
+    <Box width={maxWidth}>
+      <Text color="red" bold wrap="truncate-end">
+        ● RECORDING: {path}
+      </Text>
+    </Box>
   );
 }

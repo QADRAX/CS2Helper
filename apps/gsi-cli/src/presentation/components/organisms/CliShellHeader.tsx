@@ -8,7 +8,11 @@ import { HeaderTitleRow } from "../molecules/HeaderTitleRow";
 import { StatusLine } from "../atoms/StatusLine";
 import { SystemStatusRow } from "../molecules/SystemStatusRow";
 
+/** Horizontal space consumed by `borderStyle="single"` + `padding={1}`. */
+const HEADER_FRAME_INSET = 4;
+
 export interface CliShellHeaderProps {
+  terminalWidth: number;
   status: CliStatus;
   port: number | undefined;
   errorMessage: string | undefined;
@@ -19,6 +23,7 @@ export interface CliShellHeaderProps {
 }
 
 export function CliShellHeader({
+  terminalWidth,
   status,
   port,
   errorMessage,
@@ -27,13 +32,29 @@ export function CliShellHeader({
   cs2Status,
   steamStatus,
 }: CliShellHeaderProps) {
+  const innerWidth = Math.max(20, terminalWidth - HEADER_FRAME_INSET);
+  const stackSystemStatus = terminalWidth < 80;
+
   return (
-    <Box borderStyle="single" padding={1} flexDirection="column">
-      <HeaderTitleRow recordingPath={recordingPath} />
-      <SystemStatusRow cs2Status={cs2Status} steamStatus={steamStatus} />
-      <StatusLine status={status} port={port} />
-      <ConfigPortLine port={configPort} />
-      {errorMessage ? <ErrorLine message={errorMessage} /> : null}
+    <Box borderStyle="single" padding={1} flexDirection="column" width={terminalWidth}>
+      <HeaderTitleRow recordingPath={recordingPath} maxWidth={innerWidth} />
+      <SystemStatusRow
+        cs2Status={cs2Status}
+        steamStatus={steamStatus}
+        stacked={stackSystemStatus}
+        maxWidth={innerWidth}
+      />
+      <Box width={innerWidth}>
+        <StatusLine status={status} port={port} />
+      </Box>
+      <Box width={innerWidth}>
+        <ConfigPortLine port={configPort} />
+      </Box>
+      {errorMessage ? (
+        <Box width={innerWidth}>
+          <ErrorLine message={errorMessage} />
+        </Box>
+      ) : null}
     </Box>
   );
 }

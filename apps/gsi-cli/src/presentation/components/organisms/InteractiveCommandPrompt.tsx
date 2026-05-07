@@ -5,7 +5,11 @@ import { useAppDispatch } from "../../hooks/redux";
 import { PromptInputRow } from "../molecules/PromptInputRow";
 import { PromptSuggestionRow } from "../molecules/PromptSuggestionRow";
 
-export function InteractiveCommandPrompt() {
+interface InteractiveCommandPromptProps {
+  contentWidth: number;
+}
+
+export function InteractiveCommandPrompt({ contentWidth }: InteractiveCommandPromptProps) {
   const dispatch = useAppDispatch();
   const { query, inputKey, availableOptions, suggestionIndex, onQueryChange, flushPrompt } =
     usePrompt();
@@ -16,8 +20,12 @@ export function InteractiveCommandPrompt() {
   };
 
   return (
-    <Box flexDirection="column">
-      <PromptSuggestionRow options={availableOptions} activeIndex={suggestionIndex} />
+    <Box flexDirection="column" width={contentWidth}>
+      <PromptSuggestionRow
+        options={availableOptions}
+        activeIndex={suggestionIndex}
+        contentWidth={contentWidth}
+      />
       <PromptInputRow
         inputKey={inputKey}
         value={query}

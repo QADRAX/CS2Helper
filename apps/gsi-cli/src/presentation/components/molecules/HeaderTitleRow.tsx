@@ -4,13 +4,14 @@ import { TitleHeading } from "../atoms/TitleHeading";
 
 interface HeaderTitleRowProps {
   recordingPath: string | undefined;
+  maxWidth: number;
 }
 
-export function HeaderTitleRow({ recordingPath }: HeaderTitleRowProps) {
+export function HeaderTitleRow({ recordingPath, maxWidth }: HeaderTitleRowProps) {
   return (
-    <Box justifyContent="space-between">
+    <Box flexDirection="column" width={maxWidth} gap={1}>
       <TitleHeading />
-      {recordingPath ? <RecordingBadge path={recordingPath} /> : null}
+      {recordingPath ? <RecordingBadge path={recordingPath} maxWidth={maxWidth} /> : null}
     </Box>
   );
 }

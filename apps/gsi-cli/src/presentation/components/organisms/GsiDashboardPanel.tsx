@@ -8,13 +8,17 @@ import { StreamMetricsFooter } from "../molecules/StreamMetricsFooter";
 
 interface GsiDashboardPanelProps {
   gsiState: Readonly<GsiProcessorState> | null;
+  /** Matches TTY width so long lines wrap instead of breaking the layout. */
+  contentWidth: number;
 }
 
-export function GsiDashboardPanel({ gsiState }: GsiDashboardPanelProps) {
+export function GsiDashboardPanel({ gsiState, contentWidth }: GsiDashboardPanelProps) {
   if (!gsiState) {
     return (
-      <Box paddingY={1}>
-        <MutedText italic>Waiting for GSI State...</MutedText>
+      <Box paddingY={1} width={contentWidth}>
+        <MutedText italic wrap="wrap">
+          Waiting for GSI State...
+        </MutedText>
       </Box>
     );
   }
@@ -23,9 +27,11 @@ export function GsiDashboardPanel({ gsiState }: GsiDashboardPanelProps) {
 
   if (!currentMatch) {
     return (
-      <Box flexDirection="column" gap={1}>
-        <MutedText italic>Connected — waiting for match...</MutedText>
-        <StreamMetricsFooter gsiState={gsiState} />
+      <Box flexDirection="column" gap={1} width={contentWidth}>
+        <MutedText italic wrap="wrap">
+          Connected — waiting for match...
+        </MutedText>
+        <StreamMetricsFooter gsiState={gsiState} contentWidth={contentWidth} />
       </Box>
     );
   }
@@ -34,20 +40,20 @@ export function GsiDashboardPanel({ gsiState }: GsiDashboardPanelProps) {
   const players = Object.values(playersBySteamId);
 
   return (
-    <Box flexDirection="column" gap={1}>
-      <MatchHeadline match={currentMatch} />
+    <Box flexDirection="column" gap={1} width={contentWidth}>
+      <MatchHeadline match={currentMatch} contentWidth={contentWidth} />
       {lastRound ? <RoundSummary round={lastRound} /> : null}
       {players.length > 0 ? (
-        <Box flexDirection="column">
+        <Box flexDirection="column" width={contentWidth}>
           <Text bold color="cyan">
             Players
           </Text>
           {players.map((p) => (
-            <PlayerRow key={p.steamid} player={p} />
+            <PlayerRow key={p.steamid} player={p} contentWidth={contentWidth} />
           ))}
         </Box>
       ) : null}
-      <StreamMetricsFooter gsiState={gsiState} />
+      <StreamMetricsFooter gsiState={gsiState} contentWidth={contentWidth} />
     </Box>
   );
 }

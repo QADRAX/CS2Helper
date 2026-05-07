@@ -1,11 +1,13 @@
 import { Box } from "ink";
 import { selectUiState } from "../../store";
 import { useAppSelector } from "../../hooks/redux";
+import { useTerminalColumns } from "../../hooks/useTerminalColumns";
 import { CliShellHeader } from "./CliShellHeader";
 import { GsiDashboardPanel } from "./GsiDashboardPanel";
 import { InteractiveCommandPrompt } from "./InteractiveCommandPrompt";
 
 export function CliShell() {
+  const terminalWidth = useTerminalColumns();
   const {
     status,
     port,
@@ -18,8 +20,9 @@ export function CliShell() {
   } = useAppSelector(selectUiState);
 
   return (
-    <Box flexDirection="column" width="100%">
+    <Box flexDirection="column" width={terminalWidth}>
       <CliShellHeader
+        terminalWidth={terminalWidth}
         status={status}
         port={port}
         errorMessage={errorMessage}
@@ -28,10 +31,12 @@ export function CliShell() {
         cs2Status={cs2Status}
         steamStatus={steamStatus}
       />
-      <Box paddingY={1}>
-        <GsiDashboardPanel gsiState={gsiState} />
+      <Box paddingY={1} width={terminalWidth}>
+        <GsiDashboardPanel gsiState={gsiState} contentWidth={terminalWidth} />
       </Box>
-      <InteractiveCommandPrompt />
+      <Box width={terminalWidth}>
+        <InteractiveCommandPrompt contentWidth={terminalWidth} />
+      </Box>
     </Box>
   );
 }

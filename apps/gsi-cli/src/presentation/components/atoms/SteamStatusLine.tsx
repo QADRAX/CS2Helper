@@ -10,7 +10,7 @@ export function SteamStatusLine({ status }: SteamStatusLineProps) {
   const detail = status.running && status.pid ? ` (pid ${status.pid})` : "";
 
   return (
-    <Text>
+    <Text wrap="wrap">
       <Text color="gray" dimColor>
         Steam:{" "}
       </Text>

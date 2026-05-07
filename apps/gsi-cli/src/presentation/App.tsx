@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Box } from "ink";
 import { Provider } from "react-redux";
 import type { CliApp } from "../infrastructure/cli/CliAppService";
 import { CliShell } from "./components/organisms/CliShell";
@@ -26,8 +27,10 @@ export function App({ cliApp }: AppProps) {
 
   return (
     <Provider store={store}>
-      <AppEffects cliApp={cliApp} />
-      <CliShell />
+      <Box flexDirection="column">
+        <AppEffects cliApp={cliApp} />
+        <CliShell />
+      </Box>
     </Provider>
   );
 }

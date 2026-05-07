@@ -11,7 +11,7 @@ export function Cs2StatusLine({ status }: Cs2StatusLineProps) {
   const detail = status.running && status.pid ? ` (pid ${status.pid})` : "";
 
   return (
-    <Text>
+    <Text wrap="wrap">
       <Text color="gray" dimColor>
         CS2:{" "}
       </Text>

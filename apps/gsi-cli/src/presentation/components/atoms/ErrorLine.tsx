@@ -5,5 +5,9 @@ interface ErrorLineProps {
 }
 
 export function ErrorLine({ message }: ErrorLineProps) {
-  return <Text color="red">Error: {message}</Text>;
+  return (
+    <Text color="red" wrap="wrap">
+      Error: {message}
+    </Text>
+  );
 }

@@ -6,6 +6,8 @@ interface ConfigPortLineProps {
 
 export function ConfigPortLine({ port }: ConfigPortLineProps) {
   return (
-    <Text color="gray">Config: Port={port ?? "unset"}</Text>
+    <Text color="gray" wrap="wrap">
+      Config: Port={port ?? "unset"}
+    </Text>
   );
 }
