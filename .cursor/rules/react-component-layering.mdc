@@ -6,19 +6,19 @@ alwaysApply: false
 
 # gsi-cli Presentation Architecture
 
-The CLI UI uses a single layout root in `App.tsx` instead of atomic component layering.
+The CLI UI uses `App.tsx` as root composition, `CliShell` as layout shell, and an interactive organism for body flow.
 
 ## 1) Layout Ownership
 
-- `App.tsx` owns persistent header + switchable body.
-- `AppEffects` is preserved for bootstrap and sync hooks.
-- Do not reintroduce `atoms`, `molecules`, or `organisms` folders for gsi-cli.
+- `App.tsx` owns root composition (`Provider`, `RootReduxEffects`, `InteractiveCli`).
+- Bootstrap and sync hooks live in `App.tsx` as `RootReduxEffects` (child of `Provider`).
+- `InteractiveCli` drives screen mode/input; body screens select from the `cliSession` slice (`useCliSession` removed).
 
 ## 2) State Boundaries
 
 - Redux selectors/thunks remain the source of truth for app/system state.
-- Local React state in `App.tsx` controls screen mode and cursor positions.
-- Config editing must use a local draft and dispatch save only on explicit confirmation.
+- Local CLI navigation state maps to Redux `cliSession`; `InteractiveCli` holds `useInput` and dispatches actions.
+- Config editing keeps a slice-held draft (synced from persisted config while in config mode); `saveCliConfig` runs only after explicit confirmation.
 
 ## 3) Interaction Model
 

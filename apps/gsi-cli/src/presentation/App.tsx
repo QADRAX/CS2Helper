@@ -1,12 +1,24 @@
 import { useMemo } from "react";
 import { Provider } from "react-redux";
 import type { CliApp } from "../infrastructure/cli/CliAppService";
+import { InteractiveCli } from "./components/organisms/InteractiveCli";
+import { useConfigBootstrap } from "./hooks/useConfigBootstrap";
+import { useGatewayDiagnosticsSync } from "./hooks/useGatewayDiagnosticsSync";
+import { useGatewayStateSync } from "./hooks/useGatewayStateSync";
+import { useSystemStatusSync } from "./hooks/useSystemStatusSync";
 import { createAppStore } from "./store";
-import { AppEffects } from "./components/organisms/AppEffects";
-import { CliShell } from "./components/organisms/CliShell";
 
 export interface AppProps {
   cliApp: CliApp;
+}
+
+/** Redux bootstrap and sync hooks; must render under Provider (uses store context). */
+function RootReduxEffects({ cliApp }: { cliApp: CliApp }) {
+  useConfigBootstrap();
+  useGatewayStateSync(cliApp);
+  useGatewayDiagnosticsSync(cliApp);
+  useSystemStatusSync(cliApp);
+  return null;
 }
 
 /**
@@ -17,8 +29,8 @@ export function App({ cliApp }: AppProps) {
 
   return (
     <Provider store={store}>
-      <AppEffects cliApp={cliApp} />
-      <CliShell />
+      <RootReduxEffects cliApp={cliApp} />
+      <InteractiveCli />
     </Provider>
   );
 }

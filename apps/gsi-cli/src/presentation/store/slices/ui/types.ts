@@ -5,20 +5,6 @@ import type { SteamStatus } from "../../../../application/cli/useCases/getSteamS
 import type { CliStatus } from "../../../../domain/cli";
 import type { CliConfig } from "../../../../domain/cli/config";
 
-export interface PromptUiState {
-  query: string;
-  suggestionIndex: number;
-  lastBaseQuery: string;
-  inputKey: number;
-}
-
-export const promptInitialState: PromptUiState = {
-  query: "",
-  suggestionIndex: -1,
-  lastBaseQuery: "",
-  inputKey: 0,
-};
-
 export interface UiState {
   status: CliStatus;
   errorMessage?: string;
@@ -28,7 +14,6 @@ export interface UiState {
   port?: number;
   recordingPath?: string;
   config: CliConfig;
-  prompt: PromptUiState;
   cs2Status: Cs2ProcessStatus;
   steamStatus: SteamStatus;
 }
@@ -45,7 +30,6 @@ export const uiInitialState: UiState = {
   gsiState: null,
   gatewayDiagnostics: { receivedRequests: 0, rejectedRequests: 0 },
   config: {},
-  prompt: { ...promptInitialState },
   cs2Status: cs2StatusInitial,
   steamStatus: steamStatusInitial,
 };

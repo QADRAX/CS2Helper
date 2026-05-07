@@ -3,7 +3,7 @@ import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
 import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
-import { promptInitialState, uiInitialState, type PromptUiState } from "./types";
+import { uiInitialState } from "./types";
 import {
   loadConfig,
   openDataFolder,
@@ -30,15 +30,6 @@ const uiSlice = createSlice({
     },
     clearError: (state) => {
       state.errorMessage = undefined;
-    },
-    promptPatched: (state, action: PayloadAction<Partial<PromptUiState>>) => {
-      Object.assign(state.prompt, action.payload);
-    },
-    promptReset: (state) => {
-      state.prompt = { ...promptInitialState };
-    },
-    promptInputKeyBumped: (state) => {
-      state.prompt.inputKey += 1;
     },
     cs2StatusUpdated: (state, action: PayloadAction<Cs2ProcessStatus>) => {
       state.cs2Status = action.payload;
@@ -109,9 +100,6 @@ export const {
   gatewayDiagnosticsUpdated,
   setError,
   clearError,
-  promptPatched,
-  promptReset,
-  promptInputKeyBumped,
   cs2StatusUpdated,
   steamStatusUpdated,
 } = uiSlice.actions;

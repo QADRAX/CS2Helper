@@ -2,20 +2,20 @@
 
 ## Goal
 
-Build and evolve the CLI UI from a single layout root in `App.tsx` using explicit screen modes,
-while keeping Redux store and presentation hooks as the source of truth.
+Build and evolve the CLI UI with `App.tsx` as entry point, `CliShell` as base layout,
+and a dedicated interactive organism for screen modes and keyboard flow.
 
 ## Architecture Rules
 
-- `App.tsx` owns layout orchestration: persistent header + switchable body.
-- Use a local screen state machine in `App.tsx` (menu/config/confirm screens).
-- Keep side-effect wiring in `AppEffects` (`useConfigBootstrap`, sync hooks).
-- Do not reintroduce `atoms` / `molecules` / `organisms` for this app.
+- `App.tsx` composes store + `RootReduxEffects` + `InteractiveCli`.
+- `CliShell` is layout-only (header, optional gateway panel, primary panel slot, notifications).
+- `InteractiveCli` owns the interactive screen state machine (menu/config/confirm), `useInput`, and the `cliSession` Redux slice; child screens consume selectors/actions for that slice.
+- Keep side-effect wiring in `App.tsx` via `RootReduxEffects` (`useConfigBootstrap`, sync hooks).
 
 ## State Ownership
 
 - Global application state comes from Redux selectors/thunks.
-- Screen navigation state is local UI state in `App.tsx`.
+- Screen navigation indices and configuration draft live in the `cliSession` slice (`store/slices/cliSession`).
 - Config editing uses a local draft that is applied only on explicit save.
 
 ## Interaction Rules

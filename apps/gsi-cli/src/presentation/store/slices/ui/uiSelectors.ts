@@ -4,7 +4,7 @@ import type { SteamStatus } from "../../../../application/cli/useCases/getSteamS
 import type { CliConfig } from "../../../../domain/cli/config";
 import type { CliStatus } from "../../../../domain/cli";
 import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
-import type { PromptUiState, UiState } from "./types";
+import type { UiState } from "./types";
 import type { RootState } from "../../rootState";
 
 export function selectUiState(state: RootState): UiState {
@@ -41,10 +41,6 @@ export function selectGsiState(state: RootState): Readonly<GsiProcessorState> | 
 
 export function selectGatewayDiagnostics(state: RootState): GatewayDiagnostics {
   return state.ui.gatewayDiagnostics;
-}
-
-export function selectPromptState(state: RootState): PromptUiState {
-  return state.ui.prompt;
 }
 
 export function selectCs2Status(state: RootState): Cs2ProcessStatus {

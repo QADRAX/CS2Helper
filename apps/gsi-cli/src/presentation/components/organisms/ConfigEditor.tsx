@@ -1,36 +1,26 @@
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import { MenuOptionLine } from "../atoms/MenuOptionLine";
+import {
+  configDraftPatched,
+  selectInteractiveConfigCursor,
+  selectInteractiveConfigDraft,
+} from "../../store";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 
-interface ConfigScreenProps {
-  configCursor: number;
-  configPortDraft: string;
-  configThrottleDraft: string;
-  configHeartbeatDraft: string;
-  autoRecordEnabled: boolean;
-  onConfigPortChange: (value: string) => void;
-  onConfigThrottleChange: (value: string) => void;
-  onConfigHeartbeatChange: (value: string) => void;
-}
+export function ConfigEditor() {
+  const dispatch = useAppDispatch();
+  const configCursor = useAppSelector(selectInteractiveConfigCursor);
+  const draft = useAppSelector(selectInteractiveConfigDraft);
 
-export function ConfigScreen({
-  configCursor,
-  configPortDraft,
-  configThrottleDraft,
-  configHeartbeatDraft,
-  autoRecordEnabled,
-  onConfigPortChange,
-  onConfigThrottleChange,
-  onConfigHeartbeatChange,
-}: ConfigScreenProps) {
   return (
     <>
       <Text bold>Configuration</Text>
       <MenuOptionLine label="port:" focused={configCursor === 0} />
       <Box marginLeft={2}>
         <TextInput
-          value={configPortDraft}
-          onChange={onConfigPortChange}
+          value={draft.port}
+          onChange={(value) => dispatch(configDraftPatched({ port: value }))}
           placeholder="27015"
           focus={configCursor === 0}
         />
@@ -38,8 +28,8 @@ export function ConfigScreen({
       <MenuOptionLine label="gsi throttle (sec):" focused={configCursor === 1} />
       <Box marginLeft={2}>
         <TextInput
-          value={configThrottleDraft}
-          onChange={onConfigThrottleChange}
+          value={draft.gsiThrottleSec}
+          onChange={(value) => dispatch(configDraftPatched({ gsiThrottleSec: value }))}
           placeholder="0.1"
           focus={configCursor === 1}
         />
@@ -47,14 +37,14 @@ export function ConfigScreen({
       <MenuOptionLine label="gsi heartbeat (sec):" focused={configCursor === 2} />
       <Box marginLeft={2}>
         <TextInput
-          value={configHeartbeatDraft}
-          onChange={onConfigHeartbeatChange}
+          value={draft.gsiHeartbeatSec}
+          onChange={(value) => dispatch(configDraftPatched({ gsiHeartbeatSec: value }))}
           placeholder="10"
           focus={configCursor === 2}
         />
       </Box>
       <MenuOptionLine
-        label={`auto record on start: ${autoRecordEnabled ? "true" : "false"}`}
+        label={`auto record on start: ${draft.autoRecordRawGsiOnStart ? "true" : "false"}`}
         focused={configCursor === 3}
       />
       <MenuOptionLine label="save" focused={configCursor === 4} activeColor="green" />

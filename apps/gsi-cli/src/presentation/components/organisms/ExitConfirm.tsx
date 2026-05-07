@@ -1,6 +1,6 @@
 import { Text } from "ink";
 
-export function ExitConfirmScreen() {
+export function ExitConfirm() {
   return (
     <>
       <Text bold color="yellow">
