@@ -6,3 +6,4 @@ export * from "./Cs2InstallLocatorPort";
 export * from "./Cs2LauncherPort";
 export * from "./GsiConfigFilePort";
 export * from "./SteamInstallLocatorPort";
+export * from "./SteamProcessPort";

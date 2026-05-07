@@ -4,6 +4,7 @@ import type { CliApp } from "../infrastructure/cli/CliAppService";
 import { CliShell } from "./components/organisms/CliShell";
 import { useConfigBootstrap } from "./hooks/useConfigBootstrap";
 import { useGatewayStateSync } from "./hooks/useGatewayStateSync";
+import { useSystemStatusSync } from "./hooks/useSystemStatusSync";
 import { createAppStore } from "./store";
 
 export interface AppProps {
@@ -13,6 +14,7 @@ export interface AppProps {
 function AppEffects({ cliApp }: { cliApp: CliApp }) {
   useConfigBootstrap();
   useGatewayStateSync(cliApp);
+  useSystemStatusSync(cliApp);
   return null;
 }
 

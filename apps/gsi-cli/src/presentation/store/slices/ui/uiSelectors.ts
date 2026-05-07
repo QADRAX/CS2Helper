@@ -1,4 +1,6 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
+import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import type { CliConfig } from "../../../../domain/cli/config";
 import type { CliStatus } from "../../../../domain/cli";
 import type { PromptUiState, UiState } from "./types";
@@ -34,4 +36,12 @@ export function selectGsiState(state: RootState): Readonly<GsiProcessorState> | 
 
 export function selectPromptState(state: RootState): PromptUiState {
   return state.ui.prompt;
+}
+
+export function selectCs2Status(state: RootState): Cs2ProcessStatus {
+  return state.ui.cs2Status;
+}
+
+export function selectSteamStatus(state: RootState): SteamStatus {
+  return state.ui.steamStatus;
 }

@@ -1,5 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
+import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import { promptInitialState, uiInitialState, type PromptUiState } from "./types";
 import {
   loadConfig,
@@ -31,6 +33,12 @@ const uiSlice = createSlice({
     },
     promptInputKeyBumped: (state) => {
       state.prompt.inputKey += 1;
+    },
+    cs2StatusUpdated: (state, action: PayloadAction<Cs2ProcessStatus>) => {
+      state.cs2Status = action.payload;
+    },
+    steamStatusUpdated: (state, action: PayloadAction<SteamStatus>) => {
+      state.steamStatus = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -81,5 +89,7 @@ export const {
   promptPatched,
   promptReset,
   promptInputKeyBumped,
+  cs2StatusUpdated,
+  steamStatusUpdated,
 } = uiSlice.actions;
 export const uiReducer = uiSlice.reducer;
