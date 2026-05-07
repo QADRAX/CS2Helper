@@ -1,8 +1,12 @@
+import type { AppLocale } from "./locale";
+import { parseAppLocale } from "./locale";
+
 export interface CliConfig {
   port?: number;
   gsiThrottleSec?: number;
   gsiHeartbeatSec?: number;
   autoRecordRawGsiOnStart?: boolean;
+  locale?: AppLocale;
 }
 
 export const DEFAULT_CLI_CONFIG: Required<CliConfig> = {
@@ -10,6 +14,7 @@ export const DEFAULT_CLI_CONFIG: Required<CliConfig> = {
   gsiThrottleSec: 0.1,
   gsiHeartbeatSec: 1,
   autoRecordRawGsiOnStart: false,
+  locale: "en",
 };
 
 export function normalizeCliConfig(value: unknown): CliConfig {
@@ -22,6 +27,7 @@ export function normalizeCliConfig(value: unknown): CliConfig {
       raw.autoRecordRawGsiOnStart,
       DEFAULT_CLI_CONFIG.autoRecordRawGsiOnStart
     ),
+    locale: parseAppLocale(raw.locale),
   };
   return normalized;
 }

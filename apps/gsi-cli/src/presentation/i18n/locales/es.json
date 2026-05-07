@@ -1,0 +1,78 @@
+{
+  "cli": {
+    "header": {
+      "title": "CS2Helper CLI"
+    },
+    "status": {
+      "steam": "Steam",
+      "cs2": "CS2",
+      "gatewayLabel": "Puerta",
+      "on": "SÍ",
+      "off": "NO",
+      "gatewayListen": "ESCUCHANDO",
+      "gatewayIdle": "INACTIVO",
+      "gatewayError": "ERROR"
+    },
+    "menu": {
+      "title": "Menú",
+      "hint": "↑/↓ y Enter",
+      "start": "iniciar",
+      "stop": "detener",
+      "launchCs2": "abrir cs2",
+      "config": "config",
+      "exit": "salir"
+    },
+    "config": {
+      "title": "Configuración",
+      "port": "puerto:",
+      "throttle": "gsi throttle (seg):",
+      "heartbeat": "gsi heartbeat (seg):",
+      "locale": "idioma:",
+      "localeEn": "English",
+      "localeEs": "Español",
+      "autoRecord": "grabar al iniciar:",
+      "true": "sí",
+      "false": "no",
+      "save": "guardar",
+      "createCfg": "crear cfg",
+      "openDataFolder": "abrir carpeta de datos",
+      "cancel": "cancelar",
+      "navHint": "↑/↓ para mover, Enter para confirmar, Esc para cancelar"
+    },
+    "exit": {
+      "title": "¿Salir del CLI?",
+      "hint": "Enter o Y para confirmar, N o Esc para cancelar."
+    },
+    "gateway": {
+      "title": "Contenido del gateway",
+      "warningPrefix": "Aviso:",
+      "spinner": "{frame} esperando cliente cs2",
+      "streamState": "streamState:",
+      "ticksReceived": "ticksRecibidos:",
+      "lastTickAt": "últimoTick:",
+      "httpRequests": "httpRequests:",
+      "httpRejected": "httpRechazados:",
+      "lastRejectReason": "últimoRechazo:",
+      "watcherMode": "watcherMode:",
+      "lastGameState": "lastGameState:",
+      "player": "jugador:",
+      "allplayers": "todosLosJugadores:",
+      "valueAvailable": "disponible",
+      "valueNull": "nulo",
+      "valueNone": "ninguno"
+    },
+    "notification": {
+      "cfgUpdated": "CFG de CS2 actualizada en {path}",
+      "launchCs2": "Comando de arranque enviado a Steam para CS2.",
+      "dataFolder": "Carpeta de datos de la app abierta."
+    },
+    "error": {
+      "linePrefix": "Error:",
+      "gatewayStart": "Fallo al iniciar la puerta",
+      "configSave": "Fallo al guardar la configuración",
+      "launchCs2": "Fallo al lanzar CS2",
+      "openDataFolder": "Fallo al abrir la carpeta de datos",
+      "recording": "Fallo en la grabación"
+    }
+  }
+}

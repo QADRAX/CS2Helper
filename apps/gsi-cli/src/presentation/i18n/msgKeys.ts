@@ -1,0 +1,87 @@
+/**
+ * Claves de mensaje: valores = ids planos tras aplanar el JSON (`cli.gateway.streamState`).
+ * Los ficheros `locales/*.json` usan objetos anidados; `flattenNestedMessages` genera estos ids.
+ * Usa `msgKeys.cli.gateway.streamState` en lugar de pasar strings a mano en `t(...)`.
+ */
+export const msgKeys = {
+  cli: {
+    header: {
+      title: "cli.header.title",
+    },
+    status: {
+      steam: "cli.status.steam",
+      cs2: "cli.status.cs2",
+      gatewayLabel: "cli.status.gatewayLabel",
+      on: "cli.status.on",
+      off: "cli.status.off",
+      gatewayListen: "cli.status.gatewayListen",
+      gatewayIdle: "cli.status.gatewayIdle",
+      gatewayError: "cli.status.gatewayError",
+    },
+    menu: {
+      title: "cli.menu.title",
+      hint: "cli.menu.hint",
+      start: "cli.menu.start",
+      stop: "cli.menu.stop",
+      launchCs2: "cli.menu.launchCs2",
+      config: "cli.menu.config",
+      exit: "cli.menu.exit",
+    },
+    config: {
+      title: "cli.config.title",
+      port: "cli.config.port",
+      throttle: "cli.config.throttle",
+      heartbeat: "cli.config.heartbeat",
+      locale: "cli.config.locale",
+      localeEn: "cli.config.localeEn",
+      localeEs: "cli.config.localeEs",
+      autoRecord: "cli.config.autoRecord",
+      true: "cli.config.true",
+      false: "cli.config.false",
+      save: "cli.config.save",
+      createCfg: "cli.config.createCfg",
+      openDataFolder: "cli.config.openDataFolder",
+      cancel: "cli.config.cancel",
+      navHint: "cli.config.navHint",
+    },
+    exit: {
+      title: "cli.exit.title",
+      hint: "cli.exit.hint",
+    },
+    gateway: {
+      title: "cli.gateway.title",
+      warningPrefix: "cli.gateway.warningPrefix",
+      spinner: "cli.gateway.spinner",
+      streamState: "cli.gateway.streamState",
+      ticksReceived: "cli.gateway.ticksReceived",
+      lastTickAt: "cli.gateway.lastTickAt",
+      httpRequests: "cli.gateway.httpRequests",
+      httpRejected: "cli.gateway.httpRejected",
+      lastRejectReason: "cli.gateway.lastRejectReason",
+      watcherMode: "cli.gateway.watcherMode",
+      lastGameState: "cli.gateway.lastGameState",
+      player: "cli.gateway.player",
+      allplayers: "cli.gateway.allplayers",
+      valueAvailable: "cli.gateway.valueAvailable",
+      valueNull: "cli.gateway.valueNull",
+      valueNone: "cli.gateway.valueNone",
+    },
+    notification: {
+      cfgUpdated: "cli.notification.cfgUpdated",
+      launchCs2: "cli.notification.launchCs2",
+      dataFolder: "cli.notification.dataFolder",
+    },
+    error: {
+      linePrefix: "cli.error.linePrefix",
+      gatewayStart: "cli.error.gatewayStart",
+      configSave: "cli.error.configSave",
+      launchCs2: "cli.error.launchCs2",
+      openDataFolder: "cli.error.openDataFolder",
+      recording: "cli.error.recording",
+    },
+  },
+} as const;
+
+type NestedLeafStrings<T> = T extends string ? T : { [K in keyof T]: NestedLeafStrings<T[K]> }[keyof T];
+
+export type MessageKey = NestedLeafStrings<typeof msgKeys>;

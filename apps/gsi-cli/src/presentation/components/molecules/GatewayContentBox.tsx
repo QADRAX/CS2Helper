@@ -1,7 +1,9 @@
 import { Box, Text } from "ink";
-import { useEffect, useState } from "react";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { GatewayDiagnostics } from "../../../application/cli/ports/GatewayPort";
+import { WaitingSpinner } from "../atoms/WaitingSpinner";
+import { msgKeys } from "../../i18n/msgKeys";
+import { useTranslation } from "../../i18n/useTranslation";
 
 interface GatewayContentBoxProps {
   gsiState: Readonly<GsiProcessorState> | null;
@@ -10,15 +12,13 @@ interface GatewayContentBoxProps {
   gatewayWarning?: string;
 }
 
-const SPINNER_FRAMES = ["|", "/", "-", "\\"];
-
 export function GatewayContentBox({
   gsiState,
   gatewayDiagnostics,
   cs2Running,
   gatewayWarning,
 }: GatewayContentBoxProps) {
-  const [spinnerIndex, setSpinnerIndex] = useState(0);
+  const { t } = useTranslation();
   const payload = gsiState?.lastGameState;
   const watcherMode = gsiState?.watcherMode ?? payload?.watcherMode ?? null;
   const streamState = gsiState?.streamState ?? "inactive";
@@ -31,35 +31,52 @@ export function GatewayContentBox({
   const localPlayerName = player?.name ?? "-";
   const waitingForCs2 = !payload && !cs2Running;
 
-  useEffect(() => {
-    if (!waitingForCs2) return;
-    const t = setInterval(() => {
-      setSpinnerIndex((prev) => (prev + 1) % SPINNER_FRAMES.length);
-    }, 120);
-    return () => clearInterval(t);
-  }, [waitingForCs2]);
-
   return (
     <Box marginTop={1} borderStyle="single" paddingX={1} flexDirection="column" width="100%">
       <Text bold color="cyan">
-        Gateway Content
+        {t(msgKeys.cli.gateway.title)}
       </Text>
-      {gatewayWarning ? <Text color="yellow">Warning: {gatewayWarning}</Text> : null}
-      {waitingForCs2 ? (
+      {gatewayWarning ? (
         <Text color="yellow">
-          {SPINNER_FRAMES[spinnerIndex]} waiting for cs2 client
+          {t(msgKeys.cli.gateway.warningPrefix)} {gatewayWarning}
         </Text>
       ) : null}
-      <Text>streamState: {streamState}</Text>
-      <Text>ticksReceived: {totalTicks}</Text>
-      <Text>lastTickAt: {lastProcessedAt ? new Date(lastProcessedAt).toLocaleTimeString() : "-"}</Text>
-      <Text>httpRequests: {gatewayDiagnostics.receivedRequests}</Text>
-      <Text>httpRejected: {gatewayDiagnostics.rejectedRequests}</Text>
-      <Text>lastRejectReason: {gatewayDiagnostics.lastRejectReason ?? "-"}</Text>
-      <Text>watcherMode: {watcherMode ?? "-"}</Text>
-      <Text>lastGameState: {payload ? "available" : "null"}</Text>
-      <Text>player: {hasPlayer ? localPlayerName : "none"}</Text>
-      <Text>allplayers: {allplayersCount}</Text>
+      <WaitingSpinner
+        active={waitingForCs2}
+        format={(frame) => t(msgKeys.cli.gateway.spinner, { frame })}
+      />
+      <Text>
+        {t(msgKeys.cli.gateway.streamState)} {streamState}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.ticksReceived)} {totalTicks}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.lastTickAt)}{" "}
+        {lastProcessedAt ? new Date(lastProcessedAt).toLocaleTimeString() : "-"}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.httpRequests)} {gatewayDiagnostics.receivedRequests}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.httpRejected)} {gatewayDiagnostics.rejectedRequests}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.lastRejectReason)} {gatewayDiagnostics.lastRejectReason ?? "-"}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.watcherMode)} {watcherMode ?? "-"}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.lastGameState)}{" "}
+        {payload ? t(msgKeys.cli.gateway.valueAvailable) : t(msgKeys.cli.gateway.valueNull)}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.player)} {hasPlayer ? localPlayerName : t(msgKeys.cli.gateway.valueNone)}
+      </Text>
+      <Text>
+        {t(msgKeys.cli.gateway.allplayers)} {allplayersCount}
+      </Text>
     </Box>
   );
 }

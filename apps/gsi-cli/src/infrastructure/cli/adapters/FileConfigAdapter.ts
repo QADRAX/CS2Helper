@@ -33,8 +33,9 @@ export class FileConfigAdapter implements ConfigPort {
       return migrated;
     }
 
-    await this.saveConfig(DEFAULT_CLI_CONFIG);
-    return { ...DEFAULT_CLI_CONFIG };
+    const initial = normalizeCliConfig(DEFAULT_CLI_CONFIG);
+    await this.saveConfig(initial);
+    return { ...initial };
   }
 
   async saveConfig(config: CliConfig): Promise<void> {

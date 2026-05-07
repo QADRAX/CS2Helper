@@ -4,10 +4,23 @@ import type { GatewayDiagnostics } from "../../../../application/cli/ports/Gatew
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import type { CliStatus } from "../../../../domain/cli";
 import type { CliConfig } from "../../../../domain/cli/config";
+import { msgKeys } from "../../../i18n/msgKeys";
+
+export type UiErrorMessageKey =
+  | typeof msgKeys.cli.error.gatewayStart
+  | typeof msgKeys.cli.error.configSave
+  | typeof msgKeys.cli.error.launchCs2
+  | typeof msgKeys.cli.error.openDataFolder
+  | typeof msgKeys.cli.error.recording;
+
+export interface UiErrorDescriptor {
+  key: UiErrorMessageKey;
+  detail?: string;
+}
 
 export interface UiState {
   status: CliStatus;
-  errorMessage?: string;
+  error?: UiErrorDescriptor;
   gatewayWarning?: string;
   gsiState: Readonly<GsiProcessorState> | null;
   gatewayDiagnostics: GatewayDiagnostics;

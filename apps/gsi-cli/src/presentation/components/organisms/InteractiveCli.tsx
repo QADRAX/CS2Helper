@@ -3,6 +3,8 @@ import { useInput } from "ink";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import {
   clearError,
+  configDraftAutoRecordToggled,
+  configDraftLocaleToggled,
   configDraftResetFromCliConfig,
   createOrUpdateGsiCfg,
   exitCli,
@@ -12,7 +14,6 @@ import {
   interactiveMenuIndexSet,
   interactiveModeSet,
   launchCs2,
-  configDraftAutoRecordToggled,
   openDataFolder,
   saveCliConfig,
   selectCliConfig,
@@ -27,7 +28,7 @@ import {
   selectMainMenuOptions,
   selectNotifications,
   selectSteamStatus,
-  selectUiError,
+  selectUiErrorDisplay,
   selectUiStatus,
   startGateway,
   stopGateway,
@@ -51,7 +52,7 @@ export function InteractiveCli() {
   const uiStatus = useAppSelector(selectUiStatus);
   const steamStatus = useAppSelector(selectSteamStatus);
   const cs2Status = useAppSelector(selectCs2Status);
-  const errorMessage = useAppSelector(selectUiError);
+  const errorDisplay = useAppSelector(selectUiErrorDisplay);
   const gatewayDiagnostics = useAppSelector(selectGatewayDiagnostics);
   const gatewayWarning = useAppSelector(selectGatewayWarning);
   const gsiState = useAppSelector(selectGsiState);
@@ -75,7 +76,15 @@ export function InteractiveCli() {
   useEffect(() => {
     if (mode !== "config") return;
     dispatch(configDraftResetFromCliConfig(config));
-  }, [mode, config.port, config.gsiThrottleSec, config.gsiHeartbeatSec, config.autoRecordRawGsiOnStart, dispatch]);
+  }, [
+    mode,
+    config.port,
+    config.gsiThrottleSec,
+    config.gsiHeartbeatSec,
+    config.locale,
+    config.autoRecordRawGsiOnStart,
+    dispatch,
+  ]);
 
   const goMenu = () => {
     dispatch(interactiveGoMenu());
@@ -94,6 +103,7 @@ export function InteractiveCli() {
         gsiThrottleSec: parsedThrottle,
         gsiHeartbeatSec: parsedHeartbeat,
         autoRecordRawGsiOnStart: draft.autoRecordRawGsiOnStart,
+        locale: draft.locale,
       })
     );
     void dispatch(clearError());
@@ -128,12 +138,15 @@ export function InteractiveCli() {
       if (key.downArrow || key.tab) return void dispatch(interactiveConfigCursorMoved({ direction: "next" }));
       if (!key.return) return;
       if (configCursor === 3) {
+        return void dispatch(configDraftLocaleToggled());
+      }
+      if (configCursor === 4) {
         return void dispatch(configDraftAutoRecordToggled());
       }
-      if (configCursor === 4) return saveDraft();
-      if (configCursor === 5) return void dispatch(createOrUpdateGsiCfg());
-      if (configCursor === 6) return void dispatch(openDataFolder());
-      if (configCursor === 7) return goMenu();
+      if (configCursor === 5) return saveDraft();
+      if (configCursor === 6) return void dispatch(createOrUpdateGsiCfg());
+      if (configCursor === 7) return void dispatch(openDataFolder());
+      if (configCursor === 8) return goMenu();
       return;
     }
 
@@ -157,7 +170,7 @@ export function InteractiveCli() {
         ) : null
       }
       primarySlot={
-        <PrimaryPanel errorMessage={errorMessage}>
+        <PrimaryPanel errorMessage={errorDisplay}>
           <CliPrimaryBody />
         </PrimaryPanel>
       }

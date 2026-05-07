@@ -52,6 +52,9 @@ const cliSessionSlice = createSlice({
     configDraftAutoRecordToggled: (state) => {
       state.configDraft.autoRecordRawGsiOnStart = !state.configDraft.autoRecordRawGsiOnStart;
     },
+    configDraftLocaleToggled: (state) => {
+      state.configDraft.locale = state.configDraft.locale === "en" ? "es" : "en";
+    },
     configDraftResetFromCliConfig: (state, action: PayloadAction<CliConfig>) => {
       state.configDraft = cliConfigToDraft(action.payload);
       state.configCursor = 0;
@@ -67,6 +70,7 @@ export const {
   interactiveConfigCursorMoved,
   configDraftPatched,
   configDraftAutoRecordToggled,
+  configDraftLocaleToggled,
   configDraftResetFromCliConfig,
 } = cliSessionSlice.actions;
 

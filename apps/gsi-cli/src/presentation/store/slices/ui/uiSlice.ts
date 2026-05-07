@@ -3,7 +3,9 @@ import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
 import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
+import { msgKeys } from "../../../i18n/msgKeys";
 import { uiInitialState } from "./types";
+import type { UiErrorDescriptor } from "./types";
 import {
   loadConfig,
   openDataFolder,
@@ -25,11 +27,11 @@ const uiSlice = createSlice({
     gatewayDiagnosticsUpdated: (state, action: PayloadAction<GatewayDiagnostics>) => {
       state.gatewayDiagnostics = action.payload;
     },
-    setError: (state, action: PayloadAction<string>) => {
-      state.errorMessage = action.payload;
+    setUiError: (state, action: PayloadAction<UiErrorDescriptor | undefined>) => {
+      state.error = action.payload;
     },
     clearError: (state) => {
-      state.errorMessage = undefined;
+      state.error = undefined;
     },
     cs2StatusUpdated: (state, action: PayloadAction<Cs2ProcessStatus>) => {
       state.cs2Status = action.payload;
@@ -44,18 +46,21 @@ const uiSlice = createSlice({
         state.config = action.payload;
       })
       .addCase(startGateway.pending, (state) => {
-        state.errorMessage = undefined;
+        state.error = undefined;
         state.gatewayWarning = undefined;
       })
       .addCase(startGateway.fulfilled, (state, action) => {
         state.status = "LISTENING";
         state.port = action.payload.port;
-        state.errorMessage = undefined;
+        state.error = undefined;
         state.gatewayWarning = action.payload.gsiWarning;
       })
       .addCase(startGateway.rejected, (state, action) => {
         state.status = "ERROR";
-        state.errorMessage = action.error.message ?? "Failed to start gateway";
+        state.error = {
+          key: msgKeys.cli.error.gatewayStart,
+          detail: action.error.message,
+        };
       })
       .addCase(stopGateway.fulfilled, (state) => {
         state.status = "IDLE";
@@ -65,29 +70,41 @@ const uiSlice = createSlice({
       })
       .addCase(saveCliConfig.fulfilled, (state, action) => {
         state.config = action.payload;
-        state.errorMessage = undefined;
+        state.error = undefined;
       })
       .addCase(saveCliConfig.rejected, (state, action) => {
-        state.errorMessage = action.error.message ?? "Config save failed";
+        state.error = {
+          key: msgKeys.cli.error.configSave,
+          detail: action.error.message,
+        };
       })
       .addCase(launchCs2.pending, (state) => {
-        state.errorMessage = undefined;
+        state.error = undefined;
       })
       .addCase(launchCs2.rejected, (state, action) => {
-        state.errorMessage = action.error.message ?? "Failed to launch CS2";
+        state.error = {
+          key: msgKeys.cli.error.launchCs2,
+          detail: action.error.message,
+        };
       })
       .addCase(openDataFolder.pending, (state) => {
-        state.errorMessage = undefined;
+        state.error = undefined;
       })
       .addCase(openDataFolder.rejected, (state, action) => {
-        state.errorMessage = action.error.message ?? "Failed to open data folder";
+        state.error = {
+          key: msgKeys.cli.error.openDataFolder,
+          detail: action.error.message,
+        };
       })
       .addCase(startRecording.fulfilled, (state, action) => {
         state.recordingPath = action.meta.arg;
-        state.errorMessage = undefined;
+        state.error = undefined;
       })
       .addCase(startRecording.rejected, (state, action) => {
-        state.errorMessage = action.error.message ?? "Recording failed";
+        state.error = {
+          key: msgKeys.cli.error.recording,
+          detail: action.error.message,
+        };
       })
       .addCase(stopRecording.fulfilled, (state) => {
         state.recordingPath = undefined;
@@ -98,7 +115,7 @@ const uiSlice = createSlice({
 export const {
   gsiStateUpdated,
   gatewayDiagnosticsUpdated,
-  setError,
+  setUiError,
   clearError,
   cs2StatusUpdated,
   steamStatusUpdated,

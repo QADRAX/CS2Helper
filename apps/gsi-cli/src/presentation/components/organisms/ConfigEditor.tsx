@@ -7,16 +7,23 @@ import {
   selectInteractiveConfigDraft,
 } from "../../store";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { msgKeys } from "../../i18n/msgKeys";
+import { useTranslation } from "../../i18n/useTranslation";
 
 export function ConfigEditor() {
   const dispatch = useAppDispatch();
   const configCursor = useAppSelector(selectInteractiveConfigCursor);
   const draft = useAppSelector(selectInteractiveConfigDraft);
+  const { t } = useTranslation();
+
+  const localeLabel = `${draft.locale === "en" ? t(msgKeys.cli.config.localeEn) : t(msgKeys.cli.config.localeEs)}`;
 
   return (
     <>
-      <Text bold>Configuration</Text>
-      <MenuOptionLine label="port:" focused={configCursor === 0} />
+      <Box flexDirection="column" paddingTop={1} paddingBottom={1}>
+        <Text bold>{t(msgKeys.cli.config.title)}</Text>
+      </Box>
+      <MenuOptionLine label={t(msgKeys.cli.config.port)} focused={configCursor === 0} />
       <Box marginLeft={2}>
         <TextInput
           value={draft.port}
@@ -25,7 +32,7 @@ export function ConfigEditor() {
           focus={configCursor === 0}
         />
       </Box>
-      <MenuOptionLine label="gsi throttle (sec):" focused={configCursor === 1} />
+      <MenuOptionLine label={t(msgKeys.cli.config.throttle)} focused={configCursor === 1} />
       <Box marginLeft={2}>
         <TextInput
           value={draft.gsiThrottleSec}
@@ -34,7 +41,7 @@ export function ConfigEditor() {
           focus={configCursor === 1}
         />
       </Box>
-      <MenuOptionLine label="gsi heartbeat (sec):" focused={configCursor === 2} />
+      <MenuOptionLine label={t(msgKeys.cli.config.heartbeat)} focused={configCursor === 2} />
       <Box marginLeft={2}>
         <TextInput
           value={draft.gsiHeartbeatSec}
@@ -43,15 +50,24 @@ export function ConfigEditor() {
           focus={configCursor === 2}
         />
       </Box>
+      <MenuOptionLine label={`${t(msgKeys.cli.config.locale)} ${localeLabel}`} focused={configCursor === 3} />
       <MenuOptionLine
-        label={`auto record on start: ${draft.autoRecordRawGsiOnStart ? "true" : "false"}`}
-        focused={configCursor === 3}
+        label={`${t(msgKeys.cli.config.autoRecord)} ${draft.autoRecordRawGsiOnStart ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
+        focused={configCursor === 4}
       />
-      <MenuOptionLine label="save" focused={configCursor === 4} activeColor="green" />
-      <MenuOptionLine label="create cfg" focused={configCursor === 5} activeColor="cyan" />
-      <MenuOptionLine label="open data folder" focused={configCursor === 6} activeColor="cyan" />
-      <MenuOptionLine label="cancel" focused={configCursor === 7} activeColor="yellow" />
-      <Text color="gray">Up/Down to navigate, Enter to confirm, Esc to cancel</Text>
+      <Box flexDirection="column" marginTop={1} paddingTop={1} paddingBottom={1}>
+        <MenuOptionLine label={t(msgKeys.cli.config.save)} focused={configCursor === 5} activeColor="green" />
+        <Box marginTop={1}>
+          <MenuOptionLine label={t(msgKeys.cli.config.createCfg)} focused={configCursor === 6} activeColor="cyan" />
+        </Box>
+        <Box marginTop={1}>
+          <MenuOptionLine label={t(msgKeys.cli.config.openDataFolder)} focused={configCursor === 7} activeColor="cyan" />
+        </Box>
+        <Box marginTop={1}>
+          <MenuOptionLine label={t(msgKeys.cli.config.cancel)} focused={configCursor === 8} activeColor="yellow" />
+        </Box>
+      </Box>
+      <Text color="gray">{t(msgKeys.cli.config.navHint)}</Text>
     </>
   );
 }

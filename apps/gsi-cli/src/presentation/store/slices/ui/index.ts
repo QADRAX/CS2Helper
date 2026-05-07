@@ -6,7 +6,7 @@ export {
   cs2StatusUpdated,
   gatewayDiagnosticsUpdated,
   gsiStateUpdated,
-  setError,
+  setUiError,
   steamStatusUpdated,
   uiReducer,
 } from "./uiSlice";

@@ -1,12 +1,15 @@
 import { Text } from "ink";
+import { msgKeys } from "../../i18n/msgKeys";
+import { useTranslation } from "../../i18n/useTranslation";
 
 export function ExitConfirm() {
+  const { t } = useTranslation();
   return (
     <>
       <Text bold color="yellow">
-        Exit CLI?
+        {t(msgKeys.cli.exit.title)}
       </Text>
-      <Text>Press Enter or Y to confirm, N or Esc to cancel.</Text>
+      <Text>{t(msgKeys.cli.exit.hint)}</Text>
     </>
   );
 }

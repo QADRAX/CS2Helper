@@ -1,0 +1,78 @@
+{
+  "cli": {
+    "header": {
+      "title": "CS2Helper CLI"
+    },
+    "status": {
+      "steam": "Steam",
+      "cs2": "CS2",
+      "gatewayLabel": "Gateway",
+      "on": "ON",
+      "off": "OFF",
+      "gatewayListen": "LISTENING",
+      "gatewayIdle": "IDLE",
+      "gatewayError": "ERROR"
+    },
+    "menu": {
+      "title": "Menu",
+      "hint": "Use Up/Down + Enter",
+      "start": "start",
+      "stop": "stop",
+      "launchCs2": "launch cs2",
+      "config": "config",
+      "exit": "exit"
+    },
+    "config": {
+      "title": "Configuration",
+      "port": "port:",
+      "throttle": "gsi throttle (sec):",
+      "heartbeat": "gsi heartbeat (sec):",
+      "locale": "language:",
+      "localeEn": "English",
+      "localeEs": "Español",
+      "autoRecord": "auto record on start:",
+      "true": "true",
+      "false": "false",
+      "save": "save",
+      "createCfg": "create cfg",
+      "openDataFolder": "open data folder",
+      "cancel": "cancel",
+      "navHint": "Up/Down to navigate, Enter to confirm, Esc to cancel"
+    },
+    "exit": {
+      "title": "Exit CLI?",
+      "hint": "Press Enter or Y to confirm, N or Esc to cancel."
+    },
+    "gateway": {
+      "title": "Gateway Content",
+      "warningPrefix": "Warning:",
+      "spinner": "{frame} waiting for cs2 client",
+      "streamState": "streamState:",
+      "ticksReceived": "ticksReceived:",
+      "lastTickAt": "lastTickAt:",
+      "httpRequests": "httpRequests:",
+      "httpRejected": "httpRejected:",
+      "lastRejectReason": "lastRejectReason:",
+      "watcherMode": "watcherMode:",
+      "lastGameState": "lastGameState:",
+      "player": "player:",
+      "allplayers": "allplayers:",
+      "valueAvailable": "available",
+      "valueNull": "null",
+      "valueNone": "none"
+    },
+    "notification": {
+      "cfgUpdated": "CS2 cfg updated at {path}",
+      "launchCs2": "Launch command sent to Steam for CS2.",
+      "dataFolder": "Opened app data folder."
+    },
+    "error": {
+      "linePrefix": "Error:",
+      "gatewayStart": "Failed to start gateway",
+      "configSave": "Config save failed",
+      "launchCs2": "Failed to launch CS2",
+      "openDataFolder": "Failed to open data folder",
+      "recording": "Recording failed"
+    }
+  }
+}
