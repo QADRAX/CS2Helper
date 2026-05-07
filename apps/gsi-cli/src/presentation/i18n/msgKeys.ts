@@ -17,6 +17,10 @@ export const msgKeys = {
       gatewayListen: "cli.status.gatewayListen",
       gatewayIdle: "cli.status.gatewayIdle",
       gatewayError: "cli.status.gatewayError",
+      steamWebApi: "cli.status.steamWebApi",
+      steamWebApiOk: "cli.status.steamWebApiOk",
+      steamWebApiFail: "cli.status.steamWebApiFail",
+      steamWebApiPending: "cli.status.steamWebApiPending",
     },
     menu: {
       title: "cli.menu.title",

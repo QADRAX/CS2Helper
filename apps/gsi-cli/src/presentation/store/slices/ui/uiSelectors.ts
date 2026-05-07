@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
+import type { SteamWebApiUiSlice } from "./types";
 import type { CliConfig } from "../../../../domain/cli/config";
 import type { CliStatus } from "../../../../domain/cli";
 import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
@@ -62,4 +63,8 @@ export function selectCs2Status(state: RootState): Cs2ProcessStatus {
 
 export function selectSteamStatus(state: RootState): SteamStatus {
   return state.ui.steamStatus;
+}
+
+export function selectSteamWebApiUi(state: RootState): SteamWebApiUiSlice {
+  return state.ui.steamWebApi;
 }

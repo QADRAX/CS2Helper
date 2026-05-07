@@ -4,6 +4,7 @@ import type { Cs2ProcessStatus } from "../../../application/cli/ports/Cs2Process
 import type { SteamStatus } from "../../../application/cli/useCases/getSteamStatus";
 import type { CliStatus } from "../../../domain/cli";
 import type { NotificationItem } from "../../store";
+import type { SteamWebApiUiSlice } from "../../store/slices/ui/types";
 import { CliSectionDivider } from "../atoms/CliSectionDivider";
 import { CliHeaderPanel } from "../molecules/CliHeaderPanel";
 import { NotificationsStack } from "../molecules/NotificationsStack";
@@ -12,6 +13,7 @@ interface CliShellProps {
   steamStatus: SteamStatus;
   cs2Status: Cs2ProcessStatus;
   gatewayStatus: CliStatus;
+  steamWebApi: SteamWebApiUiSlice;
   gatewaySlot?: ReactNode;
   primarySlot: ReactNode;
   notifications: NotificationItem[];
@@ -21,6 +23,7 @@ export function CliShell({
   steamStatus,
   cs2Status,
   gatewayStatus,
+  steamWebApi,
   gatewaySlot,
   primarySlot,
   notifications,
@@ -30,7 +33,12 @@ export function CliShell({
   return (
     <Box borderStyle="single" flexDirection="column" width="100%">
       <Box paddingX={1}>
-        <CliHeaderPanel steamStatus={steamStatus} cs2Status={cs2Status} gatewayStatus={gatewayStatus} />
+        <CliHeaderPanel
+          steamStatus={steamStatus}
+          cs2Status={cs2Status}
+          gatewayStatus={gatewayStatus}
+          steamWebApi={steamWebApi}
+        />
       </Box>
       <CliSectionDivider />
       {gatewaySlot ? (

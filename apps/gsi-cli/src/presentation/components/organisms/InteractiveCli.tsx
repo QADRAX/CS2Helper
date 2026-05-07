@@ -28,6 +28,7 @@ import {
   selectMainMenuOptions,
   selectNotifications,
   selectSteamStatus,
+  selectSteamWebApiUi,
   selectUiErrorDisplay,
   selectUiStatus,
   startGateway,
@@ -51,6 +52,7 @@ export function InteractiveCli() {
   const dispatch = useAppDispatch();
   const uiStatus = useAppSelector(selectUiStatus);
   const steamStatus = useAppSelector(selectSteamStatus);
+  const steamWebApiUi = useAppSelector(selectSteamWebApiUi);
   const cs2Status = useAppSelector(selectCs2Status);
   const errorDisplay = useAppSelector(selectUiErrorDisplay);
   const gatewayDiagnostics = useAppSelector(selectGatewayDiagnostics);
@@ -162,6 +164,7 @@ export function InteractiveCli() {
       steamStatus={steamStatus}
       cs2Status={cs2Status}
       gatewayStatus={uiStatus}
+      steamWebApi={steamWebApiUi}
       gatewaySlot={
         gatewayOnline ? (
           <GatewayContentBox

@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import type { ValidateSteamApiKeyOutcome } from "../../../../application/cli/ports/SteamWebApiClientPort";
 import type { CliConfig } from "../../../../domain/cli/config";
 import type { CliApp } from "../../../../infrastructure/cli/CliAppService";
 import type { CliThunkExtra } from "../../thunkExtra";
@@ -8,6 +9,11 @@ import { msgKeys } from "../../../i18n/msgKeys";
 import { enqueueNotification } from "../notifications";
 
 type ThunkApi = { extra: CliThunkExtra; state: RootState };
+
+export const verifySteamWebApi = createAsyncThunk<ValidateSteamApiKeyOutcome, void, ThunkApi>(
+  "ui/verifySteamWebApi",
+  async (_, { extra }) => extra.cliApp.verifySteamWebApi()
+);
 
 export const loadConfig = createAsyncThunk<CliConfig, void, ThunkApi>("ui/loadConfig", async (_, { extra }) =>
   extra.cliApp.getConfig()

@@ -8,6 +8,7 @@ export {
   gsiStateUpdated,
   setUiError,
   steamStatusUpdated,
+  steamWebApiDisabled,
   uiReducer,
 } from "./uiSlice";
 export * from "./uiSelectors";

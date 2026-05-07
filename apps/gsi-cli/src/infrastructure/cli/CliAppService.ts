@@ -27,6 +27,8 @@ import {
   getSteamStatus,
   type SteamStatus,
 } from "../../application/cli/useCases/getSteamStatus";
+import { verifySteamWebApi as verifySteamWebApiUseCase } from "../../application/cli/useCases/verifySteamWebApi";
+import type { ValidateSteamApiKeyOutcome } from "../../application/cli/ports/SteamWebApiClientPort";
 import {
   subscribeSteamStatus,
   type SubscribeSteamStatusOptions,
@@ -40,7 +42,9 @@ import { SteamRegistryCs2LocatorAdapter } from "./adapters/SteamRegistryCs2Locat
 import { TasklistCs2ProcessAdapter } from "./adapters/TasklistCs2ProcessAdapter";
 import { TasklistSteamProcessAdapter } from "./adapters/TasklistSteamProcessAdapter";
 import { SteamRegistrySteamInstallAdapter } from "./adapters/SteamRegistrySteamInstallAdapter";
+import { SteamWebApiFetchAdapter } from "./adapters/SteamWebApiFetchAdapter";
 import { WindowsDataFolderOpenerAdapter } from "./adapters/WindowsDataFolderOpenerAdapter";
+import { readSteamWebApiKeyFromEnv } from "./steamWebApiEnv";
 import type { CliConfig } from "../../domain/cli/config";
 import type { GatewayStartInfo } from "../../application/cli/ports/GatewayPort";
 import type { GatewayDiagnostics } from "../../application/cli/ports/GatewayPort";
@@ -70,6 +74,8 @@ export interface CliApp {
     listener: (status: SteamStatus) => void,
     options?: SubscribeSteamStatusOptions
   ) => () => void;
+  /** Validates `CS2HELPER_STEAM_WEB_API_KEY` against Steam Web API (no-op if absent). */
+  verifySteamWebApi: () => Promise<ValidateSteamApiKeyOutcome>;
 }
 
 /**
@@ -87,6 +93,7 @@ export class CliAppService implements CliApp {
   private readonly cs2ProcessPort: TasklistCs2ProcessAdapter;
   private readonly steamProcessPort: TasklistSteamProcessAdapter;
   private readonly steamInstallPort: SteamRegistrySteamInstallAdapter;
+  private readonly steamWebApiClient: SteamWebApiFetchAdapter;
 
   constructor() {
     this.gatewayPort = new InMemoryGatewayAdapter();
@@ -99,6 +106,7 @@ export class CliAppService implements CliApp {
     this.cs2ProcessPort = new TasklistCs2ProcessAdapter();
     this.steamProcessPort = new TasklistSteamProcessAdapter();
     this.steamInstallPort = new SteamRegistrySteamInstallAdapter();
+    this.steamWebApiClient = new SteamWebApiFetchAdapter();
   }
 
   startGateway(): Promise<GatewayStartInfo> {
@@ -202,5 +210,11 @@ export class CliAppService implements CliApp {
       listener,
       options
     );
+  }
+
+  verifySteamWebApi(): Promise<ValidateSteamApiKeyOutcome> {
+    const key = readSteamWebApiKeyFromEnv();
+    if (!key) return Promise.resolve({ ok: false, detail: "missing-key" });
+    return verifySteamWebApiUseCase({ client: this.steamWebApiClient }, key);
   }
 }

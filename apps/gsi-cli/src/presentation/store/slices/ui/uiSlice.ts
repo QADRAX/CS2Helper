@@ -15,6 +15,7 @@ import {
   startRecording,
   stopGateway,
   stopRecording,
+  verifySteamWebApi,
 } from "./uiThunks";
 
 const uiSlice = createSlice({
@@ -38,6 +39,9 @@ const uiSlice = createSlice({
     },
     steamStatusUpdated: (state, action: PayloadAction<SteamStatus>) => {
       state.steamStatus = action.payload;
+    },
+    steamWebApiDisabled: (state) => {
+      state.steamWebApi = { enabled: false };
     },
   },
   extraReducers: (builder) => {
@@ -108,6 +112,21 @@ const uiSlice = createSlice({
       })
       .addCase(stopRecording.fulfilled, (state) => {
         state.recordingPath = undefined;
+      })
+      .addCase(verifySteamWebApi.pending, (state) => {
+        state.steamWebApi = { enabled: true, probe: "checking" };
+      })
+      .addCase(verifySteamWebApi.fulfilled, (state, action) => {
+        state.steamWebApi = action.payload.ok
+          ? { enabled: true, probe: "ok" }
+          : { enabled: true, probe: "fail", detail: action.payload.detail };
+      })
+      .addCase(verifySteamWebApi.rejected, (state, action) => {
+        state.steamWebApi = {
+          enabled: true,
+          probe: "fail",
+          detail: action.error.message,
+        };
       });
   },
 });
@@ -119,5 +138,6 @@ export const {
   clearError,
   cs2StatusUpdated,
   steamStatusUpdated,
+  steamWebApiDisabled,
 } = uiSlice.actions;
 export const uiReducer = uiSlice.reducer;

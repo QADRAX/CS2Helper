@@ -11,7 +11,11 @@
       "off": "NO",
       "gatewayListen": "ESCUCHANDO",
       "gatewayIdle": "INACTIVO",
-      "gatewayError": "ERROR"
+      "gatewayError": "ERROR",
+      "steamWebApi": "Steam Web API",
+      "steamWebApiOk": "OK",
+      "steamWebApiFail": "FALLO",
+      "steamWebApiPending": "···"
     },
     "menu": {
       "title": "Menú",

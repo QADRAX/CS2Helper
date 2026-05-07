@@ -18,6 +18,13 @@ export interface UiErrorDescriptor {
   detail?: string;
 }
 
+/** Probe de Steam Web API por variable `CS2HELPER_STEAM_WEB_API_KEY`. */
+export type SteamWebApiUiSlice =
+  | { enabled: false }
+  | { enabled: true; probe: "checking" | "ok" | "fail"; detail?: string };
+
+export const steamWebApiUiInitial: SteamWebApiUiSlice = { enabled: false };
+
 export interface UiState {
   status: CliStatus;
   error?: UiErrorDescriptor;
@@ -29,6 +36,7 @@ export interface UiState {
   config: CliConfig;
   cs2Status: Cs2ProcessStatus;
   steamStatus: SteamStatus;
+  steamWebApi: SteamWebApiUiSlice;
 }
 
 const cs2StatusInitial: Cs2ProcessStatus = { running: false };
@@ -45,4 +53,5 @@ export const uiInitialState: UiState = {
   config: {},
   cs2Status: cs2StatusInitial,
   steamStatus: steamStatusInitial,
+  steamWebApi: steamWebApiUiInitial,
 };
