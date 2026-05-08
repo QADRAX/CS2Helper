@@ -22,7 +22,15 @@
     "lint:gsi-gateway": "npm run lint --workspace=@cs2helper/gsi-gateway",
     "test:gsi-gateway": "npm run test --workspace=@cs2helper/gsi-gateway",
     "build:shared": "npm run build --workspace=@cs2helper/shared",
-    "lint:shared": "npm run lint --workspace=@cs2helper/shared"
+    "lint:shared": "npm run lint --workspace=@cs2helper/shared",
+    "build:cli-common": "npm run build --workspace=@cs2helper/cli-common",
+    "lint:cli-common": "npm run lint --workspace=@cs2helper/cli-common",
+    "test:cli-common": "npm run test --workspace=@cs2helper/cli-common",
+    "build:gsi-processor-ink": "npm run build --workspace=@cs2helper/gsi-processor-ink",
+    "lint:gsi-processor-ink": "npm run lint --workspace=@cs2helper/gsi-processor-ink",
+    "build:gsi-bench-cli": "npm run build --workspace=@cs2helper/gsi-bench-cli",
+    "lint:gsi-bench-cli": "npm run lint --workspace=@cs2helper/gsi-bench-cli",
+    "test:gsi-bench-cli": "npm run test --workspace=@cs2helper/gsi-bench-cli"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

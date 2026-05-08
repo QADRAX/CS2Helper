@@ -1,0 +1,22 @@
+{
+  "name": "@cs2helper/gsi-processor-ink",
+  "version": "1.0.0",
+  "description": "Ink presentation components for CS2 GSI processor state.",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && vite build && tsc --emitDeclarationOnly",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@cs2helper/gsi-processor": "1.0.0",
+    "ink": "^4.4.1",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "vite": "^8.0.10"
+  }
+}

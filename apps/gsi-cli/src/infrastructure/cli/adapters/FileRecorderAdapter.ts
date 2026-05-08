@@ -2,10 +2,7 @@ import fs from "fs";
 import path from "path";
 import type { RecorderPort } from "../../../application/cli/ports/RecorderPort";
 
-/**
- * Adapter that records GSI ticks to a local JSON file.
- * Formats the output as a JSON array of objects.
- */
+/** Adapter that records raw GSI ticks as newline-delimited JSON. */
 export class FileRecorderAdapter implements RecorderPort {
   private stream: fs.WriteStream | null = null;
   private unsubscribe: (() => void) | null = null;
