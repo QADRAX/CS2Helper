@@ -1,4 +1,7 @@
 node_modules
+.turbo
+apps/*/.turbo
+packages/*/.turbo
 packages/*/dist
 apps/*/dist
 packages/gsi-processor/coverage

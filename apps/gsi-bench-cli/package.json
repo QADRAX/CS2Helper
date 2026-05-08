@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && vite build",
+    "build": "pnpm run clean && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
@@ -16,10 +16,10 @@
     "dev": "vite-node src/index.ts"
   },
   "dependencies": {
-    "@cs2helper/cli-common": "1.0.0",
-    "@cs2helper/gsi-processor": "1.0.0",
-    "@cs2helper/gsi-processor-ink": "1.0.0",
-    "@cs2helper/shared": "1.0.0",
+    "@cs2helper/cli-common": "workspace:*",
+    "@cs2helper/gsi-processor": "workspace:*",
+    "@cs2helper/gsi-processor-ink": "workspace:*",
+    "@cs2helper/shared": "workspace:*",
     "ink": "^4.4.1",
     "react": "^18.2.0"
   },

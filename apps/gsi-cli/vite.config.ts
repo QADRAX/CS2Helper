@@ -3,6 +3,9 @@ import { resolve } from 'path';
 import { builtinModules } from 'module';
 
 export default defineConfig({
+  resolve: {
+    dedupe: ['react', 'ink'],
+  },
   build: {
     ssr: true,
     lib: {

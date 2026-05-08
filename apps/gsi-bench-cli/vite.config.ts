@@ -3,6 +3,9 @@ import { resolve } from "path";
 import { builtinModules } from "module";
 
 export default defineConfig({
+  resolve: {
+    dedupe: ["react", "ink"],
+  },
   build: {
     ssr: true,
     lib: {
@@ -16,7 +19,6 @@ export default defineConfig({
         ...builtinModules.map((moduleName) => `node:${moduleName}`),
         "@cs2helper/cli-common",
         "@cs2helper/gsi-processor",
-        "@cs2helper/gsi-processor-ink",
         "@cs2helper/shared",
         "ink",
         "react",
