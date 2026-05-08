@@ -8,6 +8,7 @@ import type {
   GsiRecordFile,
   ReadRecordFramesResult,
   ReplayResult,
+  ReplayTimelineMetadata,
   ReplayStateSummary,
   ReplayStep,
 } from "../../../domain/bench";
@@ -23,7 +24,9 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
     const processor = new GsiProcessorService();
     const steps: ReplayStep[] = [];
     const events: GsiProcessorEvent[] = [];
+    const stateByTick: GsiProcessorState[] = [];
     let currentFrameEvents: GsiProcessorEvent[] = [];
+    const initialState = cloneState(processor.getState());
 
     const unsubscribe = processor.subscribeEvents((event) => {
       events.push(event);
@@ -47,10 +50,14 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
           after,
           events: [...currentFrameEvents],
         });
+        stateByTick.push(cloneState(processor.getState()));
       });
     } finally {
       unsubscribe();
     }
+
+    const timeline = buildTimelineMetadata(steps);
+    const coldStartStateBySecond = buildColdStartStatesBySecond(framesResult, timeline.durationSeconds);
 
     return {
       record,
@@ -58,9 +65,50 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
       parseErrors: framesResult.errors,
       steps,
       events,
+      initialState,
+      stateByTick,
+      coldStartStateBySecond,
+      timeline,
       finalState: cloneState(processor.getState()),
     };
   }
+}
+
+function buildTimelineMetadata(steps: readonly ReplayStep[]): ReplayTimelineMetadata {
+  if (steps.length === 0) {
+    return { durationSeconds: 0, tickIndexBySecond: [ -1 ] };
+  }
+
+  const durationSeconds = Math.max(Math.floor((steps.at(-1)?.timestamp ?? 0) / TIMESTAMP_STEP_MS), 0);
+  const tickIndexBySecond: number[] = [];
+  let cursor = -1;
+
+  for (let second = 0; second <= durationSeconds; second += 1) {
+    while ((cursor + 1) < steps.length && Math.floor(steps[cursor + 1]!.timestamp / TIMESTAMP_STEP_MS) <= second) {
+      cursor += 1;
+    }
+    tickIndexBySecond.push(cursor);
+  }
+
+  return { durationSeconds, tickIndexBySecond };
+}
+
+function buildColdStartStatesBySecond(
+  framesResult: ReadRecordFramesResult,
+  durationSeconds: number
+): Record<number, GsiProcessorState> {
+  const map: Record<number, GsiProcessorState> = {};
+  const frames = framesResult.frames;
+
+  for (let second = 0; second <= durationSeconds; second += 1) {
+    const frame = frames[second];
+    if (!frame) continue;
+    const processor = new GsiProcessorService();
+    processor.processTick(frame.tick, second * TIMESTAMP_STEP_MS);
+    map[second] = cloneState(processor.getState());
+  }
+
+  return map;
 }
 
 function summarizeState(state: Readonly<GsiProcessorState>): ReplayStateSummary {

@@ -5,10 +5,10 @@ import {
   type GsiProcessorStatusLabels,
 } from "@cs2helper/gsi-processor-ink";
 import type { BenchCliApp } from "../../../infrastructure/bench";
-import type { GsiRecordFile, ReplayResult } from "../../../domain/bench";
+import type { GsiRecordFile, ReplayPlaybackSession, ReplayResult } from "../../../domain/bench";
 import { MenuOptionLine } from "../atoms";
 
-type ScreenMode = "list" | "replaying" | "demo" | "analysis";
+type ScreenMode = "list" | "loading" | "player" | "analysis";
 
 interface InteractiveBenchCliProps {
   benchApp: BenchCliApp;
@@ -39,7 +39,10 @@ export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [mode, setMode] = useState<ScreenMode>("list");
   const [result, setResult] = useState<ReplayResult | null>(null);
+  const [session, setSession] = useState<ReplayPlaybackSession | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [seekInput, setSeekInput] = useState("");
+  const [isSeekInputActive, setIsSeekInputActive] = useState(false);
 
   const loadRecords = async (): Promise<void> => {
     setErrorMessage(null);
@@ -56,12 +59,13 @@ export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {
     const record = benchApp.selectRecord(records, selectedIndex);
     if (!record) return;
 
-    setMode("replaying");
+    setMode("loading");
     setErrorMessage(null);
     try {
       const replayResult = await benchApp.analyzeRecordReplay(record);
       setResult(replayResult);
-      setMode("demo");
+      setSession(benchApp.createPlaybackSession(replayResult));
+      setMode("player");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Unable to replay record");
       setMode("list");
@@ -72,9 +76,47 @@ export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {
     void loadRecords();
   }, []);
 
+  useEffect(() => {
+    if (mode !== "player" || !session?.isPlaying) return;
+
+    const timer = setInterval(() => {
+      setSession((current) => {
+        if (!current) return current;
+        return benchApp.advancePlayback(current, 250);
+      });
+    }, 250);
+
+    return () => clearInterval(timer);
+  }, [benchApp, mode, session?.isPlaying]);
+
   useInput((input, key) => {
     if (input === "q") {
       exit();
+      return;
+    }
+
+    if (isSeekInputActive) {
+      if (key.escape) {
+        setIsSeekInputActive(false);
+        setSeekInput("");
+        return;
+      }
+      if (key.return) {
+        const value = Number.parseInt(seekInput, 10);
+        if (session && Number.isFinite(value)) {
+          setSession(benchApp.seekPlaybackToSecond(session, value));
+        }
+        setIsSeekInputActive(false);
+        setSeekInput("");
+        return;
+      }
+      if (key.backspace || key.delete) {
+        setSeekInput((current) => current.slice(0, -1));
+        return;
+      }
+      if (/^[0-9]$/.test(input)) {
+        setSeekInput((current) => `${current}${input}`.slice(0, 6));
+      }
       return;
     }
 
@@ -97,13 +139,54 @@ export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {
       return;
     }
 
-    if (mode === "demo" || mode === "analysis") {
+    if (mode === "player" || mode === "analysis") {
       if (input === "a" || key.tab) {
-        setMode((current) => (current === "demo" ? "analysis" : "demo"));
+        setMode((current) => (current === "player" ? "analysis" : "player"));
+        return;
+      }
+
+      if (session && mode === "player") {
+        if (input === " ") {
+          setSession(benchApp.togglePlayback(session));
+          return;
+        }
+        if (input === "1") {
+          setSession(benchApp.setPlaybackSpeed(session, 1));
+          return;
+        }
+        if (input === "2") {
+          setSession(benchApp.setPlaybackSpeed(session, 2));
+          return;
+        }
+        if (input === "m") {
+          setSession(benchApp.toggleSeekMode(session));
+          return;
+        }
+        if (key.leftArrow) {
+          setSession(benchApp.seekPlaybackToSecond(session, session.currentSecond - 1));
+          return;
+        }
+        if (key.rightArrow) {
+          setSession(benchApp.seekPlaybackToSecond(session, session.currentSecond + 1));
+          return;
+        }
+        if (input === "s") {
+          setSeekInput(`${session.currentSecond}`);
+          setIsSeekInputActive(true);
+          return;
+        }
+      }
+
+      if (input === "b") {
+        setMode("list");
+        setSession(null);
+        setResult(null);
         return;
       }
       if (key.escape || input === "b") {
         setMode("list");
+        setSession(null);
+        setResult(null);
       }
     }
   });
@@ -114,14 +197,16 @@ export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {
         CS2Helper GSI Bench CLI
       </Text>
       <Text dimColor>
-        Up/down select | enter replay | a/tab analysis | b back | r refresh | q quit
+        Up/down select | enter replay | space play/pause | 1/2 speed | arrows seek | s seek sec | m seek mode | a/tab analysis | b back | r refresh | q quit
       </Text>
       {errorMessage ? <Text color="red">Error: {errorMessage}</Text> : null}
       {mode === "list" ? (
         <RecordList records={records} selectedIndex={selectedIndex} />
       ) : null}
-      {mode === "replaying" ? <Text color="yellow">Replaying selected record...</Text> : null}
-      {result && mode === "demo" ? <ReplayDemo result={result} /> : null}
+      {mode === "loading" ? <Text color="yellow">Loading replay timeline...</Text> : null}
+      {result && session && mode === "player" ? (
+        <ReplayPlayer result={result} session={session} isSeekInputActive={isSeekInputActive} seekInput={seekInput} />
+      ) : null}
       {result && mode === "analysis" ? <ReplayAnalysis result={result} /> : null}
     </Box>
   );
@@ -156,16 +241,40 @@ function RecordList({
   );
 }
 
-function ReplayDemo({ result }: { result: ReplayResult }) {
+function ReplayPlayer({
+  result,
+  session,
+  isSeekInputActive,
+  seekInput,
+}: {
+  result: ReplayResult;
+  session: ReplayPlaybackSession;
+  isSeekInputActive: boolean;
+  seekInput: string;
+}) {
+  const visibleSteps =
+    session.currentTickIndex < 0 ? [] : result.steps.slice(0, session.currentTickIndex + 1);
+  const visibleEvents = visibleSteps.flatMap((step) => step.events);
   const lastParseError = result.parseErrors.at(-1);
+  const progress = result.timeline.durationSeconds === 0
+    ? 100
+    : Math.round((session.currentSecond / result.timeline.durationSeconds) * 100);
 
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text bold>{result.record.name}</Text>
+      <Text>
+        {session.isPlaying ? "Playing" : "Paused"} | t={session.currentSecond}s /{" "}
+        {result.timeline.durationSeconds}s | speed x{session.speed} | seek {session.seekMode} |{" "}
+        {progress}%
+      </Text>
+      {isSeekInputActive ? (
+        <Text color="yellow">Seek second (enter confirm, esc cancel): {seekInput || "_"}</Text>
+      ) : null}
       <GsiProcessorStatusBox
-        gsiState={result.finalState}
+        gsiState={session.state}
         gatewayDiagnostics={{
-          receivedRequests: result.processedTicks,
+          receivedRequests: visibleSteps.length,
           rejectedRequests: result.parseErrors.length,
           lastRejectReason: lastParseError?.message,
         }}
@@ -173,7 +282,7 @@ function ReplayDemo({ result }: { result: ReplayResult }) {
         labels={labels}
         formatTimestamp={(timestamp) => `${timestamp}ms`}
       />
-      <Text dimColor>Events emitted: {result.events.length}</Text>
+      <Text dimColor>Events emitted: {visibleEvents.length}</Text>
     </Box>
   );
 }

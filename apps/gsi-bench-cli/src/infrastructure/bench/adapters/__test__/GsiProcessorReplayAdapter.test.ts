@@ -14,6 +14,10 @@ describe("GsiProcessorReplayAdapter", () => {
     expect(result.steps[0]?.after.totalTicks).toBe(1);
     expect(result.steps[1]?.before.totalTicks).toBe(1);
     expect(result.steps[1]?.after.totalTicks).toBe(2);
+    expect(result.stateByTick).toHaveLength(2);
+    expect(result.timeline.durationSeconds).toBe(1);
+    expect(result.timeline.tickIndexBySecond).toEqual([0, 1]);
+    expect(result.coldStartStateBySecond[0]?.totalTicks).toBe(1);
   });
 });
 
