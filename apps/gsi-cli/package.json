@@ -9,6 +9,7 @@
     "build": "pnpm run clean && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "test": "vitest run",
     "start": "node dist/index.js",
     "dev": "vite-node src/index.ts"
   },
@@ -29,6 +30,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^18.2.0",
     "typescript": "^6.0.3",
+    "vitest": "^4.1.5",
     "vite": "^8.0.10",
     "vite-node": "^6.0.0"
   }

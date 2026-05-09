@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { DEFAULT_CLI_CONFIG } from "../../../../domain/cli/config";
 import { verifyGsiConfig } from "../verifyGsiConfig";
 import type { ConfigPort } from "../../ports/ConfigPort";
 import type { Cs2InstallLocatorPort } from "../../ports/Cs2InstallLocatorPort";
@@ -28,7 +29,12 @@ const gsiFile = (endpointUrl?: string): GsiConfigFilePort => ({
       ? null
       : {
           filePath: "C:/cfg/gamestate_integration_cs2helper.cfg",
-          payload: { name: "cs2helper", endpointUrl },
+          payload: {
+            name: "cs2helper",
+            endpointUrl,
+            throttle: DEFAULT_CLI_CONFIG.gsiThrottleSec,
+            heartbeat: DEFAULT_CLI_CONFIG.gsiHeartbeatSec,
+          },
         },
   write: async () => ({ filePath: "x", payload: { name: "cs2helper", endpointUrl: "x" } }),
   remove: async () => {},

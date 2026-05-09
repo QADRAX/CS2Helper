@@ -8,3 +8,6 @@ export * from "./Cs2LauncherPort";
 export * from "./GsiConfigFilePort";
 export * from "./SteamInstallLocatorPort";
 export * from "./SteamProcessPort";
+export * from "./OsProcessMetricsPort";
+export * from "./GpuProcessMetricsPort";
+export * from "./PresentChainMetricsPort";
