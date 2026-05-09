@@ -5,6 +5,19 @@ import type { GsiGatewayDiagnosticsView, GsiProcessorStatusLabels } from "../com
 
 export type GsiDashboardTabIndex = 0 | 1;
 
+/** Inputs required to build dashboard view-model rows (shared by registry resolve + context builder). */
+export interface GsiDashboardBuildInput {
+  gsiState: Readonly<GsiProcessorState> | null;
+  gatewayDiagnostics: GsiGatewayDiagnosticsView;
+  cs2Running: boolean;
+  labels: GsiProcessorStatusLabels;
+  gatewayWarning?: string;
+  formatTimestamp: (timestamp: number) => string;
+  providerTimeLocale?: Intl.LocalesArgument;
+  activeTab: GsiDashboardTabIndex;
+  setActiveTab: (tab: GsiDashboardTabIndex) => void;
+}
+
 export interface GsiDashboardPanelModel {
   title: string;
   rows: KeyValueRow[];

@@ -1,32 +1,22 @@
-import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { HotkeyTabDescriptor } from "../components/atoms/hotkeyTabStrip";
 import type { KeyValueRow } from "../components/atoms/gridRowList";
-import { formatGsiProviderClockHuman, formatGsiProviderNameAppVersionLine } from "../utils/formatGsiProvider";
+import type { GsiProcessorStatusLabels } from "../components/molecules/gsiProcessorStatusBox.types";
 import {
-  formatHudPovLine,
-  formatMatchScoreLine,
-  formatMatchSummaryLine,
-  watcherModeDisplayValue,
-} from "../utils/gsiStatusDashboardFormat";
-import type { GsiGatewayDiagnosticsView, GsiProcessorStatusLabels } from "../components/molecules/gsiProcessorStatusBox.types";
+  GSI_DASHBOARD_ALL_FIELDS,
+  type GsiDashboardFieldDefinition,
+  type GsiDashboardLabelKey,
+  type GsiDashboardRegistryPanel,
+  type GsiDashboardRegistryTab,
+} from "./gsiDashboardFieldRegistry";
 import type {
+  GsiDashboardBuildInput,
   GsiDashboardContextValue,
   GsiDashboardGameStatePanelModel,
   GsiDashboardPanelModel,
-  GsiDashboardTabIndex,
 } from "./gsiDashboardTypes";
+import { resolveDashboardFieldValue, type GsiDashboardResolveContext } from "./gsiDashboardResolve";
 
-export interface GsiDashboardBuildInput {
-  gsiState: Readonly<GsiProcessorState> | null;
-  gatewayDiagnostics: GsiGatewayDiagnosticsView;
-  cs2Running: boolean;
-  labels: GsiProcessorStatusLabels;
-  gatewayWarning?: string;
-  formatTimestamp: (timestamp: number) => string;
-  providerTimeLocale?: Intl.LocalesArgument;
-  activeTab: GsiDashboardTabIndex;
-  setActiveTab: (tab: GsiDashboardTabIndex) => void;
-}
+export type { GsiDashboardBuildInput } from "./gsiDashboardTypes";
 
 function selectHotkeyTabs(labels: GsiProcessorStatusLabels): readonly HotkeyTabDescriptor[] {
   return [
@@ -35,80 +25,46 @@ function selectHotkeyTabs(labels: GsiProcessorStatusLabels): readonly HotkeyTabD
   ];
 }
 
-function buildProcessingRows(
-  gsiState: Readonly<GsiProcessorState> | null,
-  labels: GsiProcessorStatusLabels,
-  gatewayDiagnostics: GsiGatewayDiagnosticsView,
-  formatTimestamp: (timestamp: number) => string
-): KeyValueRow[] {
-  const streamState = gsiState != null ? gsiState.streamState : "-";
-  const totalTicks = gsiState?.totalTicks ?? 0;
-  const lastProcessedAt = gsiState?.lastProcessedAt ?? null;
-  return [
-    { label: labels.streamState, value: String(streamState) },
-    { label: labels.ticksReceived, value: String(totalTicks) },
-    {
-      label: labels.lastTickAt,
-      value: lastProcessedAt ? formatTimestamp(lastProcessedAt) : "-",
-    },
-    { label: labels.httpRequests, value: String(gatewayDiagnostics.receivedRequests) },
-    { label: labels.httpRejected, value: String(gatewayDiagnostics.rejectedRequests) },
-    {
-      label: labels.lastRejectReason,
-      value: gatewayDiagnostics.lastRejectReason ?? "-",
-    },
-  ];
+function matchesPlacement(
+  field: GsiDashboardFieldDefinition,
+  tab: GsiDashboardRegistryTab,
+  panel: GsiDashboardRegistryPanel
+): boolean {
+  return field.placement.tab === tab && field.placement.panel === panel;
 }
 
-function buildGameStateRows(
-  gsiState: Readonly<GsiProcessorState> | null,
-  labels: GsiProcessorStatusLabels,
-  payload: unknown
+function rowLabel(labels: Readonly<GsiProcessorStatusLabels>, key: GsiDashboardLabelKey): string {
+  return labels[key];
+}
+
+function buildRowsFromRegistry(
+  tab: GsiDashboardRegistryTab,
+  panel: GsiDashboardRegistryPanel,
+  resolveCtx: GsiDashboardResolveContext,
+  labels: GsiProcessorStatusLabels
 ): KeyValueRow[] {
-  const watcherMode = gsiState?.watcherMode ?? (payload as { watcherMode?: string } | null)?.watcherMode ?? null;
-  const hudControl = gsiState?.isSpectatingOtherPlayer
-    ? labels.playerHudControlSpectate
-    : labels.playerHudControlLocal;
-  return [
-    {
-      label: labels.lastGameState,
-      value: payload ? labels.valueAvailable : labels.valueNull,
-    },
-    { label: labels.watcherMode, value: watcherModeDisplayValue(labels, watcherMode) },
-    { label: labels.matchSummary, value: formatMatchSummaryLine(gsiState) },
-    { label: labels.matchScore, value: formatMatchScoreLine(gsiState) },
-    { label: labels.playerHudControl, value: hudControl },
-    { label: labels.playerHudPov, value: formatHudPovLine(gsiState) },
-  ];
+  return GSI_DASHBOARD_ALL_FIELDS.filter((f) => matchesPlacement(f, tab, panel)).map((field) => ({
+    label: rowLabel(labels, field.labelKey),
+    value: resolveDashboardFieldValue(field, resolveCtx),
+  }));
 }
 
 function buildGameStatePanel(
-  gsiState: Readonly<GsiProcessorState> | null,
-  labels: GsiProcessorStatusLabels,
-  providerTimeLocale: Intl.LocalesArgument | undefined
+  resolveCtx: GsiDashboardResolveContext,
+  labels: GsiProcessorStatusLabels
 ): GsiDashboardGameStatePanelModel {
-  const payload = gsiState?.lastGameState ?? null;
-  const provider = gsiState?.lastSnapshot?.provider ?? payload?.provider ?? null;
-  const rows = buildGameStateRows(gsiState, labels, payload);
+  const mainRows = buildRowsFromRegistry("gameState", "main", resolveCtx, labels);
+  const provider = resolveCtx.provider;
   const providerBlock =
     provider == null
       ? null
       : {
           heading: labels.providerHeading,
-          rows: [
-            {
-              label: labels.providerGame,
-              value: formatGsiProviderNameAppVersionLine(provider.name, provider.appid, provider.version),
-            },
-            {
-              label: labels.providerGsiTime,
-              value: formatGsiProviderClockHuman(provider.timestamp, providerTimeLocale),
-            },
-          ] satisfies KeyValueRow[],
+          rows: buildRowsFromRegistry("gameState", "provider", resolveCtx, labels),
         };
   return {
     title: labels.tabGameState,
-    rows,
+    rows: mainRows,
     providerBlock,
   };
 }
@@ -117,16 +73,24 @@ function buildGameStatePanel(
 export function buildGsiDashboardContextValue(input: GsiDashboardBuildInput): GsiDashboardContextValue {
   const payload = input.gsiState?.lastGameState ?? null;
   const waitingForCs2 = !payload && !input.cs2Running;
+  const provider = input.gsiState?.lastSnapshot?.provider ?? payload?.provider ?? null;
+
+  const resolveCtx: GsiDashboardResolveContext = {
+    gsiState: input.gsiState,
+    gatewayDiagnostics: input.gatewayDiagnostics,
+    labels: input.labels,
+    formatTimestamp: input.formatTimestamp,
+    providerTimeLocale: input.providerTimeLocale,
+    payload,
+    provider,
+  };
+
   const processingPanel: GsiDashboardPanelModel = {
     title: input.labels.tabProcessing,
-    rows: buildProcessingRows(
-      input.gsiState,
-      input.labels,
-      input.gatewayDiagnostics,
-      input.formatTimestamp
-    ),
+    rows: buildRowsFromRegistry("processing", "main", resolveCtx, input.labels),
   };
-  const gameStatePanel = buildGameStatePanel(input.gsiState, input.labels, input.providerTimeLocale);
+  const gameStatePanel = buildGameStatePanel(resolveCtx, input.labels);
+
   return {
     labels: input.labels,
     gsiState: input.gsiState,
