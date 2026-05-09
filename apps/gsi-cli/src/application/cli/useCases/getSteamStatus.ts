@@ -16,19 +16,17 @@ export interface SteamStatus {
   location: SteamInstallLocation | null;
 }
 
-export interface GetSteamStatusPorts {
-  steamInstall: SteamInstallLocatorPort;
-  steamProcess: SteamProcessPort;
-}
-
 /**
  * Resolves Steam installation and process state in parallel and folds them
  * into a single snapshot consumed by the presentation layer.
+ *
+ * Ports tuple order: `[steamInstall, steamProcess]`.
  */
-export const getSteamStatus: AsyncUseCase<GetSteamStatusPorts, [], SteamStatus> = async ({
-  steamInstall,
-  steamProcess,
-}) => {
+export const getSteamStatus: AsyncUseCase<
+  [SteamInstallLocatorPort, SteamProcessPort],
+  [],
+  SteamStatus
+> = async ([steamInstall, steamProcess]) => {
   const [location, processStatus] = await Promise.all([
     steamInstall.detect(),
     steamProcess.getStatus(),

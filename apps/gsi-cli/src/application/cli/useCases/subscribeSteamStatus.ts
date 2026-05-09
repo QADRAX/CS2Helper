@@ -5,11 +5,6 @@ import { getSteamStatus, type SteamStatus } from "./getSteamStatus";
 
 const DEFAULT_INTERVAL_MS = 2000;
 
-export interface SubscribeSteamStatusPorts {
-  steamInstall: SteamInstallLocatorPort;
-  steamProcess: SteamProcessPort;
-}
-
 export interface SubscribeSteamStatusOptions {
   /** Poll cadence in milliseconds. Defaults to 2000ms. */
   intervalMs?: number;
@@ -20,9 +15,11 @@ export interface SubscribeSteamStatusOptions {
  * `SteamStatus` snapshot to the listener whenever any field changes.
  *
  * Returns an unsubscribe handle that cancels the polling loop.
+ *
+ * Ports tuple order: `[steamInstall, steamProcess]`.
  */
 export const subscribeSteamStatus: UseCase<
-  SubscribeSteamStatusPorts,
+  [SteamInstallLocatorPort, SteamProcessPort],
   [listener: (status: SteamStatus) => void, options?: SubscribeSteamStatusOptions],
   () => void
 > = (ports, listener, options) => {

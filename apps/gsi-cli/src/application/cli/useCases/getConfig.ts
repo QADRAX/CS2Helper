@@ -2,15 +2,11 @@ import type { AsyncUseCase } from "@cs2helper/shared";
 import type { ConfigPort } from "../ports/ConfigPort";
 import type { CliConfig } from "../../../domain/cli/config";
 
-export interface GetConfigPorts {
-  config: ConfigPort;
-}
-
 /**
  * Loads the current application configuration.
+ *
+ * Ports tuple order: `[config]`.
  */
-export const getConfig: AsyncUseCase<GetConfigPorts, [], CliConfig> = async ({
-  config,
-}) => {
+export const getConfig: AsyncUseCase<[ConfigPort], [], CliConfig> = async ([config]) => {
   return config.getConfig();
 };

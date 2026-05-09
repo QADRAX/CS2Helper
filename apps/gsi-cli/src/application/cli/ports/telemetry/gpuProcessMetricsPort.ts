@@ -1,4 +1,4 @@
-import type { GpuProcessMetricsSample } from "../../../domain/telemetry/gpuProcessMetrics";
+import type { GpuProcessMetricsSample } from "../../../../domain/telemetry/gpuProcessMetrics";
 
 export type { GpuProcessMetricsSample };
 

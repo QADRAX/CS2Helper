@@ -3,7 +3,7 @@ export { uiInitialState } from "./types";
 export * from "./uiThunks";
 export {
   clearError,
-  cs2StatusUpdated,
+  cs2TrackingUpdated,
   gatewayDiagnosticsUpdated,
   gsiStateUpdated,
   setUiError,

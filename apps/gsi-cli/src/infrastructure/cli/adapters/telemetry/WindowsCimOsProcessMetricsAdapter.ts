@@ -1,7 +1,7 @@
 import type {
   OsProcessMetricsPort,
   OsProcessMetricsSample,
-} from "../../../../application/cli/ports/OsProcessMetricsPort";
+} from "../../../../application/cli/ports";
 import {
   mapCimProcessJsonToOsSample,
   parseCimProcessJsonPayload,

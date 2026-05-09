@@ -4,15 +4,13 @@ import type {
   ValidateSteamApiKeyOutcome,
 } from "../ports/SteamWebApiClientPort";
 
-export interface VerifySteamWebApiPorts {
-  client: SteamWebApiClientPort;
-}
-
 /**
  * Probes that the given Steam Web API key is accepted (lightweight listing call).
+ *
+ * Ports tuple order: `[client]`.
  */
 export const verifySteamWebApi: AsyncUseCase<
-  VerifySteamWebApiPorts,
+  [SteamWebApiClientPort],
   [apiKey: string],
   ValidateSteamApiKeyOutcome
-> = ({ client }, apiKey) => client.validateApiKey(apiKey);
+> = ([client], apiKey) => client.validateApiKey(apiKey);

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Box } from "ink";
-import type { Cs2ProcessStatus } from "../../../application/cli/ports/Cs2ProcessPort";
+import type { Cs2ProcessStatus } from "../../../application/cli/ports";
 import type { SteamStatus } from "../../../application/cli/useCases/getSteamStatus";
 import type { CliStatus } from "../../../domain/cli";
 import type { NotificationItem } from "../../store";

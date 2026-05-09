@@ -1,7 +1,7 @@
 import type {
   GpuProcessMetricsPort,
   GpuProcessMetricsSample,
-} from "../../../../application/cli/ports/GpuProcessMetricsPort";
+} from "../../../../application/cli/ports";
 import {
   mapGpuCounterJsonToSample,
   parseGpuCounterJsonPayload,

@@ -4,7 +4,7 @@ import type {
   PresentChainMetricsPort,
   PresentChainSession,
   PresentChainSessionOptions,
-} from "../../../../application/cli/ports/PresentChainMetricsPort";
+} from "../../../../application/cli/ports";
 import { appendPresentMonFpsSmoothing } from "../../../../domain/telemetry/presentMonFpsSmooth";
 import {
   parsePresentMonHeader,

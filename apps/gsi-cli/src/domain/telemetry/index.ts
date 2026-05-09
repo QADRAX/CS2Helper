@@ -1,3 +1,5 @@
+export * from "./cs2Process";
+export * from "./cs2ProcessTrackingConstants";
 export * from "./osProcessMetrics";
 export * from "./gpuProcessMetrics";
 export * from "./presentChain";

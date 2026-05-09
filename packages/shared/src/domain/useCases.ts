@@ -1,7 +1,7 @@
 /**
  * Generic contract for application use cases with explicit port injection.
  * 
- * @typeParam TPorts - Interface containing required infrastructure ports.
+ * @typeParam TPorts - Injected ports: an object of named ports or a tuple of port instances (fixed order per use case).
  * @typeParam TArgs - Tuple of business arguments.
  * @typeParam TResult - Use case output.
  */

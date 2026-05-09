@@ -2,17 +2,15 @@ import type { UseCase } from "@cs2helper/shared";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { GatewayPort } from "../ports/GatewayPort";
 
-export interface SubscribeGatewayStatePorts {
-  gateway: GatewayPort;
-}
-
 /**
  * Subscribes to state changes from the active gateway.
+ *
+ * Ports tuple order: `[gateway]`.
  */
 export const subscribeGatewayState: UseCase<
-  SubscribeGatewayStatePorts,
+  [GatewayPort],
   [listener: (state: Readonly<GsiProcessorState>) => void],
   () => void
-> = ({ gateway }, listener) => {
+> = ([gateway], listener) => {
   return gateway.subscribeState(listener);
 };

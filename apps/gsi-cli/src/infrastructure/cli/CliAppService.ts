@@ -20,14 +20,14 @@ import { startRecording } from "../../application/cli/useCases/startRecording";
 import { stopRecording } from "../../application/cli/useCases/stopRecording";
 import { getCs2Status } from "../../application/cli/useCases/getCs2Status";
 import {
-  subscribeCs2Status,
-  type SubscribeCs2StatusOptions,
-} from "../../application/cli/useCases/subscribeCs2Status";
+  subscribeCs2ProcessTracking,
+  type SubscribeCs2ProcessTrackingOptions,
+} from "../../application/cli/useCases/subscribeCs2ProcessTracking";
 import {
   getSteamStatus,
   type SteamStatus,
 } from "../../application/cli/useCases/getSteamStatus";
-import { verifySteamWebApi as verifySteamWebApiUseCase } from "../../application/cli/useCases/verifySteamWebApi";
+import { verifyEnvSteamWebApiKey } from "../../application/cli/useCases/verifyEnvSteamWebApiKey";
 import type { ValidateSteamApiKeyOutcome } from "../../application/cli/ports/SteamWebApiClientPort";
 import {
   subscribeSteamStatus,
@@ -40,15 +40,21 @@ import { InMemoryGatewayAdapter } from "./adapters/InMemoryGatewayAdapter";
 import { SteamCs2LauncherAdapter } from "./adapters/SteamCs2LauncherAdapter";
 import { SteamRegistryCs2LocatorAdapter } from "./adapters/SteamRegistryCs2LocatorAdapter";
 import { TasklistCs2ProcessAdapter } from "./adapters/TasklistCs2ProcessAdapter";
+import {
+  PresentMonPresentChainMetricsAdapter,
+  WindowsCimOsProcessMetricsAdapter,
+  WindowsCounterGpuProcessMetricsAdapter,
+} from "./adapters/telemetry";
 import { TasklistSteamProcessAdapter } from "./adapters/TasklistSteamProcessAdapter";
 import { SteamRegistrySteamInstallAdapter } from "./adapters/SteamRegistrySteamInstallAdapter";
 import { SteamWebApiFetchAdapter } from "./adapters/SteamWebApiFetchAdapter";
+import { ProcessEnvSteamWebApiKeyAdapter } from "./adapters/ProcessEnvSteamWebApiKeyAdapter";
 import { WindowsDataFolderOpenerAdapter } from "./adapters/WindowsDataFolderOpenerAdapter";
-import { readSteamWebApiKeyFromEnv } from "./steamWebApiEnv";
 import type { CliConfig } from "../../domain/cli/config";
 import type { GatewayStartInfo } from "../../application/cli/ports/GatewayPort";
 import type { GatewayDiagnostics } from "../../application/cli/ports/GatewayPort";
-import type { Cs2ProcessStatus } from "../../application/cli/ports/Cs2ProcessPort";
+import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "../../domain/telemetry/cs2Process";
+import { withPorts, withPortsAsync } from "./withPorts";
 
 export interface CliApp {
   startGateway: () => Promise<GatewayStartInfo>;
@@ -65,9 +71,9 @@ export interface CliApp {
   startRecording: (filename: string) => Promise<void>;
   stopRecording: () => Promise<void>;
   getCs2Status: () => Promise<Cs2ProcessStatus>;
-  subscribeCs2Status: (
-    listener: (status: Cs2ProcessStatus) => void,
-    options?: SubscribeCs2StatusOptions
+  subscribeCs2ProcessTracking: (
+    listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
+    options?: SubscribeCs2ProcessTrackingOptions
   ) => () => void;
   getSteamStatus: () => Promise<SteamStatus>;
   subscribeSteamStatus: (
@@ -91,9 +97,38 @@ export class CliAppService implements CliApp {
   private readonly cs2LauncherPort: SteamCs2LauncherAdapter;
   private readonly dataFolderOpenerPort: WindowsDataFolderOpenerAdapter;
   private readonly cs2ProcessPort: TasklistCs2ProcessAdapter;
+  private readonly osProcessMetricsPort: WindowsCimOsProcessMetricsAdapter;
+  private readonly gpuProcessMetricsPort: WindowsCounterGpuProcessMetricsAdapter;
+  private readonly presentChainMetricsPort: PresentMonPresentChainMetricsAdapter;
   private readonly steamProcessPort: TasklistSteamProcessAdapter;
   private readonly steamInstallPort: SteamRegistrySteamInstallAdapter;
+  private readonly steamWebApiKeySource: ProcessEnvSteamWebApiKeyAdapter;
   private readonly steamWebApiClient: SteamWebApiFetchAdapter;
+
+  startGateway: () => Promise<GatewayStartInfo>;
+  stopGateway: () => Promise<void>;
+  getGatewayState: () => Readonly<GsiProcessorState> | null;
+  getGatewayDiagnostics: () => Readonly<GatewayDiagnostics>;
+  subscribeGatewayState: (listener: (state: Readonly<GsiProcessorState>) => void) => () => void;
+  getConfig: () => Promise<CliConfig>;
+  saveConfig: (config: Partial<CliConfig>) => Promise<CliConfig>;
+  launchCs2: () => Promise<void>;
+  openDataFolder: () => Promise<void>;
+  verifyGsiConfig: () => Promise<VerifyGsiConfigResult>;
+  createOrUpdateGsiConfig: () => Promise<CreateOrUpdateGsiConfigResult>;
+  startRecording: (filename: string) => Promise<void>;
+  stopRecording: () => Promise<void>;
+  getCs2Status: () => Promise<Cs2ProcessStatus>;
+  subscribeCs2ProcessTracking: (
+    listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
+    options?: SubscribeCs2ProcessTrackingOptions
+  ) => () => void;
+  getSteamStatus: () => Promise<SteamStatus>;
+  subscribeSteamStatus: (
+    listener: (status: SteamStatus) => void,
+    options?: SubscribeSteamStatusOptions
+  ) => () => void;
+  verifySteamWebApi: () => Promise<ValidateSteamApiKeyOutcome>;
 
   constructor() {
     this.gatewayPort = new InMemoryGatewayAdapter();
@@ -104,117 +139,59 @@ export class CliAppService implements CliApp {
     this.cs2LauncherPort = new SteamCs2LauncherAdapter();
     this.dataFolderOpenerPort = new WindowsDataFolderOpenerAdapter();
     this.cs2ProcessPort = new TasklistCs2ProcessAdapter();
+    this.osProcessMetricsPort = new WindowsCimOsProcessMetricsAdapter();
+    this.gpuProcessMetricsPort = new WindowsCounterGpuProcessMetricsAdapter();
+    this.presentChainMetricsPort = new PresentMonPresentChainMetricsAdapter();
     this.steamProcessPort = new TasklistSteamProcessAdapter();
     this.steamInstallPort = new SteamRegistrySteamInstallAdapter();
+    this.steamWebApiKeySource = new ProcessEnvSteamWebApiKeyAdapter();
     this.steamWebApiClient = new SteamWebApiFetchAdapter();
-  }
 
-  startGateway(): Promise<GatewayStartInfo> {
-    return startGateway({
-      gateway: this.gatewayPort,
-      config: this.configPort,
-      cs2Install: this.cs2InstallPort,
-      gsiConfigFile: this.gsiConfigFilePort,
-      recorder: this.recorderPort,
-    });
-  }
-
-  stopGateway(): Promise<void> {
-    return stopGateway({ gateway: this.gatewayPort, recorder: this.recorderPort });
-  }
-
-  getGatewayState(): Readonly<GsiProcessorState> | null {
-    return getGatewayState({ gateway: this.gatewayPort });
-  }
-
-  getGatewayDiagnostics(): Readonly<GatewayDiagnostics> {
-    return getGatewayDiagnostics({ gateway: this.gatewayPort });
-  }
-
-  subscribeGatewayState(listener: (state: Readonly<GsiProcessorState>) => void): () => void {
-    return subscribeGatewayState({ gateway: this.gatewayPort }, listener);
-  }
-
-  getConfig(): Promise<CliConfig> {
-    return getConfig({ config: this.configPort });
-  }
-
-  saveConfig(config: Partial<CliConfig>): Promise<CliConfig> {
-    return saveConfig({ config: this.configPort }, config);
-  }
-
-  launchCs2(): Promise<void> {
-    return launchCs2({
-      steamInstall: this.steamInstallPort,
-      cs2Launcher: this.cs2LauncherPort,
-    });
-  }
-
-  openDataFolder(): Promise<void> {
-    return openDataFolder({
-      folderOpener: this.dataFolderOpenerPort,
-    });
-  }
-
-  verifyGsiConfig(): Promise<VerifyGsiConfigResult> {
-    return verifyGsiConfig({
-      config: this.configPort,
-      cs2Install: this.cs2InstallPort,
-      gsiConfigFile: this.gsiConfigFilePort,
-    });
-  }
-
-  createOrUpdateGsiConfig(): Promise<CreateOrUpdateGsiConfigResult> {
-    return createOrUpdateGsiConfig({
-      config: this.configPort,
-      cs2Install: this.cs2InstallPort,
-      gsiConfigFile: this.gsiConfigFilePort,
-    });
-  }
-
-  startRecording(filename: string): Promise<void> {
-    return startRecording({ gateway: this.gatewayPort, recorder: this.recorderPort }, filename);
-  }
-
-  stopRecording(): Promise<void> {
-    return stopRecording({ recorder: this.recorderPort });
-  }
-
-  getCs2Status(): Promise<Cs2ProcessStatus> {
-    return getCs2Status({ cs2Process: this.cs2ProcessPort });
-  }
-
-  subscribeCs2Status(
-    listener: (status: Cs2ProcessStatus) => void,
-    options?: SubscribeCs2StatusOptions
-  ): () => void {
-    return subscribeCs2Status({ cs2Process: this.cs2ProcessPort }, listener, options);
-  }
-
-  getSteamStatus(): Promise<SteamStatus> {
-    return getSteamStatus({
-      steamInstall: this.steamInstallPort,
-      steamProcess: this.steamProcessPort,
-    });
-  }
-
-  subscribeSteamStatus(
-    listener: (status: SteamStatus) => void,
-    options?: SubscribeSteamStatusOptions
-  ): () => void {
-    return subscribeSteamStatus(
-      {
-        steamInstall: this.steamInstallPort,
-        steamProcess: this.steamProcessPort,
-      },
-      listener,
-      options
-    );
-  }
-
-  verifySteamWebApi(): Promise<ValidateSteamApiKeyOutcome> {
-    const key = readSteamWebApiKeyFromEnv();
-    if (!key) return Promise.resolve({ ok: false, detail: "missing-key" });
-    return verifySteamWebApiUseCase({ client: this.steamWebApiClient }, key);
+    this.startGateway = withPortsAsync(startGateway, [
+      this.gatewayPort,
+      this.configPort,
+      this.cs2InstallPort,
+      this.gsiConfigFilePort,
+      this.recorderPort,
+    ]);
+    this.stopGateway = withPortsAsync(stopGateway, [this.gatewayPort, this.recorderPort]);
+    this.getGatewayState = withPorts(getGatewayState, [this.gatewayPort]);
+    this.getGatewayDiagnostics = withPorts(getGatewayDiagnostics, [this.gatewayPort]);
+    this.subscribeGatewayState = withPorts(subscribeGatewayState, [this.gatewayPort]);
+    this.getConfig = withPortsAsync(getConfig, [this.configPort]);
+    this.saveConfig = withPortsAsync(saveConfig, [this.configPort]);
+    this.launchCs2 = withPortsAsync(launchCs2, [this.steamInstallPort, this.cs2LauncherPort]);
+    this.openDataFolder = withPortsAsync(openDataFolder, [this.dataFolderOpenerPort]);
+    this.verifyGsiConfig = withPortsAsync(verifyGsiConfig, [
+      this.configPort,
+      this.cs2InstallPort,
+      this.gsiConfigFilePort,
+    ]);
+    this.createOrUpdateGsiConfig = withPortsAsync(createOrUpdateGsiConfig, [
+      this.configPort,
+      this.cs2InstallPort,
+      this.gsiConfigFilePort,
+    ]);
+    this.startRecording = withPortsAsync(startRecording, [this.gatewayPort, this.recorderPort]);
+    this.stopRecording = withPortsAsync(stopRecording, [this.recorderPort]);
+    this.getCs2Status = withPortsAsync(getCs2Status, [this.cs2ProcessPort]);
+    this.subscribeCs2ProcessTracking = withPorts(subscribeCs2ProcessTracking, [
+      this.cs2ProcessPort,
+      this.osProcessMetricsPort,
+      this.gpuProcessMetricsPort,
+      this.presentChainMetricsPort,
+    ]);
+    this.getSteamStatus = withPortsAsync(getSteamStatus, [
+      this.steamInstallPort,
+      this.steamProcessPort,
+    ]);
+    this.subscribeSteamStatus = withPorts(subscribeSteamStatus, [
+      this.steamInstallPort,
+      this.steamProcessPort,
+    ]);
+    this.verifySteamWebApi = withPortsAsync(verifyEnvSteamWebApiKey, [
+      this.steamWebApiKeySource,
+      this.steamWebApiClient,
+    ]);
   }
 }

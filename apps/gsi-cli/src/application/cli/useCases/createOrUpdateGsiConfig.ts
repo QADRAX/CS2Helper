@@ -3,12 +3,6 @@ import type { ConfigPort } from "../ports/ConfigPort";
 import type { Cs2InstallLocatorPort } from "../ports/Cs2InstallLocatorPort";
 import type { GsiCfgPayload, GsiConfigFilePort } from "../ports/GsiConfigFilePort";
 
-export interface CreateOrUpdateGsiConfigPorts {
-  config: ConfigPort;
-  cs2Install: Cs2InstallLocatorPort;
-  gsiConfigFile: GsiConfigFilePort;
-}
-
 export interface CreateOrUpdateGsiConfigResult {
   filePath: string;
   endpointUrl: string;
@@ -20,12 +14,14 @@ const GSI_NAME = "cs2helper";
 /**
  * Materializes/updates CS2's `gamestate_integration_cs2helper.cfg` using
  * the currently configured gateway port.
+ *
+ * Ports tuple order: `[config, cs2Install, gsiConfigFile]`.
  */
 export const createOrUpdateGsiConfig: AsyncUseCase<
-  CreateOrUpdateGsiConfigPorts,
+  [ConfigPort, Cs2InstallLocatorPort, GsiConfigFilePort],
   [],
   CreateOrUpdateGsiConfigResult
-> = async ({ config, cs2Install, gsiConfigFile }) => {
+> = async ([config, cs2Install, gsiConfigFile]) => {
   const cliConfig = await config.getConfig();
   const configuredPort = cliConfig.port;
   if (!Number.isFinite(configuredPort) || (configuredPort ?? 0) <= 0) {

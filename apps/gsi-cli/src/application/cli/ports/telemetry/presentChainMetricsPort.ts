@@ -1,13 +1,13 @@
 import type {
   PresentChainSession,
   PresentChainSessionOptions,
-} from "../../../domain/telemetry/presentChain";
+} from "../../../../domain/telemetry/presentChain";
 
 export type {
   PresentChainSession,
   PresentChainSessionOptions,
   PresentFrameSample,
-} from "../../../domain/telemetry/presentChain";
+} from "../../../../domain/telemetry/presentChain";
 
 /**
  * Session-based observation of present/frame timing for one process (ETW / PresentMon).

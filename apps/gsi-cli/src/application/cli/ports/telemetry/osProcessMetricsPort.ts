@@ -1,4 +1,4 @@
-import type { OsProcessMetricsSample } from "../../../domain/telemetry/osProcessMetrics";
+import type { OsProcessMetricsSample } from "../../../../domain/telemetry/osProcessMetrics";
 
 export type { OsProcessMetricsSample };
 

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { CliApp } from "../../infrastructure/cli/CliAppService";
-import { cs2StatusUpdated, steamStatusUpdated } from "../store";
+import { cs2TrackingUpdated, steamStatusUpdated } from "../store";
 import { useAppDispatch } from "./redux";
 
 /**
@@ -12,8 +12,8 @@ export function useSystemStatusSync(cliApp: CliApp): void {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const unsubscribeCs2 = cliApp.subscribeCs2Status((status) => {
-      dispatch(cs2StatusUpdated(status));
+    const unsubscribeCs2 = cliApp.subscribeCs2ProcessTracking((snapshot) => {
+      dispatch(cs2TrackingUpdated(snapshot));
     });
 
     const unsubscribeSteam = cliApp.subscribeSteamStatus((status) => {

@@ -1,7 +1,4 @@
-import type {
-  Cs2ProcessPort,
-  Cs2ProcessStatus,
-} from "../../../application/cli/ports/Cs2ProcessPort";
+import type { Cs2ProcessPort, Cs2ProcessStatus } from "../../../application/cli/ports";
 import { queryWindowsTasklist } from "./process/windowsTasklist";
 
 const CS2_IMAGE_NAME = "cs2.exe";

@@ -42,31 +42,31 @@ const gsiFile = (endpointUrl?: string): GsiConfigFilePort => ({
 
 describe("verifyGsiConfig", () => {
   it("warns when cfg file is missing", async () => {
-    const result = await verifyGsiConfig({
-      config: config(3000),
-      cs2Install: cs2Install("C:/cfg"),
-      gsiConfigFile: gsiFile(undefined),
-    });
+    const result = await verifyGsiConfig([
+      config(3000),
+      cs2Install("C:/cfg"),
+      gsiFile(undefined),
+    ]);
     expect(result.ok).toBe(false);
     expect(result.warningMessage).toContain("missing");
   });
 
   it("warns when cfg endpoint port mismatches", async () => {
-    const result = await verifyGsiConfig({
-      config: config(3000),
-      cs2Install: cs2Install("C:/cfg"),
-      gsiConfigFile: gsiFile("http://127.0.0.1:4000"),
-    });
+    const result = await verifyGsiConfig([
+      config(3000),
+      cs2Install("C:/cfg"),
+      gsiFile("http://127.0.0.1:4000"),
+    ]);
     expect(result.ok).toBe(false);
     expect(result.warningMessage).toContain("mismatch");
   });
 
   it("returns ok when cfg endpoint port matches", async () => {
-    const result = await verifyGsiConfig({
-      config: config(3000),
-      cs2Install: cs2Install("C:/cfg"),
-      gsiConfigFile: gsiFile("http://127.0.0.1:3000"),
-    });
+    const result = await verifyGsiConfig([
+      config(3000),
+      cs2Install("C:/cfg"),
+      gsiFile("http://127.0.0.1:3000"),
+    ]);
     expect(result.ok).toBe(true);
     expect(result.warningMessage).toBeUndefined();
   });

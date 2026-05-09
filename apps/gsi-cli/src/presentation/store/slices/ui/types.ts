@@ -1,5 +1,5 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
+import type { Cs2ProcessTrackingSnapshot } from "../../../../domain/telemetry/cs2Process";
 import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import type { CliStatus } from "../../../../domain/cli";
@@ -34,12 +34,12 @@ export interface UiState {
   port?: number;
   recordingPath?: string;
   config: CliConfig;
-  cs2Status: Cs2ProcessStatus;
+  cs2Tracking: Cs2ProcessTrackingSnapshot;
   steamStatus: SteamStatus;
   steamWebApi: SteamWebApiUiSlice;
 }
 
-const cs2StatusInitial: Cs2ProcessStatus = { running: false };
+const cs2TrackingInitial: Cs2ProcessTrackingSnapshot = { running: false };
 const steamStatusInitial: SteamStatus = {
   installed: false,
   running: false,
@@ -51,7 +51,7 @@ export const uiInitialState: UiState = {
   gsiState: null,
   gatewayDiagnostics: { receivedRequests: 0, rejectedRequests: 0 },
   config: {},
-  cs2Status: cs2StatusInitial,
+  cs2Tracking: cs2TrackingInitial,
   steamStatus: steamStatusInitial,
   steamWebApi: steamWebApiUiInitial,
 };

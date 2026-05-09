@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import type { Cs2ProcessStatus } from "../../../../application/cli/ports/Cs2ProcessPort";
+import type { Cs2ProcessTrackingSnapshot } from "../../../../domain/telemetry/cs2Process";
 import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import { msgKeys } from "../../../i18n/msgKeys";
@@ -34,8 +34,8 @@ const uiSlice = createSlice({
     clearError: (state) => {
       state.error = undefined;
     },
-    cs2StatusUpdated: (state, action: PayloadAction<Cs2ProcessStatus>) => {
-      state.cs2Status = action.payload;
+    cs2TrackingUpdated: (state, action: PayloadAction<Cs2ProcessTrackingSnapshot>) => {
+      state.cs2Tracking = action.payload;
     },
     steamStatusUpdated: (state, action: PayloadAction<SteamStatus>) => {
       state.steamStatus = action.payload;
@@ -136,7 +136,7 @@ export const {
   gatewayDiagnosticsUpdated,
   setUiError,
   clearError,
-  cs2StatusUpdated,
+  cs2TrackingUpdated,
   steamStatusUpdated,
   steamWebApiDisabled,
 } = uiSlice.actions;

@@ -4,12 +4,6 @@ import type { ConfigPort } from "../ports/ConfigPort";
 import type { Cs2InstallLocatorPort } from "../ports/Cs2InstallLocatorPort";
 import type { GsiConfigFilePort } from "../ports/GsiConfigFilePort";
 
-export interface VerifyGsiConfigPorts {
-  config: ConfigPort;
-  cs2Install: Cs2InstallLocatorPort;
-  gsiConfigFile: GsiConfigFilePort;
-}
-
 export interface VerifyGsiConfigResult {
   ok: boolean;
   warningMessage?: string;
@@ -22,12 +16,14 @@ const GSI_NAME = "cs2helper";
  * and that its endpoint points to the configured gateway port.
  *
  * This use case is warning-oriented: callers decide whether to block or not.
+ *
+ * Ports tuple order: `[config, cs2Install, gsiConfigFile]`.
  */
 export const verifyGsiConfig: AsyncUseCase<
-  VerifyGsiConfigPorts,
+  [ConfigPort, Cs2InstallLocatorPort, GsiConfigFilePort],
   [],
   VerifyGsiConfigResult
-> = async ({ config, cs2Install, gsiConfigFile }) => {
+> = async ([config, cs2Install, gsiConfigFile]) => {
   const cliConfig = await config.getConfig();
   const expectedPort = cliConfig.port;
   const expectedThrottle = cliConfig.gsiThrottleSec ?? DEFAULT_CLI_CONFIG.gsiThrottleSec;

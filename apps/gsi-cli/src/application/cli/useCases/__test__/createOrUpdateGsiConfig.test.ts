@@ -30,11 +30,7 @@ describe("createOrUpdateGsiConfig", () => {
       remove: async () => {},
     };
 
-    const result = await createOrUpdateGsiConfig({
-      config: cfgPort,
-      cs2Install,
-      gsiConfigFile: gsiFile,
-    });
+    const result = await createOrUpdateGsiConfig([cfgPort, cs2Install, gsiFile]);
 
     expect(result.port).toBe(4000);
     expect(result.endpointUrl).toBe("http://127.0.0.1:4000");
@@ -58,12 +54,8 @@ describe("createOrUpdateGsiConfig", () => {
       remove: async () => {},
     };
 
-    await expect(
-      createOrUpdateGsiConfig({
-        config: cfgPort,
-        cs2Install,
-        gsiConfigFile: gsiFile,
-      })
-    ).rejects.toThrow(/installation not found/i);
+    await expect(createOrUpdateGsiConfig([cfgPort, cs2Install, gsiFile])).rejects.toThrow(
+      /installation not found/i
+    );
   });
 });

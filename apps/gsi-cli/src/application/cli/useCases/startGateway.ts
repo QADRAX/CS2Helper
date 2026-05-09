@@ -8,31 +8,23 @@ import { buildRecordingFilePath } from "../../../infrastructure/cli/adapters/app
 import { startRecording } from "./startRecording";
 import { verifyGsiConfig } from "./verifyGsiConfig";
 
-export interface StartGatewayPorts {
-  gateway: GatewayPort;
-  config: ConfigPort;
-  cs2Install: Cs2InstallLocatorPort;
-  gsiConfigFile: GsiConfigFilePort;
-  recorder: RecorderPort;
-}
-
 /**
  * Initializes and starts the GSI Gateway service.
+ *
+ * Ports tuple order: `[gateway, config, cs2Install, gsiConfigFile, recorder]`.
  */
-export const startGateway: AsyncUseCase<StartGatewayPorts, [], GatewayStartInfo> = async ({
-  gateway,
-  config,
-  cs2Install,
-  gsiConfigFile,
-  recorder,
-}) => {
+export const startGateway: AsyncUseCase<
+  [GatewayPort, ConfigPort, Cs2InstallLocatorPort, GsiConfigFilePort, RecorderPort],
+  [],
+  GatewayStartInfo
+> = async ([gateway, config, cs2Install, gsiConfigFile, recorder]) => {
   if (gateway.isRunning()) {
     await gateway.stop();
   }
 
   let gsiWarning: string | undefined;
   try {
-    const verification = await verifyGsiConfig({ config, cs2Install, gsiConfigFile });
+    const verification = await verifyGsiConfig([config, cs2Install, gsiConfigFile]);
     gsiWarning = verification.warningMessage;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown verification failure";
@@ -42,7 +34,7 @@ export const startGateway: AsyncUseCase<StartGatewayPorts, [], GatewayStartInfo>
   const currentConfig = await config.getConfig();
   const startInfo = await gateway.start({ port: currentConfig.port });
   if (currentConfig.autoRecordRawGsiOnStart) {
-    await startRecording({ gateway, recorder }, buildRecordingFilePath());
+    await startRecording([gateway, recorder], buildRecordingFilePath());
   }
   return { ...startInfo, gsiWarning };
 };
