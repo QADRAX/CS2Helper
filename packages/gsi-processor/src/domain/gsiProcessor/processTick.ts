@@ -38,9 +38,9 @@ export function processTickDomain(
 
   nextState.totalTicks += 1;
   nextState.lastProcessedAt = timestamp;
-  nextState.lastGameState = payload;
 
   if (!payload) {
+    nextState.lastGameState = null;
     if (nextState.streamState === "healthy") {
       nextState.streamState = "gap";
       nextState.streamMetrics.gapCount += 1;
@@ -53,6 +53,7 @@ export function processTickDomain(
   const snapshot = normalizeWatcherPayload(payload);
   nextState.lastSnapshot = snapshot;
   nextState.watcherMode = snapshot.watcherMode;
+  nextState.lastGameState = snapshot.source;
   const quality = evaluateSnapshotQuality(
     snapshot,
     nextState.streamWatermarks.lastReliableTimestamp

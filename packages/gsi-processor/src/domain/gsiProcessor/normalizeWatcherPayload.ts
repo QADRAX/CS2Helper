@@ -1,4 +1,4 @@
-import type { NormalizedSnapshot, SnapshotPlayer, WatcherPayload } from "../csgo";
+import { resolveWatcherMode, type NormalizedSnapshot, type SnapshotPlayer, type WatcherPayload } from "../csgo";
 import type { WatcherPlayer } from "../csgo/rawWatcherPayload.types";
 
 /**
@@ -43,14 +43,21 @@ function toSnapshotPlayer(player: WatcherPlayer): SnapshotPlayer {
  * into a single canonical snapshot consumed by domain reducers.
  */
 export function normalizeWatcherPayload(payload: WatcherPayload): NormalizedSnapshot {
+  const watcherMode = resolveWatcherMode(payload);
+  const declared = (payload as { watcherMode?: typeof watcherMode }).watcherMode;
+  const source =
+    declared === watcherMode
+      ? payload
+      : ({ ...(payload as object), watcherMode } as WatcherPayload);
+
   const players: SnapshotPlayer[] = [];
 
-  if ("player" in payload && payload.player) {
-    players.push(toSnapshotPlayer(payload.player));
+  if ("player" in source && source.player) {
+    players.push(toSnapshotPlayer(source.player));
   }
 
-  if ("allplayers" in payload && payload.allplayers) {
-    for (const player of Object.values(payload.allplayers)) {
+  if ("allplayers" in source && source.allplayers) {
+    for (const player of Object.values(source.allplayers)) {
       if (!players.some((entry) => entry.steamid === player.steamid)) {
         players.push(toSnapshotPlayer(player));
       }
@@ -58,11 +65,11 @@ export function normalizeWatcherPayload(payload: WatcherPayload): NormalizedSnap
   }
 
   return {
-    watcherMode: payload.watcherMode,
-    provider: payload.provider,
-    map: payload.map ?? null,
-    round: payload.round ?? null,
+    watcherMode,
+    provider: source.provider,
+    map: source.map ?? null,
+    round: source.round ?? null,
     players,
-    source: payload,
+    source,
   };
 }

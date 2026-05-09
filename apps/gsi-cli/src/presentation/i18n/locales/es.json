@@ -51,6 +51,9 @@
       "title": "Contenido del gateway",
       "warningPrefix": "Aviso:",
       "spinner": "{frame} esperando cliente cs2",
+      "tabProcessing": "Procesamiento",
+      "tabGameState": "Estado del juego",
+      "tabSwitchHint": "7 = pestaña Procesamiento | 8 = pestaña Estado del juego",
       "streamState": "streamState:",
       "ticksReceived": "ticksRecibidos:",
       "lastTickAt": "últimoTick:",
@@ -59,11 +62,15 @@
       "lastRejectReason": "últimoRechazo:",
       "watcherMode": "watcherMode:",
       "lastGameState": "lastGameState:",
-      "player": "jugador:",
-      "allplayers": "todosLosJugadores:",
+      "payloadKindClientLocal": "Cliente",
+      "payloadKindSpectatorHltv": "Espectador / HLTV",
+      "payloadKindDedicatedServer": "Servidor dedicado",
       "valueAvailable": "disponible",
       "valueNull": "nulo",
-      "valueNone": "ninguno"
+      "valueNone": "ninguno",
+      "providerHeading": "Cliente del juego (proveedor GSI)",
+      "providerGame": "Juego",
+      "providerGsiTime": "Reloj GSI"
     },
     "notification": {
       "cfgUpdated": "CFG de CS2 actualizada en {path}",

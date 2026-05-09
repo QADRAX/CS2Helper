@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { Pistol } from "../../csgo/weaponTypes";
+import type { WatcherPayload } from "../../csgo";
 import { normalizeWatcherPayload } from "../normalizeWatcherPayload";
 import {
   minimalClientTick,
   minimalDedicatedTick,
+  minimalSpectatorTick,
 } from "../../../__test__/fixtures/minimalWatcherTick";
 
 describe("normalizeWatcherPayload", () => {
@@ -68,5 +70,29 @@ describe("normalizeWatcherPayload", () => {
     const snap = normalizeWatcherPayload(tick);
     expect(snap.map).toBeNull();
     expect(snap.round).toBeNull();
+  });
+
+  it("infers client_local when stock GSI omits watcherMode (provider + player)", () => {
+    const tick = minimalClientTick();
+    const { watcherMode: _declared, ...raw } = tick;
+    const snap = normalizeWatcherPayload(raw as WatcherPayload);
+    expect(snap.watcherMode).toBe("client_local");
+    expect(snap.source.watcherMode).toBe("client_local");
+  });
+
+  it("infers dedicated_server when only allplayers is present (no watcherMode)", () => {
+    const tick = minimalDedicatedTick();
+    const { watcherMode: _declared, ...raw } = tick;
+    const snap = normalizeWatcherPayload(raw as WatcherPayload);
+    expect(snap.watcherMode).toBe("dedicated_server");
+    expect(snap.source.watcherMode).toBe("dedicated_server");
+  });
+
+  it("infers spectator_hltv when player and non-empty allplayers exist without watcherMode", () => {
+    const tick = minimalSpectatorTick();
+    const { watcherMode: _declared, ...raw } = tick;
+    const snap = normalizeWatcherPayload(raw as WatcherPayload);
+    expect(snap.watcherMode).toBe("spectator_hltv");
+    expect(snap.source.watcherMode).toBe("spectator_hltv");
   });
 });

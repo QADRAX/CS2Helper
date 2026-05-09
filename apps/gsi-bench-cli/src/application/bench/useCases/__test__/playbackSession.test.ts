@@ -44,7 +44,7 @@ describe("playbackSession", () => {
 function createReplayResult(): ReplayResult {
   const stateByTick = Array.from({ length: 5 }).map((_, idx) => ({
     totalTicks: idx + 1,
-    streamState: "active",
+    streamState: "healthy" as const,
     watcherMode: null,
     lastSnapshot: null,
     playersBySteamId: {},
@@ -67,7 +67,7 @@ function createReplayResult(): ReplayResult {
       timestamp: idx * 1_000,
       before: {
         totalTicks: idx,
-        streamState: "active",
+        streamState: "healthy",
         watcherMode: null,
         mapRound: null,
         roundPhase: null,
@@ -75,7 +75,7 @@ function createReplayResult(): ReplayResult {
       },
       after: {
         totalTicks: state.totalTicks,
-        streamState: "active",
+        streamState: "healthy",
         watcherMode: null,
         mapRound: null,
         roundPhase: null,
@@ -86,7 +86,7 @@ function createReplayResult(): ReplayResult {
     events: [],
     initialState: {
       totalTicks: 0,
-      streamState: "inactive",
+      streamState: "cold_start",
       watcherMode: null,
       lastSnapshot: null,
       playersBySteamId: {},
@@ -105,5 +105,5 @@ function createReplayResult(): ReplayResult {
       tickIndexBySecond: [0, 1, 2, 3, 4],
     },
     finalState: stateByTick[4]!,
-  } as ReplayResult;
+  } as unknown as ReplayResult;
 }

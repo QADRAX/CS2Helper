@@ -17,11 +17,14 @@ export function GatewayContentBox({
   cs2Running,
   gatewayWarning,
 }: GatewayContentBoxProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const labels: GsiProcessorStatusLabels = {
     title: t(msgKeys.cli.gateway.title),
     warningPrefix: t(msgKeys.cli.gateway.warningPrefix),
     spinner: (frame) => t(msgKeys.cli.gateway.spinner, { frame }),
+    tabProcessing: t(msgKeys.cli.gateway.tabProcessing),
+    tabGameState: t(msgKeys.cli.gateway.tabGameState),
+    tabSwitchHint: t(msgKeys.cli.gateway.tabSwitchHint),
     streamState: t(msgKeys.cli.gateway.streamState),
     ticksReceived: t(msgKeys.cli.gateway.ticksReceived),
     lastTickAt: t(msgKeys.cli.gateway.lastTickAt),
@@ -30,11 +33,15 @@ export function GatewayContentBox({
     lastRejectReason: t(msgKeys.cli.gateway.lastRejectReason),
     watcherMode: t(msgKeys.cli.gateway.watcherMode),
     lastGameState: t(msgKeys.cli.gateway.lastGameState),
-    player: t(msgKeys.cli.gateway.player),
-    allplayers: t(msgKeys.cli.gateway.allplayers),
+    payloadKindClientLocal: t(msgKeys.cli.gateway.payloadKindClientLocal),
+    payloadKindSpectatorHltv: t(msgKeys.cli.gateway.payloadKindSpectatorHltv),
+    payloadKindDedicatedServer: t(msgKeys.cli.gateway.payloadKindDedicatedServer),
     valueAvailable: t(msgKeys.cli.gateway.valueAvailable),
     valueNull: t(msgKeys.cli.gateway.valueNull),
     valueNone: t(msgKeys.cli.gateway.valueNone),
+    providerHeading: t(msgKeys.cli.gateway.providerHeading),
+    providerGame: t(msgKeys.cli.gateway.providerGame),
+    providerGsiTime: t(msgKeys.cli.gateway.providerGsiTime),
   };
 
   return (
@@ -44,6 +51,7 @@ export function GatewayContentBox({
       cs2Running={cs2Running}
       gatewayWarning={gatewayWarning}
       labels={labels}
+      providerTimeLocale={locale === "es" ? "es-ES" : "en-US"}
     />
   );
 }

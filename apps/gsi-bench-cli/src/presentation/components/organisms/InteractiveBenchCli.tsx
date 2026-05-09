@@ -18,6 +18,9 @@ const labels: GsiProcessorStatusLabels = {
   title: "GSI processor demo",
   warningPrefix: "Warning:",
   spinner: (frame) => `${frame} Waiting for replay data...`,
+  tabProcessing: "Processing",
+  tabGameState: "Game state",
+  tabSwitchHint: "7 = Processing tab | 8 = Game state tab",
   streamState: "Stream state:",
   ticksReceived: "Ticks processed:",
   lastTickAt: "Last tick at:",
@@ -26,11 +29,15 @@ const labels: GsiProcessorStatusLabels = {
   lastRejectReason: "Last parse error:",
   watcherMode: "Watcher mode:",
   lastGameState: "Last game state:",
-  player: "Player:",
-  allplayers: "All players:",
+  payloadKindClientLocal: "Client",
+  payloadKindSpectatorHltv: "Spectator / HLTV",
+  payloadKindDedicatedServer: "Dedicated server",
   valueAvailable: "available",
   valueNull: "null",
   valueNone: "none",
+  providerHeading: "Game client (GSI provider)",
+  providerGame: "Game",
+  providerGsiTime: "GSI clock",
 };
 
 export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {
@@ -197,7 +204,8 @@ export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {
         CS2Helper GSI Bench CLI
       </Text>
       <Text dimColor>
-        Up/down select | enter replay | space play/pause | 1/2 speed | arrows seek | s seek sec | m seek mode | a/tab analysis | b back | r refresh | q quit
+        Up/down select | enter replay | space play/pause | 1/2 speed | arrows seek | s seek sec | m seek mode | 7/8
+        dashboard tabs | a/tab analysis | b back | r refresh | q quit
       </Text>
       {errorMessage ? <Text color="red">Error: {errorMessage}</Text> : null}
       {mode === "list" ? (
