@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { CliApp } from "../../infrastructure/cli/CliAppService";
+import type { CliApp } from "../../infrastructure/CliAppService";
 import { cs2TrackingUpdated, steamStatusUpdated } from "../store";
 import { useAppDispatch } from "./redux";
 

@@ -1,6 +1,6 @@
 import { GsiProcessorStatusBox, type GsiProcessorStatusLabels } from "@cs2helper/gsi-processor-ink";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import type { GatewayDiagnostics } from "../../../application/cli/ports/GatewayPort";
+import type { GatewayDiagnostics } from "../../../application/ports/GatewayPort";
 import { msgKeys } from "../../i18n/msgKeys";
 import { useTranslation } from "../../i18n/useTranslation";
 

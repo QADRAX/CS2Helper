@@ -1,35 +1,36 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { ValidateSteamApiKeyOutcome } from "../../../../application/cli/ports/SteamWebApiClientPort";
+import type { ValidateSteamApiKeyOutcome } from "../../../../application/ports/SteamWebApiClientPort";
 import type { CliConfig } from "../../../../domain/cli/config";
-import type { CliApp } from "../../../../infrastructure/cli/CliAppService";
-import type { CliThunkExtra } from "../../thunkExtra";
-import type { RootState } from "../../rootState";
+import type { CliApp } from "../../../../infrastructure/CliAppService";
+import type { UiAsyncThunkConfig } from "../../uiAsyncThunkConfig";
 import { translate } from "../../../i18n/translate";
 import { msgKeys } from "../../../i18n/msgKeys";
 import { enqueueNotification } from "../notifications";
 
-type ThunkApi = { extra: CliThunkExtra; state: RootState };
-
-export const verifySteamWebApi = createAsyncThunk<ValidateSteamApiKeyOutcome, void, ThunkApi>(
+export const verifySteamWebApi = createAsyncThunk<ValidateSteamApiKeyOutcome, void, UiAsyncThunkConfig>(
   "ui/verifySteamWebApi",
   async (_, { extra }) => extra.cliApp.verifySteamWebApi()
 );
 
-export const loadConfig = createAsyncThunk<CliConfig, void, ThunkApi>("ui/loadConfig", async (_, { extra }) =>
+export const loadConfig = createAsyncThunk<CliConfig, void, UiAsyncThunkConfig>("ui/loadConfig", async (_, { extra }) =>
   extra.cliApp.getConfig()
 );
 
 export const startGateway = createAsyncThunk<
   Awaited<ReturnType<CliApp["startGateway"]>>,
   void,
-  ThunkApi
+  UiAsyncThunkConfig
 >("ui/startGateway", async (_, { extra }) => extra.cliApp.startGateway());
 
-export const stopGateway = createAsyncThunk<void, void, ThunkApi>("ui/stopGateway", async (_, { extra }) => {
+export const stopGateway = createAsyncThunk<void, void, UiAsyncThunkConfig>("ui/stopGateway", async (_, { extra }) => {
   await extra.cliApp.stopGateway();
 });
 
-export const saveCliConfig = createAsyncThunk<Awaited<ReturnType<CliApp["saveConfig"]>>, Partial<CliConfig>, ThunkApi>(
+export const saveCliConfig = createAsyncThunk<
+  Awaited<ReturnType<CliApp["saveConfig"]>>,
+  Partial<CliConfig>,
+  UiAsyncThunkConfig
+>(
   "ui/saveConfig",
   async (partial, { extra }) => extra.cliApp.saveConfig(partial)
 );
@@ -37,7 +38,7 @@ export const saveCliConfig = createAsyncThunk<Awaited<ReturnType<CliApp["saveCon
 export const createOrUpdateGsiCfg = createAsyncThunk<
   Awaited<ReturnType<CliApp["createOrUpdateGsiConfig"]>>,
   void,
-  ThunkApi
+  UiAsyncThunkConfig
 >("ui/createOrUpdateGsiCfg", async (_, { dispatch, extra, getState }) => {
   const result = await extra.cliApp.createOrUpdateGsiConfig();
   const locale = getState().i18n.locale;
@@ -51,7 +52,7 @@ export const createOrUpdateGsiCfg = createAsyncThunk<
   return result;
 });
 
-export const launchCs2 = createAsyncThunk<void, void, ThunkApi>(
+export const launchCs2 = createAsyncThunk<void, void, UiAsyncThunkConfig>(
   "ui/launchCs2",
   async (_, { dispatch, extra, getState }) => {
     await extra.cliApp.launchCs2();
@@ -65,7 +66,7 @@ export const launchCs2 = createAsyncThunk<void, void, ThunkApi>(
   }
 );
 
-export const openDataFolder = createAsyncThunk<void, void, ThunkApi>(
+export const openDataFolder = createAsyncThunk<void, void, UiAsyncThunkConfig>(
   "ui/openDataFolder",
   async (_, { dispatch, extra, getState }) => {
     await extra.cliApp.openDataFolder();
@@ -79,18 +80,21 @@ export const openDataFolder = createAsyncThunk<void, void, ThunkApi>(
   }
 );
 
-export const startRecording = createAsyncThunk<void, string, ThunkApi>(
+export const startRecording = createAsyncThunk<void, string, UiAsyncThunkConfig>(
   "ui/startRecording",
   async (filename, { extra }) => {
     await extra.cliApp.startRecording(filename);
   }
 );
 
-export const stopRecording = createAsyncThunk<void, void, ThunkApi>("ui/stopRecording", async (_, { extra }) => {
-  await extra.cliApp.stopRecording();
-});
+export const stopRecording = createAsyncThunk<void, void, UiAsyncThunkConfig>(
+  "ui/stopRecording",
+  async (_, { extra }) => {
+    await extra.cliApp.stopRecording();
+  }
+);
 
-export const exitCli = createAsyncThunk<void, void, ThunkApi>("ui/exit", async (_, { extra }) => {
+export const exitCli = createAsyncThunk<void, void, UiAsyncThunkConfig>("ui/exit", async (_, { extra }) => {
   await extra.cliApp.stopRecording();
   await extra.cliApp.stopGateway();
   process.exit(0);

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { CliApp } from "../../infrastructure/cli/CliAppService";
+import type { CliApp } from "../../infrastructure/CliAppService";
 import { gsiStateUpdated, selectUiStatus } from "../store";
 import { useAppDispatch, useAppSelector } from "./redux";
 

@@ -1,7 +1,7 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessTrackingSnapshot } from "../../../../domain/telemetry/cs2Process";
-import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
-import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
+import type { GatewayDiagnostics } from "../../../../application/ports/GatewayPort";
+import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
 import type { CliStatus } from "../../../../domain/cli";
 import type { CliConfig } from "../../../../domain/cli/config";
 import { msgKeys, type MessageKey } from "../../../i18n/msgKeys";

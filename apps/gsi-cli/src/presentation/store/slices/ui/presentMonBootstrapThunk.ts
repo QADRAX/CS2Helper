@@ -1,13 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { PresentMonBootstrapProgressEvent } from "../../../../application/cli/ports/PresentMonBootstrapPort";
+import type { PresentMonBootstrapProgressEvent } from "../../../../application/ports/PresentMonBootstrapPort";
 import { msgKeys, type MessageKey } from "../../../i18n/msgKeys";
 import { translate } from "../../../i18n/translate";
 import { enqueueNotification } from "../notifications";
-import type { CliThunkExtra } from "../../thunkExtra";
-import type { RootState } from "../../rootState";
+import type { UiAsyncThunkConfig } from "../../uiAsyncThunkConfig";
 import { presentMonBootstrapStep } from "./uiSlice";
-
-type ThunkApi = { extra: CliThunkExtra; state: RootState };
 
 function progressEventToStepKey(event: PresentMonBootstrapProgressEvent): MessageKey | undefined {
   switch (event.kind) {
@@ -34,7 +31,7 @@ function progressEventToStepKey(event: PresentMonBootstrapProgressEvent): Messag
  * Runs once at UI startup: managed PresentMon install/update with progress for the initial loader.
  * Failures are non-fatal (notification only); FPS telemetry may still fail later with {@link Cs2ProcessTrackingSnapshot.presentChainError}.
  */
-export const bootstrapPresentMonAtStartup = createAsyncThunk<void, void, ThunkApi>(
+export const bootstrapPresentMonAtStartup = createAsyncThunk<void, void, UiAsyncThunkConfig>(
   "ui/bootstrapPresentMonAtStartup",
   async (_, { dispatch, extra, getState }) => {
     dispatch(

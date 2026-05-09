@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessTrackingSnapshot } from "../../../../domain/telemetry/cs2Process";
-import type { GatewayDiagnostics } from "../../../../application/cli/ports/GatewayPort";
-import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
+import type { GatewayDiagnostics } from "../../../../application/ports/GatewayPort";
+import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
 import { msgKeys } from "../../../i18n/msgKeys";
 import { uiInitialState } from "./types";
 import type { MessageKey } from "../../../i18n/msgKeys";

@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "ink";
-import { CliAppService } from "./infrastructure/cli/CliAppService.js";
+import { CliAppService } from "./infrastructure/CliAppService.js";
 import { App } from "./presentation/App.js";
 
 /**

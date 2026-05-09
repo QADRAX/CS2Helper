@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import type { MenuOption } from "../../../components/types";
 import type { RootState } from "../../rootState";
-import { selectCs2Status, selectUiStatus } from "../ui/uiSelectors";
+import { selectCs2Running, selectUiStatus } from "../ui/uiSelectors";
 import type { CliSessionState } from "./types";
 
 export function selectCliSession(state: RootState): CliSessionState {
@@ -25,11 +25,11 @@ export function selectInteractiveConfigDraft(state: RootState) {
 }
 
 export const selectMainMenuOptions = createSelector(
-  [selectUiStatus, selectCs2Status],
-  (status, cs2): MenuOption[] => {
+  [selectUiStatus, selectCs2Running],
+  (status, running): MenuOption[] => {
     const gatewayOnline = status === "LISTENING";
     return gatewayOnline
-      ? cs2.running
+      ? running
         ? ["stop", "exit"]
         : ["launch_cs2", "stop", "exit"]
       : ["start", "config", "exit"];

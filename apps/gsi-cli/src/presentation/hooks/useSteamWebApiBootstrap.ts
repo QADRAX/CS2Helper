@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { readSteamWebApiKeyFromEnv } from "../../infrastructure/cli/steamWebApiEnv";
+import { readSteamWebApiKeyFromEnv } from "../../infrastructure/steamWebApiEnv";
 import { steamWebApiDisabled, verifySteamWebApi } from "../store";
 import { useAppDispatch } from "./redux";
 
