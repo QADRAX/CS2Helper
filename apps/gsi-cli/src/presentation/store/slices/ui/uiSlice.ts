@@ -5,6 +5,7 @@ import type { GatewayDiagnostics } from "../../../../application/cli/ports/Gatew
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import { msgKeys } from "../../../i18n/msgKeys";
 import { uiInitialState } from "./types";
+import type { MessageKey } from "../../../i18n/msgKeys";
 import type { UiErrorDescriptor } from "./types";
 import {
   loadConfig,
@@ -42,6 +43,15 @@ const uiSlice = createSlice({
     },
     steamWebApiDisabled: (state) => {
       state.steamWebApi = { enabled: false };
+    },
+    presentMonBootstrapStep: (
+      state,
+      action: PayloadAction<{ blocking: boolean; stepKey?: MessageKey }>
+    ) => {
+      state.presentMonBootstrap = {
+        blocking: action.payload.blocking,
+        stepKey: action.payload.stepKey,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -139,5 +149,6 @@ export const {
   cs2TrackingUpdated,
   steamStatusUpdated,
   steamWebApiDisabled,
+  presentMonBootstrapStep,
 } = uiSlice.actions;
 export const uiReducer = uiSlice.reducer;

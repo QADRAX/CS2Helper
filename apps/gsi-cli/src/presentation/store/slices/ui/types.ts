@@ -4,7 +4,12 @@ import type { GatewayDiagnostics } from "../../../../application/cli/ports/Gatew
 import type { SteamStatus } from "../../../../application/cli/useCases/getSteamStatus";
 import type { CliStatus } from "../../../../domain/cli";
 import type { CliConfig } from "../../../../domain/cli/config";
-import { msgKeys } from "../../../i18n/msgKeys";
+import { msgKeys, type MessageKey } from "../../../i18n/msgKeys";
+
+export interface PresentMonBootstrapUiState {
+  blocking: boolean;
+  stepKey?: MessageKey;
+}
 
 export type UiErrorMessageKey =
   | typeof msgKeys.cli.error.gatewayStart
@@ -37,6 +42,7 @@ export interface UiState {
   cs2Tracking: Cs2ProcessTrackingSnapshot;
   steamStatus: SteamStatus;
   steamWebApi: SteamWebApiUiSlice;
+  presentMonBootstrap: PresentMonBootstrapUiState;
 }
 
 const cs2TrackingInitial: Cs2ProcessTrackingSnapshot = { running: false };
@@ -54,4 +60,5 @@ export const uiInitialState: UiState = {
   cs2Tracking: cs2TrackingInitial,
   steamStatus: steamStatusInitial,
   steamWebApi: steamWebApiUiInitial,
+  presentMonBootstrap: { blocking: true, stepKey: msgKeys.cli.presentMon.loader.started },
 };

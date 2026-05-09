@@ -61,9 +61,25 @@ export function selectCs2Tracking(state: RootState): Cs2ProcessTrackingSnapshot 
   return state.ui.cs2Tracking;
 }
 
-export function selectCs2Status(state: RootState): Cs2ProcessStatus {
-  const t = state.ui.cs2Tracking;
-  return { running: t.running, pid: t.pid };
+const selectCs2Running = (state: RootState): boolean => state.ui.cs2Tracking.running;
+const selectCs2Pid = (state: RootState): number | undefined => state.ui.cs2Tracking.pid;
+
+/** Stable object reference when `running` and `pid` are unchanged (avoids extra rerenders). */
+export const selectCs2Status = createSelector(
+  [selectCs2Running, selectCs2Pid],
+  (running, pid): Cs2ProcessStatus => ({ running, pid })
+);
+
+export function selectCs2PresentChainError(state: RootState): string | undefined {
+  return state.ui.cs2Tracking.presentChainError;
+}
+
+export function selectPresentMonBootstrapBlocking(state: RootState): boolean {
+  return state.ui.presentMonBootstrap.blocking;
+}
+
+export function selectPresentMonBootstrapStepKey(state: RootState) {
+  return state.ui.presentMonBootstrap.stepKey;
 }
 
 export function selectSteamStatus(state: RootState): SteamStatus {

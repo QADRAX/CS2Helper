@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { Provider } from "react-redux";
 import type { CliApp } from "../infrastructure/cli/CliAppService";
-import { InteractiveCli } from "./components/organisms/InteractiveCli";
+import { AppShell } from "./components/organisms/AppShell";
 import { useConfigBootstrap } from "./hooks/useConfigBootstrap";
+import { usePresentMonBootstrap } from "./hooks/usePresentMonBootstrap";
 import { useGatewayDiagnosticsSync } from "./hooks/useGatewayDiagnosticsSync";
 import { useGatewayStateSync } from "./hooks/useGatewayStateSync";
 import { useSteamWebApiBootstrap } from "./hooks/useSteamWebApiBootstrap";
@@ -16,6 +17,7 @@ export interface AppProps {
 /** Redux bootstrap and sync hooks; must render under Provider (uses store context). */
 function RootReduxEffects({ cliApp }: { cliApp: CliApp }) {
   useConfigBootstrap();
+  usePresentMonBootstrap();
   useSteamWebApiBootstrap();
   useGatewayStateSync(cliApp);
   useGatewayDiagnosticsSync(cliApp);
@@ -32,7 +34,7 @@ export function App({ cliApp }: AppProps) {
   return (
     <Provider store={store}>
       <RootReduxEffects cliApp={cliApp} />
-      <InteractiveCli />
+      <AppShell />
     </Provider>
   );
 }

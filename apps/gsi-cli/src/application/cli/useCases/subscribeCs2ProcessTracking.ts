@@ -45,6 +45,7 @@ export const subscribeCs2ProcessTracking: UseCase<
   let presentSession: Awaited<ReturnType<PresentChainMetricsPort["startSession"]>> | null = null;
   let sessionPid: number | null = null;
   let lastPresent: Cs2ProcessTrackingSnapshot["present"];
+  let presentChainError: string | undefined;
 
   const tearDownPresent = async (): Promise<void> => {
     if (presentSession) {
@@ -57,6 +58,7 @@ export const subscribeCs2ProcessTracking: UseCase<
     }
     sessionPid = null;
     lastPresent = undefined;
+    presentChainError = undefined;
   };
 
   const ensurePresent = async (pid: number): Promise<void> => {
@@ -72,10 +74,12 @@ export const subscribeCs2ProcessTracking: UseCase<
         },
       });
       sessionPid = pid;
-    } catch {
+      presentChainError = undefined;
+    } catch (err) {
       presentSession = null;
       sessionPid = null;
       lastPresent = undefined;
+      presentChainError = err instanceof Error ? err.message : String(err);
     }
   };
 
@@ -111,6 +115,7 @@ export const subscribeCs2ProcessTracking: UseCase<
           os,
           gpu,
           present: lastPresent,
+          presentChainError,
         });
         lastIdleKey = key;
       } else {

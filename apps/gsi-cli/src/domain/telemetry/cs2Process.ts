@@ -24,4 +24,9 @@ export interface Cs2ProcessTrackingSnapshot extends Cs2ProcessStatus {
   gpu?: GpuProcessMetricsSample | null;
   /** Latest present-chain sample while a PresentMon session is active. */
   present?: PresentFrameSample;
+  /**
+   * Set when PresentMon / present-chain telemetry could not be started (missing binary, ETW, etc.).
+   * OS and GPU samples may still be present. Omitted when idle or when telemetry is working.
+   */
+  presentChainError?: string;
 }

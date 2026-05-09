@@ -1,4 +1,5 @@
 import { spawn, type ChildProcess } from "node:child_process";
+import fs from "node:fs";
 import * as readline from "node:readline";
 import type {
   PresentChainMetricsPort,
@@ -11,14 +12,18 @@ import {
   presentMonDataLineToSample,
   splitPresentMonCsvLine,
 } from "../../../../domain/telemetry/presentMonCsvParse";
+import { getManagedPresentMonExecutablePath } from "../../presentMon/presentMonPaths";
 import { assertPositiveIntegerPid, requireWin32 } from "../../windows/requireWin32";
 
 const FPS_SMOOTH_WINDOW = 32;
 
 /**
  * Spawns [PresentMon](https://github.com/GameTechDev/PresentMon) with `--output_stdout`
- * and parses CSV rows into {@link PresentFrameSample}. Requires `PresentMon.exe` on
- * `PATH` or set `CS2HELPER_PRESENTMON_PATH` / `PRESENTMON_PATH` to the executable.
+ * and parses CSV rows into {@link PresentFrameSample}.
+ *
+ * Resolution order: `CS2HELPER_PRESENTMON_PATH` / `PRESENTMON_PATH`, then a managed copy under
+ * `%APPDATA%\\CS2Helper\\gsi-cli\\presentmon\\PresentMon.exe` (installed at app startup),
+ * then `PresentMon.exe` on `PATH`.
  *
  * May require elevation or ETW permissions on some systems.
  */
@@ -104,6 +109,10 @@ function resolvePresentMonExecutable(): string {
   const fromEnv = process.env.CS2HELPER_PRESENTMON_PATH ?? process.env.PRESENTMON_PATH;
   if (fromEnv?.trim()) {
     return fromEnv.trim();
+  }
+  const managed = getManagedPresentMonExecutablePath();
+  if (fs.existsSync(managed)) {
+    return managed;
   }
   return "PresentMon.exe";
 }

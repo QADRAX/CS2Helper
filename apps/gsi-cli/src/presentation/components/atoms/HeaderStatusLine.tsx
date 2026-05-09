@@ -8,6 +8,7 @@ import { StatusIndicator } from "./StatusIndicator";
 interface HeaderStatusLineProps {
   steamRunning: boolean;
   cs2Running: boolean;
+  cs2PresentChainError?: string;
   gatewayStatus: CliStatus;
   steamWebApi: SteamWebApiUiSlice;
 }
@@ -20,6 +21,7 @@ function trimDetail(detail: string): string {
 export function HeaderStatusLine({
   steamRunning,
   cs2Running,
+  cs2PresentChainError,
   gatewayStatus,
   steamWebApi,
 }: HeaderStatusLineProps) {
@@ -54,6 +56,13 @@ export function HeaderStatusLine({
         {t(msgKeys.cli.status.gatewayLabel)}:{" "}
         <Text color={gatewayOnline ? "green" : "red"}>{gatewayLabelText}</Text>
       </Text>
+      {cs2Running && cs2PresentChainError ? (
+        <Text>
+          {t(msgKeys.cli.presentMon.status.fpsTelemetryIssue)}:{" "}
+          <Text color="yellow">{t(msgKeys.cli.presentMon.status.fpsTelemetryUnavailable)}</Text>
+          <Text dimColor> ({trimDetail(cs2PresentChainError)})</Text>
+        </Text>
+      ) : null}
       {steamWebApi.enabled ? (
         <Text>
           {t(msgKeys.cli.status.steamWebApi)}:{" "}

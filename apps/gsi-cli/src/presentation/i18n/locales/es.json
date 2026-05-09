@@ -78,6 +78,25 @@
       "playerHudControlSpectate": "Compañero (espectando)",
       "playerHudPov": "Jugador en HUD"
     },
+    "presentMon": {
+      "loader": {
+        "title": "Preparando telemetría FPS (PresentMon)",
+        "started": "Iniciando…",
+        "checkingRelease": "Comprobando última versión de PresentMon…",
+        "downloading": "Descargando PresentMon…",
+        "verifying": "Verificando binario PresentMon…",
+        "usingLocal": "Usando copia local de PresentMon",
+        "skippedOs": "Omitido (no es Windows)",
+        "skippedEnv": "Omitido (CS2HELPER_PRESENTMON_PATH)"
+      },
+      "notification": {
+        "bootstrapFailed": "Fallo al preparar PresentMon"
+      },
+      "status": {
+        "fpsTelemetryIssue": "Telemetría FPS",
+        "fpsTelemetryUnavailable": "no disponible"
+      }
+    },
     "notification": {
       "cfgUpdated": "CFG de CS2 actualizada en {path}",
       "launchCs2": "Comando de arranque enviado a Steam para CS2.",

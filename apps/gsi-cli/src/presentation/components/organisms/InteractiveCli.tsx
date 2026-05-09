@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useInput } from "ink";
+import { useCs2PresentChainError } from "../../hooks/useCs2PresentChainError";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import {
   clearError,
@@ -54,6 +55,7 @@ export function InteractiveCli() {
   const steamStatus = useAppSelector(selectSteamStatus);
   const steamWebApiUi = useAppSelector(selectSteamWebApiUi);
   const cs2Status = useAppSelector(selectCs2Status);
+  const cs2PresentChainError = useCs2PresentChainError();
   const errorDisplay = useAppSelector(selectUiErrorDisplay);
   const gatewayDiagnostics = useAppSelector(selectGatewayDiagnostics);
   const gatewayWarning = useAppSelector(selectGatewayWarning);
@@ -163,6 +165,7 @@ export function InteractiveCli() {
     <CliShell
       steamStatus={steamStatus}
       cs2Status={cs2Status}
+      cs2PresentChainError={cs2PresentChainError}
       gatewayStatus={uiStatus}
       steamWebApi={steamWebApiUi}
       gatewaySlot={

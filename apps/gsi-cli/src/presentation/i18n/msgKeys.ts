@@ -83,6 +83,25 @@ export const msgKeys = {
       playerHudControlSpectate: "cli.gateway.playerHudControlSpectate",
       playerHudPov: "cli.gateway.playerHudPov",
     },
+    presentMon: {
+      loader: {
+        title: "cli.presentMon.loader.title",
+        started: "cli.presentMon.loader.started",
+        checkingRelease: "cli.presentMon.loader.checkingRelease",
+        downloading: "cli.presentMon.loader.downloading",
+        verifying: "cli.presentMon.loader.verifying",
+        usingLocal: "cli.presentMon.loader.usingLocal",
+        skippedOs: "cli.presentMon.loader.skippedOs",
+        skippedEnv: "cli.presentMon.loader.skippedEnv",
+      },
+      notification: {
+        bootstrapFailed: "cli.presentMon.notification.bootstrapFailed",
+      },
+      status: {
+        fpsTelemetryIssue: "cli.presentMon.status.fpsTelemetryIssue",
+        fpsTelemetryUnavailable: "cli.presentMon.status.fpsTelemetryUnavailable",
+      },
+    },
     notification: {
       cfgUpdated: "cli.notification.cfgUpdated",
       launchCs2: "cli.notification.launchCs2",

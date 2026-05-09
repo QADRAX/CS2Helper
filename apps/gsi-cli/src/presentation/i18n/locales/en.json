@@ -78,6 +78,25 @@
       "playerHudControlSpectate": "Teammate (spectating)",
       "playerHudPov": "HUD player"
     },
+    "presentMon": {
+      "loader": {
+        "title": "Preparing FPS telemetry (PresentMon)",
+        "started": "Starting…",
+        "checkingRelease": "Checking latest PresentMon release…",
+        "downloading": "Downloading PresentMon…",
+        "verifying": "Verifying PresentMon binary…",
+        "usingLocal": "Using local PresentMon copy",
+        "skippedOs": "Skipped (not Windows)",
+        "skippedEnv": "Skipped (using CS2HELPER_PRESENTMON_PATH)"
+      },
+      "notification": {
+        "bootstrapFailed": "PresentMon setup failed"
+      },
+      "status": {
+        "fpsTelemetryIssue": "FPS telemetry",
+        "fpsTelemetryUnavailable": "unavailable"
+      }
+    },
     "notification": {
       "cfgUpdated": "CS2 cfg updated at {path}",
       "launchCs2": "Launch command sent to Steam for CS2.",

@@ -28,11 +28,14 @@ import {
   type SteamStatus,
 } from "../../application/cli/useCases/getSteamStatus";
 import { verifyEnvSteamWebApiKey } from "../../application/cli/useCases/verifyEnvSteamWebApiKey";
+import { ensurePresentMonBootstrap } from "../../application/cli/useCases/ensurePresentMonBootstrap";
+import type { PresentMonBootstrapOptions } from "../../application/cli/ports/PresentMonBootstrapPort";
 import type { ValidateSteamApiKeyOutcome } from "../../application/cli/ports/SteamWebApiClientPort";
 import {
   subscribeSteamStatus,
   type SubscribeSteamStatusOptions,
 } from "../../application/cli/useCases/subscribeSteamStatus";
+import { ManagedPresentMonBootstrapAdapter } from "./adapters/ManagedPresentMonBootstrapAdapter";
 import { FileConfigAdapter } from "./adapters/FileConfigAdapter";
 import { FileRecorderAdapter } from "./adapters/FileRecorderAdapter";
 import { FsGsiConfigFileAdapter } from "./adapters/FsGsiConfigFileAdapter";
@@ -82,6 +85,10 @@ export interface CliApp {
   ) => () => void;
   /** Validates `CS2HELPER_STEAM_WEB_API_KEY` against Steam Web API (no-op if absent). */
   verifySteamWebApi: () => Promise<ValidateSteamApiKeyOutcome>;
+  /**
+   * Ensures managed PresentMon is available (download/update). When/how to call is decided by the UI layer.
+   */
+  ensurePresentMonBootstrap: (options?: PresentMonBootstrapOptions) => Promise<void>;
 }
 
 /**
@@ -99,6 +106,7 @@ export class CliAppService implements CliApp {
   private readonly cs2ProcessPort: TasklistCs2ProcessAdapter;
   private readonly osProcessMetricsPort: WindowsCimOsProcessMetricsAdapter;
   private readonly gpuProcessMetricsPort: WindowsCounterGpuProcessMetricsAdapter;
+  private readonly presentMonBootstrap: ManagedPresentMonBootstrapAdapter;
   private readonly presentChainMetricsPort: PresentMonPresentChainMetricsAdapter;
   private readonly steamProcessPort: TasklistSteamProcessAdapter;
   private readonly steamInstallPort: SteamRegistrySteamInstallAdapter;
@@ -129,6 +137,7 @@ export class CliAppService implements CliApp {
     options?: SubscribeSteamStatusOptions
   ) => () => void;
   verifySteamWebApi: () => Promise<ValidateSteamApiKeyOutcome>;
+  ensurePresentMonBootstrap: (options?: PresentMonBootstrapOptions) => Promise<void>;
 
   constructor() {
     this.gatewayPort = new InMemoryGatewayAdapter();
@@ -141,6 +150,7 @@ export class CliAppService implements CliApp {
     this.cs2ProcessPort = new TasklistCs2ProcessAdapter();
     this.osProcessMetricsPort = new WindowsCimOsProcessMetricsAdapter();
     this.gpuProcessMetricsPort = new WindowsCounterGpuProcessMetricsAdapter();
+    this.presentMonBootstrap = new ManagedPresentMonBootstrapAdapter();
     this.presentChainMetricsPort = new PresentMonPresentChainMetricsAdapter();
     this.steamProcessPort = new TasklistSteamProcessAdapter();
     this.steamInstallPort = new SteamRegistrySteamInstallAdapter();
@@ -192,6 +202,9 @@ export class CliAppService implements CliApp {
     this.verifySteamWebApi = withPortsAsync(verifyEnvSteamWebApiKey, [
       this.steamWebApiKeySource,
       this.steamWebApiClient,
+    ]);
+    this.ensurePresentMonBootstrap = withPortsAsync(ensurePresentMonBootstrap, [
+      this.presentMonBootstrap,
     ]);
   }
 }

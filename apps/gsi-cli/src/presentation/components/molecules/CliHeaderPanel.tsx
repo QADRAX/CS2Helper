@@ -10,6 +10,7 @@ import { HeaderStatusLine } from "../atoms/HeaderStatusLine";
 interface CliHeaderPanelProps {
   steamStatus: SteamStatus;
   cs2Status: Cs2ProcessStatus;
+  cs2PresentChainError?: string;
   gatewayStatus: CliStatus;
   steamWebApi: SteamWebApiUiSlice;
 }
@@ -17,6 +18,7 @@ interface CliHeaderPanelProps {
 export function CliHeaderPanel({
   steamStatus,
   cs2Status,
+  cs2PresentChainError,
   gatewayStatus,
   steamWebApi,
 }: CliHeaderPanelProps) {
@@ -29,6 +31,7 @@ export function CliHeaderPanel({
       <HeaderStatusLine
         steamRunning={steamStatus.running}
         cs2Running={cs2Status.running}
+        cs2PresentChainError={cs2PresentChainError}
         gatewayStatus={gatewayStatus}
         steamWebApi={steamWebApi}
       />

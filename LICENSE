@@ -19,3 +19,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN     
 THE SOFTWARE.
+
+---
+
+Third-party software (runtime)
+
+The CS2Helper `gsi-cli` application may download and run **PresentMon**
+(<https://github.com/GameTechDev/PresentMon>) from official GitHub releases on
+Windows for frame-timing / presentation telemetry. PresentMon is not part of
+this repository; it is separate software.
+
+PresentMon is licensed under the MIT License, Copyright (C) 2017-2024 Intel
+Corporation. Its terms and full license text are available in the upstream
+repository. Your use of PresentMon is governed by that license, not by the
+license above, which applies to the CS2Helper project’s own source code.

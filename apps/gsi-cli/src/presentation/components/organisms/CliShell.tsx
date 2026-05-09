@@ -12,6 +12,8 @@ import { NotificationsStack } from "../molecules/NotificationsStack";
 interface CliShellProps {
   steamStatus: SteamStatus;
   cs2Status: Cs2ProcessStatus;
+  /** PresentMon / present-chain error while CS2 is running (optional). */
+  cs2PresentChainError?: string;
   gatewayStatus: CliStatus;
   steamWebApi: SteamWebApiUiSlice;
   gatewaySlot?: ReactNode;
@@ -22,6 +24,7 @@ interface CliShellProps {
 export function CliShell({
   steamStatus,
   cs2Status,
+  cs2PresentChainError,
   gatewayStatus,
   steamWebApi,
   gatewaySlot,
@@ -36,6 +39,7 @@ export function CliShell({
         <CliHeaderPanel
           steamStatus={steamStatus}
           cs2Status={cs2Status}
+          cs2PresentChainError={cs2PresentChainError}
           gatewayStatus={gatewayStatus}
           steamWebApi={steamWebApi}
         />
