@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import type { CliApp } from "../../infrastructure/CliAppService";
+import type { CliApp } from "../../application/CliApp";
 import { cliSessionReducer } from "./slices/cliSession";
 import { i18nReducer } from "./slices/i18n";
 import { notificationsReducer } from "./slices/notifications";

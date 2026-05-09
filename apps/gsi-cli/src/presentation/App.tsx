@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Provider } from "react-redux";
-import type { CliApp } from "../infrastructure/CliAppService";
+import type { CliApp } from "../application/CliApp";
 import { AppShell } from "./components/organisms/AppShell";
 import { useConfigBootstrap } from "./hooks/useConfigBootstrap";
 import { usePresentMonBootstrap } from "./hooks/usePresentMonBootstrap";

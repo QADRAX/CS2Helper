@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { ValidateSteamApiKeyOutcome } from "../../../../application/ports/SteamWebApiClientPort";
 import type { CliConfig } from "../../../../domain/cli/config";
-import type { CliApp } from "../../../../infrastructure/CliAppService";
+import type { CliApp } from "../../../../application/CliApp";
 import type { UiAsyncThunkConfig } from "../../uiAsyncThunkConfig";
 import { translate } from "../../../i18n/translate";
 import { msgKeys } from "../../../i18n/msgKeys";

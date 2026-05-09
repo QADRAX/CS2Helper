@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CliAppService } from "../../../CliAppService";
 import { WindowsCimOsProcessMetricsAdapter } from "../WindowsCimOsProcessMetricsAdapter";
 
 describe("WindowsCimOsProcessMetricsAdapter", () => {
@@ -6,7 +7,7 @@ describe("WindowsCimOsProcessMetricsAdapter", () => {
     if (process.platform === "win32") {
       return;
     }
-    const adapter = new WindowsCimOsProcessMetricsAdapter();
+    const adapter = new WindowsCimOsProcessMetricsAdapter(new CliAppService());
     await expect(adapter.sample(4)).rejects.toThrow(/requires Windows/);
   });
 
@@ -14,7 +15,7 @@ describe("WindowsCimOsProcessMetricsAdapter", () => {
     if (process.platform !== "win32") {
       return;
     }
-    const adapter = new WindowsCimOsProcessMetricsAdapter();
+    const adapter = new WindowsCimOsProcessMetricsAdapter(new CliAppService());
     await expect(adapter.sample(0)).rejects.toThrow(/Invalid process id/);
     await expect(adapter.sample(-1)).rejects.toThrow(/Invalid process id/);
   });
@@ -23,7 +24,7 @@ describe("WindowsCimOsProcessMetricsAdapter", () => {
     if (process.platform !== "win32") {
       return;
     }
-    const adapter = new WindowsCimOsProcessMetricsAdapter();
+    const adapter = new WindowsCimOsProcessMetricsAdapter(new CliAppService());
     const sample = await adapter.sample(4);
     expect(sample.workingSetBytes).toBeDefined();
     expect(sample.workingSetBytes).toBeGreaterThan(0);

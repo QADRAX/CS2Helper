@@ -6,14 +6,16 @@ import {
   mapCimProcessJsonToOsSample,
   parseCimProcessJsonPayload,
 } from "../../../domain/telemetry/cimProcessMetricsMap";
-import { assertPositiveIntegerPid, requireWin32 } from "../../windows/requireWin32";
-import { runPowerShellCommand } from "../../windows/runPowerShell";
+import { assertPositiveIntegerPid, requireWin32 } from "../../../domain/platform/requireWin32";
+import type { CliAppService } from "../../CliAppService";
 
 /**
  * Windows implementation using `Win32_Process` (CIM) for kernel/user time, working
  * set, private bytes, and cumulative I/O transfer counts.
  */
 export class WindowsCimOsProcessMetricsAdapter implements OsProcessMetricsPort {
+  constructor(private readonly powershell: CliAppService) {}
+
   async sample(pid: number): Promise<OsProcessMetricsSample> {
     requireWin32("WindowsCimOsProcessMetricsAdapter");
     assertPositiveIntegerPid(pid);
@@ -26,7 +28,7 @@ export class WindowsCimOsProcessMetricsAdapter implements OsProcessMetricsPort {
       "}",
     ].join("; ");
 
-    const out = await runPowerShellCommand(script);
+    const out = await this.powershell.runCommand(script);
     const payload = parseCimProcessJsonPayload(out);
     if (payload === null) {
       return {};

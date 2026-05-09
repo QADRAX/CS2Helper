@@ -6,8 +6,8 @@ import {
   mapGpuCounterJsonToSample,
   parseGpuCounterJsonPayload,
 } from "../../../domain/telemetry/gpuCounterMetricsMap";
-import { assertPositiveIntegerPid, requireWin32 } from "../../windows/requireWin32";
-import { runPowerShellCommand } from "../../windows/runPowerShell";
+import { assertPositiveIntegerPid, requireWin32 } from "../../../domain/platform/requireWin32";
+import type { CliAppService } from "../../CliAppService";
 
 /**
  * Samples WDDM performance counters for the given PID. Uses **English** PDH paths
@@ -15,12 +15,14 @@ import { runPowerShellCommand } from "../../windows/runPowerShell";
  * may return `null` until a discovery-based query is added.
  */
 export class WindowsCounterGpuProcessMetricsAdapter implements GpuProcessMetricsPort {
+  constructor(private readonly powershell: CliAppService) {}
+
   async sample(pid: number): Promise<GpuProcessMetricsSample | null> {
     requireWin32("WindowsCounterGpuProcessMetricsAdapter");
     assertPositiveIntegerPid(pid);
 
     const script = buildGpuCounterScript(pid);
-    const out = await runPowerShellCommand(script);
+    const out = await this.powershell.runCommand(script);
     const payload = parseGpuCounterJsonPayload(out);
     if (payload === null) {
       return null;

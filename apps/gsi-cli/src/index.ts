@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "ink";
-import { CliAppService } from "./infrastructure/CliAppService.js";
+import { GsiCliApplication } from "./infrastructure/GsiCliApplication.js";
 import { App } from "./presentation/App.js";
 
 /**
@@ -13,7 +13,7 @@ import { App } from "./presentation/App.js";
 const CLEAR_TERMINAL = "\x1B[2J\x1B[3J\x1B[H";
 
 function main() {
-  const cliApp = new CliAppService();
+  const cliApp = new GsiCliApplication();
   const element = React.createElement(App, { cliApp });
 
   process.stdout.write(CLEAR_TERMINAL);

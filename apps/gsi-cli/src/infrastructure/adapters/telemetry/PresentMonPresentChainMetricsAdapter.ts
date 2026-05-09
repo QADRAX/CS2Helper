@@ -13,7 +13,7 @@ import {
   splitPresentMonCsvLine,
 } from "../../../domain/telemetry/presentMonCsvParse";
 import { getManagedPresentMonExecutablePath } from "../../presentMon/presentMonPaths";
-import { assertPositiveIntegerPid, requireWin32 } from "../../windows/requireWin32";
+import { assertPositiveIntegerPid, requireWin32 } from "../../../domain/platform/requireWin32";
 
 const FPS_SMOOTH_WINDOW = 32;
 
