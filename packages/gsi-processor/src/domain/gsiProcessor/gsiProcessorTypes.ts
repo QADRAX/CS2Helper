@@ -36,6 +36,22 @@ export interface GsiProcessorState {
   lastSnapshot: NormalizedSnapshot | null;
   /** Current operation mode of the watcher (e.g., matching, observing). */
   watcherMode: WatcherMode | null;
+  /**
+   * SteamID of the local client from `provider.steamid` when the payload
+   * includes it. Used to tell apart your account from the `player` HUD block.
+   */
+  localClientSteamId: string | null;
+  /**
+   * SteamID of the subject in the primary `player` block (first entry in the
+   * normalized snapshot). Matches {@link localClientSteamId} while you
+   * control your pawn; differs while GSI reports a spectated teammate.
+   */
+  focusedPlayerSteamId: string | null;
+  /**
+   * `true` on `client_local` when `provider.steamid` and the HUD `player`
+   * steamid disagree (e.g. dead and spectating a teammate in competitive).
+   */
+  isSpectatingOtherPlayer: boolean;
   /** Dictionary of aggregated player stats keyed by their SteamID. */
   playersBySteamId: Record<string, PlayerAggregate>;
   /** The current health state of the incoming stream. */

@@ -42,6 +42,12 @@ export function GatewayContentBox({
     providerHeading: t(msgKeys.cli.gateway.providerHeading),
     providerGame: t(msgKeys.cli.gateway.providerGame),
     providerGsiTime: t(msgKeys.cli.gateway.providerGsiTime),
+    matchSummary: t(msgKeys.cli.gateway.matchSummary),
+    matchScore: t(msgKeys.cli.gateway.matchScore),
+    playerHudControl: t(msgKeys.cli.gateway.playerHudControl),
+    playerHudControlLocal: t(msgKeys.cli.gateway.playerHudControlLocal),
+    playerHudControlSpectate: t(msgKeys.cli.gateway.playerHudControlSpectate),
+    playerHudPov: t(msgKeys.cli.gateway.playerHudPov),
   };
 
   return (

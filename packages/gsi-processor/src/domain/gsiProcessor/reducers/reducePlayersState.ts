@@ -9,6 +9,14 @@ import type { ReducerContext } from "./reducerTypes";
 export function reducePlayersState(ctx: ReducerContext): void {
   const { state, snapshot, timestamp } = ctx;
 
+  state.localClientSteamId = snapshot.provider.steamid ?? null;
+  const primary = snapshot.players[0];
+  state.focusedPlayerSteamId = primary?.steamid ?? null;
+  const local = state.localClientSteamId;
+  const focused = state.focusedPlayerSteamId;
+  state.isSpectatingOtherPlayer =
+    snapshot.watcherMode === "client_local" && !!local && !!focused && local !== focused;
+
   for (const player of snapshot.players) {
     state.playersBySteamId[player.steamid] = {
       steamid: player.steamid,

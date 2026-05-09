@@ -7,6 +7,9 @@ export function createInitialGsiProcessorState(): GsiProcessorState {
     lastGameState: null,
     lastSnapshot: null,
     watcherMode: null,
+    localClientSteamId: null,
+    focusedPlayerSteamId: null,
+    isSpectatingOtherPlayer: false,
     playersBySteamId: {},
     streamState: "cold_start",
     streamMetrics: {

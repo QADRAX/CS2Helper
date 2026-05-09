@@ -38,6 +38,12 @@ const labels: GsiProcessorStatusLabels = {
   providerHeading: "Game client (GSI provider)",
   providerGame: "Game",
   providerGsiTime: "GSI clock",
+  matchSummary: "Match",
+  matchScore: "Score",
+  playerHudControl: "HUD control",
+  playerHudControlLocal: "Your pawn",
+  playerHudControlSpectate: "Teammate (spectating)",
+  playerHudPov: "HUD player",
 };
 
 export function InteractiveBenchCli({ benchApp }: InteractiveBenchCliProps) {

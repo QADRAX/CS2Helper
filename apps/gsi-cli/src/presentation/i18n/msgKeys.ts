@@ -76,6 +76,12 @@ export const msgKeys = {
       providerHeading: "cli.gateway.providerHeading",
       providerGame: "cli.gateway.providerGame",
       providerGsiTime: "cli.gateway.providerGsiTime",
+      matchSummary: "cli.gateway.matchSummary",
+      matchScore: "cli.gateway.matchScore",
+      playerHudControl: "cli.gateway.playerHudControl",
+      playerHudControlLocal: "cli.gateway.playerHudControlLocal",
+      playerHudControlSpectate: "cli.gateway.playerHudControlSpectate",
+      playerHudPov: "cli.gateway.playerHudPov",
     },
     notification: {
       cfgUpdated: "cli.notification.cfgUpdated",

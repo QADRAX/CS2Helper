@@ -70,7 +70,13 @@
       "valueNone": "none",
       "providerHeading": "Game client (GSI provider)",
       "providerGame": "Game",
-      "providerGsiTime": "GSI clock"
+      "providerGsiTime": "GSI clock",
+      "matchSummary": "Match",
+      "matchScore": "Score",
+      "playerHudControl": "HUD control",
+      "playerHudControlLocal": "Your pawn",
+      "playerHudControlSpectate": "Teammate (spectating)",
+      "playerHudPov": "HUD player"
     },
     "notification": {
       "cfgUpdated": "CS2 cfg updated at {path}",

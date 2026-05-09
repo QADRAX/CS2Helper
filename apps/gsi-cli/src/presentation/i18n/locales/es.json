@@ -70,7 +70,13 @@
       "valueNone": "ninguno",
       "providerHeading": "Cliente del juego (proveedor GSI)",
       "providerGame": "Juego",
-      "providerGsiTime": "Reloj GSI"
+      "providerGsiTime": "Reloj GSI",
+      "matchSummary": "Partida",
+      "matchScore": "Marcador",
+      "playerHudControl": "Control HUD",
+      "playerHudControlLocal": "Tu personaje",
+      "playerHudControlSpectate": "Compañero (espectando)",
+      "playerHudPov": "Jugador en HUD"
     },
     "notification": {
       "cfgUpdated": "CFG de CS2 actualizada en {path}",

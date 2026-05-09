@@ -41,6 +41,9 @@ export function processTickDomain(
 
   if (!payload) {
     nextState.lastGameState = null;
+    nextState.localClientSteamId = null;
+    nextState.focusedPlayerSteamId = null;
+    nextState.isSpectatingOtherPlayer = false;
     if (nextState.streamState === "healthy") {
       nextState.streamState = "gap";
       nextState.streamMetrics.gapCount += 1;

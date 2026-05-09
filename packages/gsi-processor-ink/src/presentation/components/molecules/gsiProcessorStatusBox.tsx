@@ -37,6 +37,13 @@ export interface GsiProcessorStatusLabels {
   providerHeading: string;
   providerGame: string;
   providerGsiTime: string;
+  /** Aggregated match / HUD context (game tab). */
+  matchSummary: string;
+  matchScore: string;
+  playerHudControl: string;
+  playerHudControlLocal: string;
+  playerHudControlSpectate: string;
+  playerHudPov: string;
 }
 
 /** Props for the shared Ink GSI processor status panel. */
@@ -130,6 +137,17 @@ export function GsiProcessorStatusBox({
             value={payload ? labels.valueAvailable : labels.valueNull}
           />
           <GridRow label={labels.watcherMode} value={watcherModeDisplayValue(labels, watcherMode)} />
+          <GridRow label={labels.matchSummary} value={formatMatchSummaryLine(gsiState)} />
+          <GridRow label={labels.matchScore} value={formatMatchScoreLine(gsiState)} />
+          <GridRow
+            label={labels.playerHudControl}
+            value={
+              gsiState?.isSpectatingOtherPlayer
+                ? labels.playerHudControlSpectate
+                : labels.playerHudControlLocal
+            }
+          />
+          <GridRow label={labels.playerHudPov} value={formatHudPovLine(gsiState)} />
           {provider ? (
             <>
               <Box marginTop={1}>
@@ -181,4 +199,24 @@ function watcherModeDisplayValue(
 
 function defaultFormatTimestamp(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString();
+}
+
+function formatMatchSummaryLine(gsiState: Readonly<GsiProcessorState> | null): string {
+  const map = gsiState?.lastSnapshot?.map;
+  if (!map) return "-";
+  return `${map.name} · ${map.mode} · ${map.phase} · R${map.round}`;
+}
+
+function formatMatchScoreLine(gsiState: Readonly<GsiProcessorState> | null): string {
+  const map = gsiState?.lastSnapshot?.map;
+  if (!map) return "-";
+  return `CT ${map.team_ct.score} – ${map.team_t.score} T`;
+}
+
+function formatHudPovLine(gsiState: Readonly<GsiProcessorState> | null): string {
+  const id = gsiState?.focusedPlayerSteamId;
+  if (!id) return "-";
+  const row = gsiState.playersBySteamId[id];
+  if (!row) return id;
+  return `${row.name} (${row.team})`;
 }

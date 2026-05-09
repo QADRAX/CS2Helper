@@ -15,11 +15,17 @@ describe("processTickDomain", () => {
   it("on null payload while healthy, enters gap and emits gap_started", () => {
     const state = createInitialGsiProcessorState();
     state.streamState = "healthy";
+    state.localClientSteamId = "x";
+    state.focusedPlayerSteamId = "y";
+    state.isSpectatingOtherPlayer = true;
     const memory = createInitialGsiProcessorMemory();
     const result = processTickDomain(state, memory, null, 5000);
     expect(result.state.streamState).toBe("gap");
     expect(result.state.streamWatermarks.requiresResync).toBe(true);
     expect(result.events.some((e) => e.type === "gap_started")).toBe(true);
+    expect(result.state.localClientSteamId).toBeNull();
+    expect(result.state.focusedPlayerSteamId).toBeNull();
+    expect(result.state.isSpectatingOtherPlayer).toBe(false);
   });
 
   it("on null payload while cold_start, does not emit gap_started", () => {
@@ -40,6 +46,9 @@ describe("processTickDomain", () => {
     expect(result.events.some((e) => e.type === "match_started")).toBe(true);
     expect(result.state.currentMatch).not.toBeNull();
     expect(result.state.streamWatermarks.lastReliableTimestamp).toBe(2000);
+    expect(result.state.localClientSteamId).toBe("self-steamid");
+    expect(result.state.focusedPlayerSteamId).toBe("self-steamid");
+    expect(result.state.isSpectatingOtherPlayer).toBe(false);
   });
 
   it("partial snapshot does not advance reliable watermarks", () => {

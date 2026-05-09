@@ -28,6 +28,23 @@ function canReducePlayerEvents(ctx: ReducerContext): boolean {
 }
 
 /**
+ * For `client_local`, kill/death/damage/economy/flash inference must only run
+ * for `provider.steamid` when present. After death, GSI often swaps `player`
+ * to a spectated teammate — we still mirror them in `reducePlayersState`,
+ * but those HUD rows must not emit events tied to your personal match timeline.
+ */
+function shouldEmitInferredEventsForSteamId(ctx: ReducerContext, steamid: string): boolean {
+  if (ctx.snapshot.watcherMode !== "client_local") {
+    return true;
+  }
+  const local = ctx.snapshot.provider.steamid;
+  if (!local) {
+    return true;
+  }
+  return steamid === local;
+}
+
+/**
  * Builds the baseline memory used on the first observation of a player.
  *
  * The first tick should never emit retroactive events, so the baseline starts
@@ -268,14 +285,19 @@ export function reducePlayerEvents(ctx: ReducerContext): void {
       roundPhase,
     };
 
-    if (frame.player.kills > frame.previous.kills) pushKillEvent(ctx, frame);
-    if (frame.player.deaths > frame.previous.deaths) pushDeathEvent(ctx, frame);
+    const emit = shouldEmitInferredEventsForSteamId(ctx, player.steamid);
 
-    const damage = frame.previous.health - frame.player.health;
-    if (damage > 0) pushDamageEvent(ctx, frame, damage);
+    if (emit) {
+      if (frame.player.kills > frame.previous.kills) pushKillEvent(ctx, frame);
+      if (frame.player.deaths > frame.previous.deaths) pushDeathEvent(ctx, frame);
 
-    reduceFlashEvents(ctx, frame);
-    reduceWeaponTransactions(ctx, frame);
+      const damage = frame.previous.health - frame.player.health;
+      if (damage > 0) pushDamageEvent(ctx, frame, damage);
+
+      reduceFlashEvents(ctx, frame);
+      reduceWeaponTransactions(ctx, frame);
+    }
+
     persistPlayerMemory(ctx, frame);
   }
 }

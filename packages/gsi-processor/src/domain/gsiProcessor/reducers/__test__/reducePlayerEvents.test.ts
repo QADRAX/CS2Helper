@@ -262,4 +262,42 @@ describe("reducePlayerEvents", () => {
     expect(ctx.events.some((e) => e.type === "weapon_transaction")).toBe(true);
     expect(state.currentMatch?.rounds[0].weaponTransactions.length).toBeGreaterThan(0);
   });
+
+  it("does not emit inferred events for a spectated teammate on client_local", () => {
+    const state = createInitialGsiProcessorState();
+    state.currentMatch = liveMatchWithRound(1);
+    const memory = createInitialGsiProcessorMemory();
+    memory.lastGameRound = 1;
+    memory.players["mate-steamid"] = {
+      health: 100,
+      kills: 0,
+      deaths: 0,
+      flashed: 0,
+      money: 800,
+      weapons: ["weapon_ak47"],
+      flashStartTimestamp: null,
+    };
+    const tick = minimalClientTick({
+      map: { ...minimalClientTick().map!, phase: "live", round: 1 },
+      round: { phase: "live" },
+      player: {
+        ...minimalClientTick().player!,
+        steamid: "mate-steamid",
+        name: "Mate",
+        match_stats: { kills: 1, assists: 0, deaths: 0, mvps: 0, score: 0 },
+      },
+    });
+    const snap = normalizeWatcherPayload(tick);
+    const ctx: ReducerContext = {
+      state,
+      memory,
+      snapshot: snap,
+      timestamp: 5000,
+      events: [],
+      criticalReducersEnabled: true,
+    };
+    reducePlayerEvents(ctx);
+    expect(ctx.events).toHaveLength(0);
+    expect(memory.players["mate-steamid"]?.kills).toBe(1);
+  });
 });
