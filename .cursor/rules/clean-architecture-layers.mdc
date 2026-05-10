@@ -34,6 +34,13 @@ Do not add other roots (`src/ports`, `src/helpers`, etc.). Put code in the right
 - **Wiring**: private adapter fields; in the **constructor**, assign each method with `withPorts(useCase, [...adapters])` or `withPortsAsync(...)` — do not hand-roll `return useCase([...], ...)` per method unless there is a strong reason.
 - **Naming**: prefer `*Application` for the composition root, not `*AppService`, so apps stay consistent.
 
+## SDK-style packages (`tick-hub`, `cs2-client-listener`, similar)
+
+- Expose a **named SDK interface** (e.g. in **domain/**: `TickHub`, `Cs2ClientListenerSdk`) and a **single infrastructure class** that **`implements`** it, mirroring `GsiGatewayService implements GsiGateway`.
+- SDK methods must **not** take **application `*Port`** parameters for normal flows (e.g. recording = `filePath: string` or a small options type, not `TickRecordingPort`).
+- **`UseCase` + port tuples** stay **internal** (or for tests); do not blend `withPorts`-style wiring into the public SDK surface.
+- Prefer **`class X implements YPort`** for adapters exported from **infrastructure** over `createX()` factory exports unless there is a documented exception.
+
 ## Use case shape
 
 - **Ports are always a tuple**: `UseCase<[PortA, PortB], [...args], Result>`. Use `[]` when there are no ports.

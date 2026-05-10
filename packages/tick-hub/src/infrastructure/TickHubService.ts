@@ -1,37 +1,37 @@
-import { withPorts, withPortsAsync } from "@cs2helper/shared";
-import type { TickFrame } from "../domain";
+import type { TickFrame, TickHub } from "../domain";
 import type { MasterClockPort } from "../application/ports/MasterClockPort";
-import type { TickRecordingPort } from "../application/ports/TickRecordingPort";
 import type { TickSourcePort } from "../application/ports/TickSourcePort";
 import type { TickSourcesPort } from "../application/ports/TickSourcesPort";
 import { subscribeTickFrames, startTickRecording, stopTickRecording } from "../application/useCases";
 import type { SubscribeTickFramesOptions } from "../application/useCases/subscribeTickFrames";
+import { JsonlTickRecordingAdapter } from "./adapters/JsonlTickRecordingAdapter";
+import { FixedTickSources } from "./FixedTickSources";
 import { TickRecordingSession } from "./TickRecordingSession";
-import { toTickSourcesPort } from "./toTickSourcesPort";
 
 export interface TickHubOptions {
   subscribeFrames?: SubscribeTickFramesOptions;
 }
 
+function asSourcesPort(sources: readonly TickSourcePort[] | TickSourcesPort): TickSourcesPort {
+  if (Array.isArray(sources)) {
+    return new FixedTickSources(sources);
+  }
+  return sources as TickSourcesPort;
+}
+
 /**
- * Composition root: master clock + any number of {@link TickSourcePort}s + optional JSONL/memory recording.
- * CS2-specific adapters (GSI gateway, PresentMon, …) live outside this package.
+ * Implements {@link TickHub}: wires master clock, sources, and internal recording (JSONL by path).
  */
-export class TickHubService {
+export class TickHubService implements TickHub {
   private readonly recordingSession = new TickRecordingSession();
   private readonly sourcesPort: TickSourcesPort;
-
-  readonly startTickRecording: (sink: TickRecordingPort) => void;
-  readonly stopTickRecording: () => Promise<void>;
 
   constructor(
     private readonly master: MasterClockPort,
     sources: readonly TickSourcePort[] | TickSourcesPort,
     private readonly options: TickHubOptions = {}
   ) {
-    this.sourcesPort = toTickSourcesPort(sources);
-    this.startTickRecording = withPorts(startTickRecording, [this.recordingSession]);
-    this.stopTickRecording = withPortsAsync(stopTickRecording, [this.recordingSession]);
+    this.sourcesPort = asSourcesPort(sources);
   }
 
   subscribeTickFrames(listener: (frame: TickFrame) => void): () => void {
@@ -40,5 +40,13 @@ export class TickHubService {
       listener,
       this.options.subscribeFrames
     );
+  }
+
+  startRecording(filePath: string): void {
+    startTickRecording([this.recordingSession], new JsonlTickRecordingAdapter(filePath));
+  }
+
+  async stopRecording(): Promise<void> {
+    await stopTickRecording([this.recordingSession]);
   }
 }

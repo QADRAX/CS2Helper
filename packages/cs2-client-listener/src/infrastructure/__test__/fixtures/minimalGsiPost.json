@@ -1,0 +1,69 @@
+{
+  "watcherMode": "client_local",
+  "provider": {
+    "name": "Counter-Strike 2",
+    "appid": 730,
+    "version": 13795,
+    "steamid": "self-steamid",
+    "timestamp": 1
+  },
+  "map": {
+    "mode": "competitive",
+    "name": "de_inferno",
+    "phase": "warmup",
+    "round": 0,
+    "team_ct": {
+      "score": 0,
+      "consecutive_round_losses": 0,
+      "timeouts_remaining": 4,
+      "matches_won_this_series": 0
+    },
+    "team_t": {
+      "score": 0,
+      "consecutive_round_losses": 0,
+      "timeouts_remaining": 4,
+      "matches_won_this_series": 0
+    },
+    "num_matches_to_win_series": 1
+  },
+  "round": { "phase": "freezetime" },
+  "player": {
+    "steamid": "self-steamid",
+    "name": "player",
+    "observer_slot": 1,
+    "team": "CT",
+    "activity": "playing",
+    "state": {
+      "health": 100,
+      "armor": 100,
+      "helmet": true,
+      "flashed": 0,
+      "smoked": 0,
+      "burning": 0,
+      "money": 800,
+      "round_kills": 0,
+      "round_killhs": 0,
+      "round_totaldmg": 0,
+      "equip_value": 1200
+    },
+    "weapons": {
+      "weapon_1": {
+        "type": "Pistol",
+        "name": "weapon_usp_silencer",
+        "paintkit": "default",
+        "ammo_clip": 12,
+        "ammo_clip_max": 12,
+        "ammo_reserve": 24,
+        "state": "active"
+      }
+    },
+    "match_stats": {
+      "kills": 0,
+      "assists": 0,
+      "deaths": 0,
+      "mvps": 0,
+      "score": 0
+    }
+  },
+  "auth": { "token": "test" }
+}

@@ -1,2 +1,2 @@
-export { createGsiMasterClockPort } from "./gsiMasterClockPort";
-export { createPerformanceTickSource } from "./performanceTickSource";
+export { GsiGatewayMasterClock } from "./GsiGatewayMasterClock";
+export { PerformanceAlignmentTickSource } from "./PerformanceAlignmentTickSource";

@@ -1,46 +1,63 @@
+import { readFileSync } from "node:fs";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it, vi } from "vitest";
-import type { GsiGateway } from "@cs2helper/gsi-gateway";
-import type { Cs2PerformanceApi } from "@cs2helper/performance-processor";
-import { InMemoryTickRecordingAdapter } from "@cs2helper/tick-hub";
+import type { PowerShellCommandPort } from "@cs2helper/shared";
 import { Cs2ClientListenerService } from "../Cs2ClientListenerService";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const minimalGsiBody = readFileSync(join(__dirname, "fixtures", "minimalGsiPost.json"), "utf8");
+
 describe("Cs2ClientListenerService", () => {
-  it("emits tick frames with gsi master + aligned performance", async () => {
-    let rawListener: ((raw: string) => void) | undefined;
-    const gateway = {
-      subscribeRawTicks: vi.fn((fn: (raw: string) => void) => {
-        rawListener = fn;
-        return () => {};
-      }),
-      getState: vi.fn().mockReturnValue({ totalTicks: 1 }),
-    } as unknown as GsiGateway;
+  it("starts gateway + performance, streams ticks, records JSONL, and stops", async () => {
+    const powershell: PowerShellCommandPort = {
+      runCommand: vi.fn().mockResolvedValue(""),
+    };
 
-    const align = vi.fn().mockResolvedValue(undefined);
-    const performance = {
-      subscribeCs2ProcessTrackingForAlignment: vi.fn().mockImplementation((onSnap: (s: unknown) => void) => {
-        onSnap({ running: true, pid: 99 });
-        return {
-          unsubscribe: vi.fn(),
-          alignToExternalTick: align,
-        };
-      }),
-    } as unknown as Cs2PerformanceApi;
+    const svc = new Cs2ClientListenerService(powershell, { gateway: { port: 0 } });
+    const { gatewayPort } = await svc.start();
+    expect(gatewayPort).toBeGreaterThan(0);
 
-    const svc = new Cs2ClientListenerService(gateway, performance, {});
-    const mem = new InMemoryTickRecordingAdapter();
-    svc.startTickRecording(mem);
+    const dir = await mkdtemp(join(tmpdir(), "cs2-listener-"));
+    const recordingPath = join(dir, "out.jsonl");
 
-    const listener = vi.fn();
-    svc.subscribeTickFrames(listener);
+    try {
+      svc.startRecording(recordingPath);
 
-    rawListener!("{}");
+      const listener = vi.fn();
+      svc.subscribeTickFrames(listener);
 
-    await new Promise((r) => setTimeout(r, 0));
+      const res = await fetch(`http://127.0.0.1:${gatewayPort}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: minimalGsiBody,
+      });
+      expect(res.status).toBe(204);
 
-    expect(align).toHaveBeenCalledTimes(1);
-    expect(listener).toHaveBeenCalledTimes(1);
-    expect(listener.mock.calls[0][0].master).toEqual({ state: { totalTicks: 1 }, raw: "{}" });
-    expect(listener.mock.calls[0][0].sources.performance).toEqual({ running: true, pid: 99 });
-    expect(mem.frames.length).toBe(1);
+      await new Promise((r) => setTimeout(r, 500));
+
+      expect(listener.mock.calls.length).toBeGreaterThanOrEqual(1);
+      const frame = listener.mock.calls[0][0];
+      expect(JSON.parse((frame.master as { raw: string }).raw)).toEqual(JSON.parse(minimalGsiBody));
+      expect(frame.sources).toBeDefined();
+
+      const raw = await readFile(recordingPath, "utf8");
+      expect(raw.trim().length).toBeGreaterThan(0);
+
+      await svc.stopRecording();
+      await svc.stop();
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects start when already running", async () => {
+    const powershell: PowerShellCommandPort = { runCommand: vi.fn().mockResolvedValue("") };
+    const svc = new Cs2ClientListenerService(powershell, { gateway: { port: 0 } });
+    await svc.start();
+    await expect(svc.start()).rejects.toThrow(/already running/i);
+    await svc.stop();
   });
 });

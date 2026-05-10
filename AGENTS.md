@@ -42,6 +42,14 @@ Los **bordes del paquete** se exponen desde `src/index.ts` (o subpaths documenta
 4. **Infrastructure** solo cablea y adapta; tests de integración contra adapters reales o test doubles compartidos.
 5. En **apps**, la capa de presentación solo consume la API pública de packages o puertos registrados en el composition root.
 
+## Paquetes SDK / composición (p. ej. `tick-hub`, `cs2-client-listener`)
+
+- **Contrato público = interfaz de SDK** en **domain/** o **application/** (p. ej. `TickHub`, `Cs2ClientListenerSdk`) que la clase raíz de **infrastructure** **implementa** explícitamente (`class XService implements XSdk`), al estilo de `GsiGatewayService implements GsiGateway`.
+- La API del SDK usa **tipos de dominio y opciones declarativas** (rutas de archivo, flags, DTOs). **No** expongas en esa interfaz tipos de **application/ports** (`*Port`) ni pidas al consumidor que inyecte adaptadores de grabación/IO salvo casos muy avanzados documentados aparte.
+- **Puertos y casos de uso** (`UseCase`, tuplas de ports) son **detalle interno** para orquestar y testear; no mezcles su forma (`withPorts`, firmas de ports) con la superficie del SDK.
+- **Adapters en infrastructure**: preferir **`class FooAdapter implements BarPort`** (como `GsiGatewayService`) antes que factories sueltas `createFooAdapter()` en la superficie exportada del paquete.
+- Quien necesite **extender** el comportamiento no debe colgar “fuentes extra” en opciones del SDK salvo decisión explícita del diseño: en general **compón otro servicio** o **implementa el contrato** tú mismo reutilizando el paquete genérico (`tick-hub`) por debajo.
+
 ## Referencias en el repo
 
 - `packages/shared` — tipos `UseCase` / `AsyncUseCase`, helpers `withPorts` / `withPortsAsync`, y ports transversales en `application/ports/`.
