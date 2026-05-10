@@ -8,12 +8,14 @@ import type {
   GsiRecordFile,
   ReadRecordFramesResult,
   ReplayResult,
-  ReplayTimelineMetadata,
-  ReplayStateSummary,
   ReplayStep,
 } from "../../domain";
-
-const TIMESTAMP_STEP_MS = 1_000;
+import {
+  REPLAY_TICK_TIMESTAMP_MS,
+  buildReplayTimelineMetadata,
+  cloneGsiProcessorState,
+  summarizeReplayState,
+} from "../../domain/replayAggregation";
 
 /** Processor adapter that replays parsed frames through a fresh GSI engine. */
 export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
@@ -26,7 +28,7 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
     const events: GsiProcessorEvent[] = [];
     const stateByTick: GsiProcessorState[] = [];
     let currentFrameEvents: GsiProcessorEvent[] = [];
-    const initialState = cloneState(processor.getState());
+    const initialState = cloneGsiProcessorState(processor.getState());
 
     const unsubscribe = processor.subscribeEvents((event) => {
       events.push(event);
@@ -35,12 +37,12 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
 
     try {
       framesResult.frames.forEach((frame, tickIndex) => {
-        const timestamp = tickIndex * TIMESTAMP_STEP_MS;
+        const timestamp = tickIndex * REPLAY_TICK_TIMESTAMP_MS;
         currentFrameEvents = [];
 
-        const before = summarizeState(processor.getState());
+        const before = summarizeReplayState(processor.getState());
         processor.processTick(frame.tick, timestamp);
-        const after = summarizeState(processor.getState());
+        const after = summarizeReplayState(processor.getState());
 
         steps.push({
           tickIndex,
@@ -50,13 +52,13 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
           after,
           events: [...currentFrameEvents],
         });
-        stateByTick.push(cloneState(processor.getState()));
+        stateByTick.push(cloneGsiProcessorState(processor.getState()));
       });
     } finally {
       unsubscribe();
     }
 
-    const timeline = buildTimelineMetadata(steps);
+    const timeline = buildReplayTimelineMetadata(steps);
     const coldStartStateBySecond = buildColdStartStatesBySecond(framesResult, timeline.durationSeconds);
 
     return {
@@ -69,28 +71,9 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
       stateByTick,
       coldStartStateBySecond,
       timeline,
-      finalState: cloneState(processor.getState()),
+      finalState: cloneGsiProcessorState(processor.getState()),
     };
   }
-}
-
-function buildTimelineMetadata(steps: readonly ReplayStep[]): ReplayTimelineMetadata {
-  if (steps.length === 0) {
-    return { durationSeconds: 0, tickIndexBySecond: [ -1 ] };
-  }
-
-  const durationSeconds = Math.max(Math.floor((steps.at(-1)?.timestamp ?? 0) / TIMESTAMP_STEP_MS), 0);
-  const tickIndexBySecond: number[] = [];
-  let cursor = -1;
-
-  for (let second = 0; second <= durationSeconds; second += 1) {
-    while ((cursor + 1) < steps.length && Math.floor(steps[cursor + 1]!.timestamp / TIMESTAMP_STEP_MS) <= second) {
-      cursor += 1;
-    }
-    tickIndexBySecond.push(cursor);
-  }
-
-  return { durationSeconds, tickIndexBySecond };
 }
 
 function buildColdStartStatesBySecond(
@@ -104,24 +87,9 @@ function buildColdStartStatesBySecond(
     const frame = frames[second];
     if (!frame) continue;
     const processor = new GsiProcessorService();
-    processor.processTick(frame.tick, second * TIMESTAMP_STEP_MS);
-    map[second] = cloneState(processor.getState());
+    processor.processTick(frame.tick, second * REPLAY_TICK_TIMESTAMP_MS);
+    map[second] = cloneGsiProcessorState(processor.getState());
   }
 
   return map;
-}
-
-function summarizeState(state: Readonly<GsiProcessorState>): ReplayStateSummary {
-  return {
-    totalTicks: state.totalTicks,
-    streamState: state.streamState,
-    watcherMode: state.watcherMode,
-    mapRound: state.lastSnapshot?.map?.round ?? null,
-    roundPhase: state.lastSnapshot?.round?.phase ?? null,
-    playersCount: Object.keys(state.playersBySteamId).length,
-  };
-}
-
-function cloneState(state: Readonly<GsiProcessorState>): GsiProcessorState {
-  return JSON.parse(JSON.stringify(state)) as GsiProcessorState;
 }
