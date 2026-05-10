@@ -18,6 +18,11 @@ export function getGsiCliRecordingsDir(): string {
   return path.join(getCliAppDataDir(GSI_CLI_APP_NAME), "recordings");
 }
 
+/** Scoreboard screenshot output folder for a host CLI app (e.g. `gsi-cli`). */
+export function getScoreboardSnapshotsDir(hostAppName: string): string {
+  return path.join(getCliAppDataDir(hostAppName), "scoreboard-snapshots");
+}
+
 /** Builds a timestamped raw GSI recording file path in the shared records directory. */
 export function buildGsiCliRecordingFilePath(startedAt: Date = new Date()): string {
   const iso = startedAt.toISOString().replace(/[:.]/g, "-");
