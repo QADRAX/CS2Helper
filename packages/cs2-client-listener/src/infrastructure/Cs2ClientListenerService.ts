@@ -50,6 +50,10 @@ export class Cs2ClientListenerService implements Cs2ClientListenerSdk {
     return this.engine.getGatewayDiagnostics();
   }
 
+  getGsiProcessorState() {
+    return this.engine.getGsiProcessorState();
+  }
+
   ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void> {
     return this.engine.ensurePresentMonBootstrap(options);
   }

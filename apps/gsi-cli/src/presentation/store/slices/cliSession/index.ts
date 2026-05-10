@@ -3,6 +3,8 @@ export { cliSessionInitialState, cliConfigToDraft, CONFIG_FORM_ROW_COUNT } from 
 export {
   cliSessionReducer,
   configDraftAutoRecordToggled,
+  configDraftScoreboardSnapshotToggled,
+  configDraftScoreboardRequireLivePhaseToggled,
   configDraftLocaleToggled,
   configDraftPatched,
   configDraftResetFromCliConfig,

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@cs2helper/cli-common": "workspace:*",
+    "@cs2helper/cs2-scoreboard-screenshot": "workspace:*",
     "@cs2helper/cs2-client-listener": "workspace:*",
     "@cs2helper/cs2-client-listener-ink": "workspace:*",
     "@cs2helper/gsi-processor": "workspace:*",

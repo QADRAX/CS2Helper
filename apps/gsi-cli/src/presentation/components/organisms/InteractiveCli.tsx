@@ -1,11 +1,17 @@
 import { useEffect } from "react";
 import { useInput } from "ink";
+import {
+  DEFAULT_SCOREBOARD_HOTKEY_VK,
+  parseScoreboardVkInput,
+} from "../../../domain/cli/config";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import {
   clearError,
   configDraftAutoRecordToggled,
   configDraftLocaleToggled,
   configDraftResetFromCliConfig,
+  configDraftScoreboardRequireLivePhaseToggled,
+  configDraftScoreboardSnapshotToggled,
   createOrUpdateGsiCfg,
   exitCli,
   interactiveConfigCursorMoved,
@@ -85,6 +91,9 @@ export function InteractiveCli() {
     config.gsiHeartbeatSec,
     config.locale,
     config.autoRecordClientTicksOnStart,
+    config.scoreboardSnapshotEnabled,
+    config.scoreboardHotkeyVirtualKey,
+    config.scoreboardRequireLivePhase,
     dispatch,
   ]);
 
@@ -99,6 +108,10 @@ export function InteractiveCli() {
     if (!Number.isFinite(parsedPort) || parsedPort <= 0) return;
     if (!Number.isFinite(parsedThrottle) || parsedThrottle <= 0) return;
     if (!Number.isFinite(parsedHeartbeat) || parsedHeartbeat <= 0) return;
+    const scoreboardHotkeyVirtualKey = parseScoreboardVkInput(
+      draft.scoreboardHotkeyVirtualKey,
+      DEFAULT_SCOREBOARD_HOTKEY_VK
+    );
     void dispatch(
       saveCliConfig({
         port: parsedPort,
@@ -106,6 +119,9 @@ export function InteractiveCli() {
         gsiHeartbeatSec: parsedHeartbeat,
         autoRecordClientTicksOnStart: draft.autoRecordClientTicksOnStart,
         locale: draft.locale,
+        scoreboardSnapshotEnabled: draft.scoreboardSnapshotEnabled,
+        scoreboardHotkeyVirtualKey,
+        scoreboardRequireLivePhase: draft.scoreboardRequireLivePhase,
       })
     );
     void dispatch(clearError());
@@ -148,10 +164,16 @@ export function InteractiveCli() {
       if (configCursor === 4) {
         return void dispatch(configDraftAutoRecordToggled());
       }
-      if (configCursor === 5) return saveDraft();
-      if (configCursor === 6) return void dispatch(createOrUpdateGsiCfg());
-      if (configCursor === 7) return void dispatch(openDataFolder());
-      if (configCursor === 8) return goMenu();
+      if (configCursor === 5) {
+        return void dispatch(configDraftScoreboardSnapshotToggled());
+      }
+      if (configCursor === 7) {
+        return void dispatch(configDraftScoreboardRequireLivePhaseToggled());
+      }
+      if (configCursor === 8) return saveDraft();
+      if (configCursor === 9) return void dispatch(createOrUpdateGsiCfg());
+      if (configCursor === 10) return void dispatch(openDataFolder());
+      if (configCursor === 11) return goMenu();
       return;
     }
 

@@ -52,6 +52,17 @@ export const msgKeys = {
       openDataFolder: "cli.config.openDataFolder",
       cancel: "cli.config.cancel",
       navHint: "cli.config.navHint",
+      scoreboardHotkey: "cli.config.scoreboardHotkey",
+      scoreboardHotkeyHint: "cli.config.scoreboardHotkeyHint",
+      scoreboardVk: "cli.config.scoreboardVk",
+      scoreboardRequireLive: "cli.config.scoreboardRequireLive",
+    },
+    scoreboard: {
+      captured: "cli.scoreboard.captured",
+      skippedNoMatch: "cli.scoreboard.skippedNoMatch",
+      skippedNotForeground: "cli.scoreboard.skippedNotForeground",
+      skippedNotLive: "cli.scoreboard.skippedNotLive",
+      failed: "cli.scoreboard.failed",
     },
     exit: {
       title: "cli.exit.title",

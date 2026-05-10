@@ -46,7 +46,18 @@
       "createCfg": "create cfg",
       "openDataFolder": "open data folder",
       "cancel": "cancel",
-      "navHint": "Up/Down to navigate, Enter to confirm, Esc to cancel"
+      "navHint": "Up/Down to navigate, Enter to confirm, Esc to cancel",
+      "scoreboardHotkey": "scoreboard hotkey (Windows):",
+      "scoreboardHotkeyHint": "Use keyboard macro: TAB + this VK. CLI registers only the auxiliary key (default 88 = X).",
+      "scoreboardVk": "auxiliary VK (decimal or 0x hex):",
+      "scoreboardRequireLive": "require live map phase:"
+    },
+    "scoreboard": {
+      "captured": "Scoreboard snapshot saved: {path}",
+      "skippedNoMatch": "Snapshot skipped (no active GSI match).",
+      "skippedNotForeground": "Snapshot skipped (CS2 not in foreground).",
+      "skippedNotLive": "Snapshot skipped (map not live).",
+      "failed": "Snapshot failed: {detail}"
     },
     "exit": {
       "title": "Exit CLI?",

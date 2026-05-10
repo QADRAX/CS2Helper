@@ -1,4 +1,5 @@
 import type { GsiGatewayDiagnostics, GsiGatewayOptions } from "@cs2helper/gsi-gateway";
+import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatus, PresentMonBootstrapOptions } from "@cs2helper/performance-processor";
 import type { TickFrame } from "@cs2helper/tick-hub";
 import type { Cs2ClientListenerStartResult } from "./cs2ClientListenerStartResult";
@@ -12,6 +13,11 @@ export interface Cs2ClientListenerSdk {
   readonly stop: () => Promise<void>;
   isRunning(): boolean;
   getGatewayDiagnostics(): Readonly<GsiGatewayDiagnostics>;
+  /**
+   * Latest GSI processor aggregate while the gateway is running; `null` when idle.
+   * Synchronous snapshot suitable for hotkey handlers (not the last Redux tick).
+   */
+  getGsiProcessorState(): Readonly<GsiProcessorState> | null;
   /** Current CS2 process presence from the same tasklist-backed adapter as performance telemetry. */
   getCs2ProcessStatus(): Promise<Cs2ProcessStatus>;
   ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void>;

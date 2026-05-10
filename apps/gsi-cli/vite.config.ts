@@ -21,7 +21,10 @@ export default defineConfig({
         'ink',
         'ink-text-input',
         'fs/promises',
-        'path'
+        'path',
+        '@cs2helper/cs2-scoreboard-screenshot',
+        'koffi',
+        'pngjs',
       ],
     },
     outDir: 'dist',

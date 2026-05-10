@@ -3,6 +3,7 @@ import {
   type GsiGatewayDiagnostics,
   type GsiGatewayOptions,
 } from "@cs2helper/gsi-gateway";
+import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import {
   PerformanceProcessorService,
   type Cs2ProcessStatus,
@@ -63,6 +64,10 @@ export class Cs2ClientListenerEngine {
       return { receivedRequests: 0, rejectedRequests: 0 };
     }
     return this.gateway.getDiagnostics();
+  }
+
+  getGsiProcessorState(): Readonly<GsiProcessorState> | null {
+    return this.gateway?.getState() ?? null;
   }
 
   ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void> {

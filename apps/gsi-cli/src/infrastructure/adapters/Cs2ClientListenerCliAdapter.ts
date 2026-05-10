@@ -10,6 +10,8 @@ export class Cs2ClientListenerCliAdapter implements Cs2ClientListenerCliPort {
   isRunning: Cs2ClientListenerCliPort["isRunning"] = () => this.service.isRunning();
   getGatewayDiagnostics: Cs2ClientListenerCliPort["getGatewayDiagnostics"] = () =>
     this.service.getGatewayDiagnostics();
+  getGsiProcessorState: Cs2ClientListenerCliPort["getGsiProcessorState"] = () =>
+    this.service.getGsiProcessorState();
   subscribeTickFrames: Cs2ClientListenerCliPort["subscribeTickFrames"] = (l) =>
     this.service.subscribeTickFrames(l);
   startRecording: Cs2ClientListenerCliPort["startRecording"] = (p) => this.service.startRecording(p);

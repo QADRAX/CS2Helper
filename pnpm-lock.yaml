@@ -96,6 +96,9 @@ importers:
       '@cs2helper/cs2-client-listener-ink':
         specifier: workspace:*
         version: link:../../packages/cs2-client-listener-ink
+      '@cs2helper/cs2-scoreboard-screenshot':
+        specifier: workspace:*
+        version: link:../../packages/cs2-scoreboard-screenshot
       '@cs2helper/gsi-processor':
         specifier: workspace:*
         version: link:../../packages/gsi-processor

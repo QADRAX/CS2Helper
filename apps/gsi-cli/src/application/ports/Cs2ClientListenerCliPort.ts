@@ -5,6 +5,7 @@ import type {
   PresentMonBootstrapOptions,
   TickFrame,
 } from "@cs2helper/cs2-client-listener";
+import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatusProbePort } from "./Cs2ProcessStatusProbePort";
 
 /**
@@ -17,6 +18,7 @@ export interface Cs2ClientListenerCliPort extends Cs2ProcessStatusProbePort {
   stop(): Promise<void>;
   isRunning(): boolean;
   getGatewayDiagnostics(): Readonly<GsiGatewayDiagnostics>;
+  getGsiProcessorState(): Readonly<GsiProcessorState> | null;
   subscribeTickFrames(listener: (frame: TickFrame) => void): () => void;
   startRecording(filePath: string): void;
   stopRecording(): Promise<void>;

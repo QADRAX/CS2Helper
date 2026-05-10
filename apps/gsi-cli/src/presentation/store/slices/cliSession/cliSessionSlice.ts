@@ -53,6 +53,12 @@ const cliSessionSlice = createSlice({
       state.configDraft.autoRecordClientTicksOnStart =
         !state.configDraft.autoRecordClientTicksOnStart;
     },
+    configDraftScoreboardSnapshotToggled: (state) => {
+      state.configDraft.scoreboardSnapshotEnabled = !state.configDraft.scoreboardSnapshotEnabled;
+    },
+    configDraftScoreboardRequireLivePhaseToggled: (state) => {
+      state.configDraft.scoreboardRequireLivePhase = !state.configDraft.scoreboardRequireLivePhase;
+    },
     configDraftLocaleToggled: (state) => {
       state.configDraft.locale = state.configDraft.locale === "en" ? "es" : "en";
     },
@@ -71,6 +77,8 @@ export const {
   interactiveConfigCursorMoved,
   configDraftPatched,
   configDraftAutoRecordToggled,
+  configDraftScoreboardSnapshotToggled,
+  configDraftScoreboardRequireLivePhaseToggled,
   configDraftLocaleToggled,
   configDraftResetFromCliConfig,
 } = cliSessionSlice.actions;

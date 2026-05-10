@@ -40,6 +40,7 @@ export interface UiState {
   recordingPath?: string;
   config: CliConfig;
   cs2Tracking: Cs2ProcessTrackingSnapshot;
+  cs2ProcessProbe: Cs2ProcessStatus;
   steamStatus: SteamStatus;
   steamWebApi: SteamWebApiUiSlice;
   presentMonBootstrap: PresentMonBootstrapUiState;

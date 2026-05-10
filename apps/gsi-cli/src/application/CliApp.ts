@@ -1,4 +1,5 @@
 import type { PresentMonBootstrapOptions, TickFrame } from "@cs2helper/cs2-client-listener";
+import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatus } from "@cs2helper/performance-processor";
 import type { CreateOrUpdateGsiConfigResult } from "./useCases/createOrUpdateGsiConfig";
 import type { VerifyGsiConfigResult } from "./useCases/verifyGsiConfig";
@@ -12,6 +13,7 @@ export interface CliApp {
   startGateway: () => Promise<GatewayStartInfo>;
   stopGateway: () => Promise<void>;
   getGatewayDiagnostics: () => Readonly<GatewayDiagnostics>;
+  getGsiProcessorState: () => Readonly<GsiProcessorState> | null;
   subscribeTickFrames: (listener: (frame: TickFrame) => void) => () => void;
   getConfig: () => Promise<CliConfig>;
   saveConfig: (config: Partial<CliConfig>) => Promise<CliConfig>;

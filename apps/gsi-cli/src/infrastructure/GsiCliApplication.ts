@@ -66,6 +66,7 @@ export class GsiCliApplication implements CliApp {
   startGateway: () => Promise<GatewayStartInfo>;
   stopGateway: () => Promise<void>;
   getGatewayDiagnostics: () => Readonly<GatewayDiagnostics>;
+  getGsiProcessorState: CliApp["getGsiProcessorState"];
   subscribeTickFrames: CliApp["subscribeTickFrames"];
   getConfig: () => Promise<CliConfig>;
   saveConfig: (config: Partial<CliConfig>) => Promise<CliConfig>;
@@ -110,6 +111,7 @@ export class GsiCliApplication implements CliApp {
     ]);
     this.stopGateway = withPortsAsync(stopGateway, [this.listenerCli]);
     this.getGatewayDiagnostics = () => this.listener.getGatewayDiagnostics();
+    this.getGsiProcessorState = () => this.listener.getGsiProcessorState();
     this.subscribeTickFrames = (listener) => this.listener.subscribeTickFrames(listener);
     this.getConfig = withPortsAsync(getConfig, [this.configPort]);
     this.saveConfig = withPortsAsync(saveConfig, [this.configPort]);

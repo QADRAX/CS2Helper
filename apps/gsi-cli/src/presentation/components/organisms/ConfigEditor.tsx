@@ -1,4 +1,4 @@
-import { Box } from "ink";
+import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import { MenuFootnote } from "../atoms/MenuFootnote";
 import { MenuHeading } from "../atoms/MenuHeading";
@@ -56,14 +56,34 @@ export function ConfigEditor() {
           label={`${t(msgKeys.cli.config.autoRecord)} ${draft.autoRecordClientTicksOnStart ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
           focused={configCursor === 4}
         />
+        <MenuOptionLine
+          label={`${t(msgKeys.cli.config.scoreboardHotkey)} ${draft.scoreboardSnapshotEnabled ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
+          focused={configCursor === 5}
+        />
+        <MenuOptionLine label={t(msgKeys.cli.config.scoreboardVk)} focused={configCursor === 6} />
+        <Box marginLeft={2}>
+          <TextInput
+            value={draft.scoreboardHotkeyVirtualKey}
+            onChange={(value) => dispatch(configDraftPatched({ scoreboardHotkeyVirtualKey: value }))}
+            placeholder="88"
+            focus={configCursor === 6}
+          />
+        </Box>
+        <MenuOptionLine
+          label={`${t(msgKeys.cli.config.scoreboardRequireLive)} ${draft.scoreboardRequireLivePhase ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
+          focused={configCursor === 7}
+        />
         <Box flexDirection="column" marginTop={1}>
-          <MenuOptionLine label={t(msgKeys.cli.config.save)} focused={configCursor === 5} activeColor="green" />
-          <MenuOptionLine label={t(msgKeys.cli.config.createCfg)} focused={configCursor === 6} activeColor="cyan" />
-          <MenuOptionLine label={t(msgKeys.cli.config.openDataFolder)} focused={configCursor === 7} activeColor="cyan" />
-          <MenuOptionLine label={t(msgKeys.cli.config.cancel)} focused={configCursor === 8} activeColor="yellow" />
+          <MenuOptionLine label={t(msgKeys.cli.config.save)} focused={configCursor === 8} activeColor="green" />
+          <MenuOptionLine label={t(msgKeys.cli.config.createCfg)} focused={configCursor === 9} activeColor="cyan" />
+          <MenuOptionLine label={t(msgKeys.cli.config.openDataFolder)} focused={configCursor === 10} activeColor="cyan" />
+          <MenuOptionLine label={t(msgKeys.cli.config.cancel)} focused={configCursor === 11} activeColor="yellow" />
         </Box>
       </Box>
       <MenuFootnote>{t(msgKeys.cli.config.navHint)}</MenuFootnote>
+      <Box paddingX={1}>
+        <Text dimColor>{t(msgKeys.cli.config.scoreboardHotkeyHint)}</Text>
+      </Box>
     </>
   );
 }
