@@ -1,19 +1,36 @@
 export {
-  GsiDashboardProvider,
-  gsiDashboardSelectors,
-  useGsiDashboard,
-  type GsiDashboardContextValue,
-  type GsiDashboardProviderProps,
-  type GsiDashboardTabIndex,
-} from "./gsiDashboardContext";
-export type { GsiDashboardBuildInput } from "./gsiDashboardTypes";
+  ClientListenerDashboardProvider,
+  clientListenerDashboardSelectors,
+  useClientListenerDashboard,
+  type ClientListenerDashboardContextValue,
+  type ClientListenerDashboardProviderProps,
+  type ClientListenerDashboardTabIndex,
+} from "./clientListenerDashboardContext";
+
+export type { ClientListenerDashboardBuildInput } from "./clientListenerDashboardTypes";
+
 export {
-  GSI_DASHBOARD_ALL_FIELDS,
-  GSI_DASHBOARD_GAME_STATE_FIELDS,
-  GSI_DASHBOARD_PROCESSING_FIELDS,
-  GSI_DASHBOARD_PROVIDER_FIELDS,
-  type GsiDashboardFieldDefinition,
-  type GsiDashboardLabelKey,
-} from "./gsiDashboardFieldRegistry";
-export { resolveDashboardFieldValue, type GsiDashboardResolveContext } from "./gsiDashboardResolve";
-export { buildGsiDashboardContextValue } from "./gsiDashboardSelectors";
+  CLIENT_LISTENER_DASHBOARD_ALL_FIELDS,
+  CLIENT_LISTENER_DASHBOARD_GAME_FIELDS,
+  CLIENT_LISTENER_DASHBOARD_PERFORMANCE_FIELDS,
+  CLIENT_LISTENER_DASHBOARD_PROVIDER_FIELDS,
+  CLIENT_LISTENER_DASHBOARD_STREAM_FIELDS,
+  type ClientListenerDashboardComputedBindingId,
+  type ClientListenerDashboardDataBinding,
+  type ClientListenerDashboardFieldDefinition,
+  type ClientListenerDashboardFieldPlacement,
+  type ClientListenerDashboardGatewayKey,
+  type ClientListenerDashboardLabelKey,
+  type ClientListenerDashboardPerformanceKey,
+  type ClientListenerDashboardPresentKind,
+  type ClientListenerDashboardRegistryPanel,
+  type ClientListenerDashboardRegistryTab,
+  type ClientListenerDashboardStateScalarKey,
+} from "./clientListenerDashboardFieldRegistry";
+
+export {
+  resolveDashboardFieldValue,
+  type ClientListenerDashboardResolveContext,
+} from "./clientListenerDashboardResolve";
+
+export { buildClientListenerDashboardContextValue } from "./clientListenerDashboardSelectors";

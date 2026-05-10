@@ -1,7 +1,7 @@
 import type { TickFrame } from "@cs2helper/tick-hub";
 
-/** Gateway counters displayed next to the processor state. */
-export interface GsiGatewayDiagnosticsView {
+/** HTTP ingest counters for the embedded GSI gateway (shown on the stream tab). */
+export interface ClientListenerGatewayCounters {
   receivedRequests: number;
   rejectedRequests: number;
   lastRejectReason?: string;
@@ -12,8 +12,12 @@ export interface Cs2ClientListenerDashboardLabels {
   title: string;
   warningPrefix: string;
   spinner: (frame: string) => string;
-  tabProcessing: string;
-  tabGameState: string;
+  /** Stream tab: GSI processor + gateway. */
+  tabStream: string;
+  /** Game tab: match / HUD / provider. */
+  tabGame: string;
+  /** Performance tab: CPU / GPU / FPS from tick `sources.performance`. */
+  tabPerformance: string;
   tabSwitchHint: string;
   streamState: string;
   ticksReceived: string;
@@ -29,6 +33,8 @@ export interface Cs2ClientListenerDashboardLabels {
   valueAvailable: string;
   valueNull: string;
   valueNone: string;
+  yes: string;
+  no: string;
   /** Row labels for the GSI `provider` block (game tab). */
   providerHeading: string;
   providerGame: string;
@@ -40,13 +46,24 @@ export interface Cs2ClientListenerDashboardLabels {
   playerHudControlLocal: string;
   playerHudControlSpectate: string;
   playerHudPov: string;
+  /** Performance tab rows. */
+  perfProcessRunning: string;
+  perfProcessPid: string;
+  perfCpuPercent: string;
+  perfWorkingSetMb: string;
+  perfGpuUtilization: string;
+  perfGpuDedicatedMb: string;
+  perfGpuSharedMb: string;
+  perfFpsSmoothed: string;
+  perfFrametimeMs: string;
+  perfPresentChainError: string;
 }
 
 /** Props for the shared Ink CS2 client listener dashboard (live or replayed ticks). */
 export interface Cs2ClientListenerDashboardProps {
   /** Latest assembled tick (`TickFrame` from `@cs2helper/tick-hub` / `cs2-client-listener`). */
   tickFrame: TickFrame | null;
-  gatewayDiagnostics: GsiGatewayDiagnosticsView;
+  gatewayDiagnostics: ClientListenerGatewayCounters;
   cs2Running: boolean;
   labels: Cs2ClientListenerDashboardLabels;
   gatewayWarning?: string;

@@ -1,17 +1,19 @@
 import { Box } from "ink";
 import { useMemo } from "react";
 import { isCs2TickMasterData } from "@cs2helper/cs2-client-listener";
-import { GsiDashboardProvider } from "../../contexts/gsiDashboardContext";
+import { ClientListenerDashboardProvider } from "../../contexts/clientListenerDashboardContext";
 import {
-  GsiDashboardChromeSection,
-  GsiDashboardGameStateSection,
-  GsiDashboardProcessingSection,
-  GsiDashboardTabsSection,
-} from "./gsiDashboardSections";
+  ClientListenerDashboardChromeSection,
+  ClientListenerDashboardGameSection,
+  ClientListenerDashboardPerformanceSection,
+  ClientListenerDashboardStreamSection,
+  ClientListenerDashboardTabsSection,
+} from "./clientListenerDashboardSections";
 import type { Cs2ClientListenerDashboardProps } from "./cs2ClientListenerDashboard.types";
 import { defaultFormatProcessorTimestamp } from "../../utils/gsiStatusDashboardFormat";
+import { parseTickPerformanceSnapshot } from "../../utils/parseTickPerformanceSnapshot";
 
-/** Displays GSI processor stream, gateway counters, and payload summary from a {@link TickFrame} stream. */
+/** CS2 client listener Ink dashboard: stream, game, and performance tabs from a {@link TickFrame} hub. */
 export function Cs2ClientListenerDashboard(props: Cs2ClientListenerDashboardProps) {
   const {
     tickFrame,
@@ -30,10 +32,13 @@ export function Cs2ClientListenerDashboard(props: Cs2ClientListenerDashboardProp
     return isCs2TickMasterData(tickFrame.master) ? tickFrame.master.state : null;
   }, [tickFrame]);
 
+  const performanceSnapshot = useMemo(() => parseTickPerformanceSnapshot(tickFrame), [tickFrame]);
+
   return (
-    <GsiDashboardProvider
+    <ClientListenerDashboardProvider
       gsiState={gsiState}
       gatewayDiagnostics={gatewayDiagnostics}
+      performanceSnapshot={performanceSnapshot}
       cs2Running={cs2Running}
       labels={labels}
       gatewayWarning={gatewayWarning}
@@ -41,11 +46,12 @@ export function Cs2ClientListenerDashboard(props: Cs2ClientListenerDashboardProp
       providerTimeLocale={providerTimeLocale}
     >
       <Box flexDirection="column" width="100%">
-        <GsiDashboardChromeSection />
-        <GsiDashboardTabsSection />
-        <GsiDashboardProcessingSection />
-        <GsiDashboardGameStateSection />
+        <ClientListenerDashboardChromeSection />
+        <ClientListenerDashboardTabsSection />
+        <ClientListenerDashboardStreamSection />
+        <ClientListenerDashboardGameSection />
+        <ClientListenerDashboardPerformanceSection />
       </Box>
-    </GsiDashboardProvider>
+    </ClientListenerDashboardProvider>
   );
 }

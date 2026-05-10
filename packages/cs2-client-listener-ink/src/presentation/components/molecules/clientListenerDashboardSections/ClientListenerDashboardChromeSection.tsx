@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { AlertPrefixLine } from "../../atoms/alertPrefixLine";
 import { InkHeading } from "../../atoms/inkHeading";
 import { WaitingSpinner } from "../../atoms/waitingSpinner";
-import { gsiDashboardSelectors, useGsiDashboard } from "../../../contexts/gsiDashboardContext";
+import { clientListenerDashboardSelectors, useClientListenerDashboard } from "../../../contexts/clientListenerDashboardContext";
 
 /** Title, optional gateway warning, and CS2 wait spinner. */
-export function GsiDashboardChromeSection() {
-  const ctx = useGsiDashboard();
-  const slice = useMemo(() => gsiDashboardSelectors.chrome(ctx), [ctx]);
+export function ClientListenerDashboardChromeSection() {
+  const ctx = useClientListenerDashboard();
+  const slice = useMemo(() => clientListenerDashboardSelectors.chrome(ctx), [ctx]);
 
   return (
     <>

@@ -13,6 +13,7 @@
   "dependencies": {
     "@cs2helper/cs2-client-listener": "workspace:*",
     "@cs2helper/gsi-processor": "workspace:*",
+    "@cs2helper/performance-processor": "workspace:*",
     "@cs2helper/tick-hub": "workspace:*"
   },
   "peerDependencies": {

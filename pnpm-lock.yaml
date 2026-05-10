@@ -219,6 +219,9 @@ importers:
       '@cs2helper/gsi-processor':
         specifier: workspace:*
         version: link:../gsi-processor
+      '@cs2helper/performance-processor':
+        specifier: workspace:*
+        version: link:../performance-processor
       '@cs2helper/tick-hub':
         specifier: workspace:*
         version: link:../tick-hub

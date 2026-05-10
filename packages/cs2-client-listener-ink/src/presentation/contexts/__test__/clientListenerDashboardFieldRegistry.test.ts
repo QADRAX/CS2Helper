@@ -1,14 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { Cs2ClientListenerDashboardLabels } from "../../components/molecules/cs2ClientListenerDashboard.types";
-import { GSI_DASHBOARD_ALL_FIELDS } from "../gsiDashboardFieldRegistry";
+import { CLIENT_LISTENER_DASHBOARD_ALL_FIELDS } from "../clientListenerDashboardFieldRegistry";
 
 /** Minimal stub; `satisfies` ensures every `keyof Cs2ClientListenerDashboardLabels` is present. */
 const labelStub = {
   title: "t",
   warningPrefix: "w",
   spinner: (frame: string) => frame,
-  tabProcessing: "p",
-  tabGameState: "g",
+  tabStream: "ts",
+  tabGame: "tg",
+  tabPerformance: "tp",
   tabSwitchHint: "h",
   streamState: "ss",
   ticksReceived: "tr",
@@ -24,6 +25,8 @@ const labelStub = {
   valueAvailable: "va",
   valueNull: "vn",
   valueNone: "none",
+  yes: "y",
+  no: "n",
   providerHeading: "ph",
   providerGame: "pg",
   providerGsiTime: "pt",
@@ -33,12 +36,22 @@ const labelStub = {
   playerHudControlLocal: "phcl",
   playerHudControlSpectate: "phcs",
   playerHudPov: "php",
+  perfProcessRunning: "pr",
+  perfProcessPid: "pp",
+  perfCpuPercent: "pc",
+  perfWorkingSetMb: "pw",
+  perfGpuUtilization: "pgu",
+  perfGpuDedicatedMb: "pgd",
+  perfGpuSharedMb: "pgs",
+  perfFpsSmoothed: "pf",
+  perfFrametimeMs: "pft",
+  perfPresentChainError: "pe",
 } satisfies Cs2ClientListenerDashboardLabels;
 
-describe("gsiDashboardFieldRegistry", () => {
+describe("clientListenerDashboardFieldRegistry", () => {
   it("each registry entry maps to a label slot on Cs2ClientListenerDashboardLabels", () => {
     const seen = new Set<string>();
-    for (const field of GSI_DASHBOARD_ALL_FIELDS) {
+    for (const field of CLIENT_LISTENER_DASHBOARD_ALL_FIELDS) {
       expect(seen.has(field.id)).toBe(false);
       seen.add(field.id);
       const slot = labelStub[field.labelKey];
@@ -47,12 +60,13 @@ describe("gsiDashboardFieldRegistry", () => {
   });
 
   it("keeps expected section sizes for regression detection", () => {
-    const count = (tab: "processing" | "gameState", panel: "main" | "provider") =>
-      GSI_DASHBOARD_ALL_FIELDS.filter((f) => f.placement.tab === tab && f.placement.panel === panel).length;
+    const count = (tab: "stream" | "game" | "performance", panel: "main" | "provider") =>
+      CLIENT_LISTENER_DASHBOARD_ALL_FIELDS.filter((f) => f.placement.tab === tab && f.placement.panel === panel).length;
 
-    expect(count("processing", "main")).toBe(6);
-    expect(count("gameState", "main")).toBe(6);
-    expect(count("gameState", "provider")).toBe(2);
-    expect(GSI_DASHBOARD_ALL_FIELDS).toHaveLength(14);
+    expect(count("stream", "main")).toBe(6);
+    expect(count("game", "main")).toBe(6);
+    expect(count("game", "provider")).toBe(2);
+    expect(count("performance", "main")).toBe(10);
+    expect(CLIENT_LISTENER_DASHBOARD_ALL_FIELDS).toHaveLength(24);
   });
 });

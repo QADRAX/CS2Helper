@@ -1,12 +1,12 @@
 import { BorderedPanel } from "../../atoms/borderedPanel";
 import { DimSectionLabel } from "../../atoms/dimSectionLabel";
 import { GridRowList } from "../../atoms/gridRowList";
-import { useGsiDashboard } from "../../../contexts/gsiDashboardContext";
+import { useClientListenerDashboard } from "../../../contexts/clientListenerDashboardContext";
 
-/** Game state tab: match/HUD rows plus optional GSI provider block. */
-export function GsiDashboardGameStateSection() {
-  const ctx = useGsiDashboard();
-  const panel = ctx.gameStatePanel;
+/** Game tab: match / HUD rows plus optional GSI `provider` block. */
+export function ClientListenerDashboardGameSection() {
+  const ctx = useClientListenerDashboard();
+  const panel = ctx.gamePanel;
   if (ctx.activeTab !== 1) {
     return null;
   }
