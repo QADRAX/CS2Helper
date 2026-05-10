@@ -1,0 +1,36 @@
+---
+description: Clean Architecture layers and use-case conventions for apps and packages
+globs: packages/*/src/**/*.ts,apps/*/src/**/*.ts
+alwaysApply: false
+---
+
+# Clean Architecture (CS2Helper)
+
+When planning or implementing in `packages/*` or `apps/*`, follow the repo layering. See root **AGENTS.md** for the full contract.
+
+## Layer placement
+
+- **domain/** — Pure domain: types, state machines, reducers, domain functions. No concrete adapters, no UI. Minimize framework/process coupling.
+- **application/useCases/** — Orchestration only. Use `UseCase` / `AsyncUseCase` from `@cs2helper/shared`.
+- **application/ports/** — Interfaces (ports) only.
+- **infrastructure/** — Adapters, HTTP, filesystem, clocks, and composition roots (`*Service`) that wire ports to use cases.
+- **presentation/** (apps) — UI / store; depends on application ports or package public APIs, not on skipping domain rules.
+
+## Use case shape
+
+- Prefer **tuple ports**: `UseCase<[PortA, PortB], [...args], Result>`.
+- First parameter is always the ports tuple: `(ports, ...args)`.
+- Document order: `Ports tuple order: \`[a, b]\`.` (match `apps/gsi-cli` / `gsi-gateway` / `gsi-processor`).
+
+## Dependencies (allowed direction)
+
+`presentation` → `application` → `domain` ← `infrastructure` (infrastructure implements ports defined in application; domain does not depend on application/infrastructure).
+
+## New package / evolution
+
+1. Domain types and pure logic first.
+2. Use cases + ports.
+3. Infrastructure adapters + service composition.
+4. Export stable surface from package `src/index.ts`; avoid deep imports unless the package documents them.
+
+If a change would import “inward” from domain into infrastructure types for convenience, stop and invert the dependency (port interface in application, implementation in infrastructure).
