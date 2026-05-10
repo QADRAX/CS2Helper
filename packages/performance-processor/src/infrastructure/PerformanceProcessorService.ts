@@ -3,6 +3,10 @@ import type { PresentMonBootstrapOptions } from "../application/ports/PresentMon
 import { ensurePresentMonBootstrap } from "../application/useCases/ensurePresentMonBootstrap";
 import { getCs2Status } from "../application/useCases/getCs2Status";
 import { subscribeCs2ProcessTracking } from "../application/useCases/subscribeCs2ProcessTracking";
+import {
+  subscribeCs2ProcessTrackingForAlignment,
+  type Cs2ProcessTrackingAlignmentSubscription,
+} from "../application/useCases/subscribeCs2ProcessTrackingForAlignment";
 import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "../domain/telemetry/cs2Process";
 import type { Cs2ProcessTrackingPollOptions } from "../domain/telemetry/cs2ProcessTrackingPoll";
 import { ManagedPresentMonBootstrapAdapter } from "./adapters/ManagedPresentMonBootstrapAdapter";
@@ -32,6 +36,10 @@ export interface Cs2PerformanceApi {
     listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
     options?: Cs2ProcessTrackingPollOptions
   ) => () => void;
+  subscribeCs2ProcessTrackingForAlignment: (
+    listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
+    options?: Cs2ProcessTrackingPollOptions
+  ) => Cs2ProcessTrackingAlignmentSubscription;
   ensurePresentMonBootstrap: (options?: PresentMonBootstrapOptions) => Promise<void>;
 }
 
@@ -51,6 +59,10 @@ export class PerformanceProcessorService implements Cs2PerformanceApi {
     listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
     options?: Cs2ProcessTrackingPollOptions
   ) => () => void;
+  subscribeCs2ProcessTrackingForAlignment: (
+    listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
+    options?: Cs2ProcessTrackingPollOptions
+  ) => Cs2ProcessTrackingAlignmentSubscription;
   ensurePresentMonBootstrap: (options?: PresentMonBootstrapOptions) => Promise<void>;
 
   constructor(options: PerformanceProcessorServiceOptions) {
@@ -64,6 +76,17 @@ export class PerformanceProcessorService implements Cs2PerformanceApi {
     this.getCs2Status = withPortsAsync(getCs2Status, [this.cs2ProcessPort]);
     this.subscribeCs2ProcessTracking = (listener, opts) =>
       subscribeCs2ProcessTracking(
+        [
+          this.cs2ProcessPort,
+          this.osProcessMetricsPort,
+          this.gpuProcessMetricsPort,
+          this.presentChainMetricsPort,
+        ],
+        listener,
+        { ...this.defaultSubscribeCs2, ...opts }
+      );
+    this.subscribeCs2ProcessTrackingForAlignment = (listener, opts) =>
+      subscribeCs2ProcessTrackingForAlignment(
         [
           this.cs2ProcessPort,
           this.osProcessMetricsPort,

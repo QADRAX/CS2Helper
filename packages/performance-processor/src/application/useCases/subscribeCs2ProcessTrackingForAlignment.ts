@@ -8,21 +8,30 @@ import type {
 } from "../ports";
 import { createCs2ProcessTrackingSession } from "./cs2ProcessTrackingSession";
 
+export interface Cs2ProcessTrackingAlignmentSubscription {
+  unsubscribe: () => void;
+  alignToExternalTick: () => Promise<void>;
+}
+
 /**
- * Polls CS2 process visibility and, when running with a PID, samples OS/GPU metrics
- * and maintains a PresentMon session whose latest frame is attached to each snapshot.
+ * Same polling behavior as `subscribeCs2ProcessTracking`, plus `alignToExternalTick` for a master
+ * clock (e.g. GSI) to push the latest PresentMon frame and optionally OS/GPU (throttled by
+ * `externalAlignSystemSampleMinMs`).
  *
  * Ports tuple order: `[cs2Process, osMetrics, gpuMetrics, presentChain]`.
  */
-export const subscribeCs2ProcessTracking: UseCase<
+export const subscribeCs2ProcessTrackingForAlignment: UseCase<
   [Cs2ProcessPort, OsProcessMetricsPort, GpuProcessMetricsPort, PresentChainMetricsPort],
   [
     listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
     options?: Cs2ProcessTrackingPollOptions,
   ],
-  () => void
+  Cs2ProcessTrackingAlignmentSubscription
 > = (ports, listener, options) => {
   const session = createCs2ProcessTrackingSession(ports, listener, options);
   session.startPollLoop();
-  return session.dispose;
+  return {
+    unsubscribe: session.dispose,
+    alignToExternalTick: session.alignToExternalTick,
+  };
 };

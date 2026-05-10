@@ -22,18 +22,30 @@ export interface Cs2ProcessTrackingPollOptions {
    * Defaults to {@link DEFAULT_PRESENT_NOTIFY_INTERVAL_MS}.
    */
   presentNotifyIntervalMs?: number;
+  /**
+   * Minimum time between OS + GPU samples on an externally driven alignment tick
+   * (e.g. once per GSI POST). If omitted, matches `systemMetricsIntervalMs` (after defaults).
+   */
+  externalAlignSystemSampleMinMs?: number;
 }
 
 export function resolveCs2ProcessTrackingPollIntervals(
   options: Cs2ProcessTrackingPollOptions | undefined
-): { processPollMs: number; systemMetricsMs: number; presentNotifyMs: number } {
+): {
+  processPollMs: number;
+  systemMetricsMs: number;
+  presentNotifyMs: number;
+  externalAlignSystemSampleMinMs: number;
+} {
   const processPollMs =
     options?.processPollIntervalMs ?? DEFAULT_CS2_PROCESS_TRACKING_INTERVAL_MS;
   const rawSystem = options?.systemMetricsIntervalMs ?? processPollMs;
   const systemMetricsMs = Math.max(rawSystem, processPollMs);
   const presentNotifyMs =
     options?.presentNotifyIntervalMs ?? DEFAULT_PRESENT_NOTIFY_INTERVAL_MS;
-  return { processPollMs, systemMetricsMs, presentNotifyMs };
+  const externalAlignSystemSampleMinMs =
+    options?.externalAlignSystemSampleMinMs ?? systemMetricsMs;
+  return { processPollMs, systemMetricsMs, presentNotifyMs, externalAlignSystemSampleMinMs };
 }
 
 export function normalizeLogicalCpuCount(length: number): number {

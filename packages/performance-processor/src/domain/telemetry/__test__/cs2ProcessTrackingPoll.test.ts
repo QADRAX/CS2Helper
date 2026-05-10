@@ -21,6 +21,19 @@ describe("resolveCs2ProcessTrackingPollIntervals", () => {
     });
     expect(r.systemMetricsMs).toBe(500);
   });
+
+  it("defaults external align throttle to system metrics interval", () => {
+    const r = resolveCs2ProcessTrackingPollIntervals({ processPollIntervalMs: 300 });
+    expect(r.externalAlignSystemSampleMinMs).toBe(300);
+  });
+
+  it("honors externalAlignSystemSampleMinMs override", () => {
+    const r = resolveCs2ProcessTrackingPollIntervals({
+      processPollIntervalMs: 1000,
+      externalAlignSystemSampleMinMs: 50,
+    });
+    expect(r.externalAlignSystemSampleMinMs).toBe(50);
+  });
 });
 
 describe("cpuPercentSinceLastOsSamples", () => {

@@ -9,6 +9,9 @@ export {
   type Cs2PerformanceApi,
 } from "./infrastructure/PerformanceProcessorService";
 
+export type { Cs2ProcessTrackingAlignmentSubscription } from "./application/useCases/subscribeCs2ProcessTrackingForAlignment";
+export { subscribeCs2ProcessTrackingForAlignment } from "./application/useCases/subscribeCs2ProcessTrackingForAlignment";
+
 export type {
   PresentMonBootstrapOptions,
   PresentMonBootstrapProgressEvent,
