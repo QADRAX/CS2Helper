@@ -15,7 +15,12 @@
       "steamWebApi": "Steam Web API",
       "steamWebApiOk": "OK",
       "steamWebApiFail": "FALLO",
-      "steamWebApiPending": "···"
+      "steamWebApiPending": "···",
+      "trackingCpu": "CPU",
+      "trackingRam": "RAM",
+      "trackingGpu": "GPU",
+      "trackingFps": "FPS",
+      "trackingNa": "—"
     },
     "menu": {
       "title": "Menú",

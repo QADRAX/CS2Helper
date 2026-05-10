@@ -53,6 +53,43 @@ describe("subscribeCs2ProcessTracking", () => {
     unsub();
   });
 
+  it("derives cpuPercent from successive Win32_Process time samples", async () => {
+    const cs2Process: Cs2ProcessPort = {
+      isRunning: async () => true,
+      getStatus: async () => ({ running: true, pid: 7 }),
+    };
+
+    let sampleN = 0;
+    const osMetrics: OsProcessMetricsPort = {
+      sample: vi.fn().mockImplementation(async () => {
+        sampleN += 1;
+        const base = sampleN * 200;
+        return {
+          kernelTimeMs: base,
+          userTimeMs: base * 0.5,
+          workingSetBytes: 4096,
+        };
+      }),
+    };
+
+    const startSession = vi.fn().mockResolvedValue({ stop: vi.fn().mockResolvedValue(undefined) });
+    const presentChain: PresentChainMetricsPort = { startSession };
+
+    const listener = vi.fn();
+    const unsub = subscribeCs2ProcessTracking(
+      [cs2Process, osMetrics, { sample: vi.fn().mockResolvedValue(null) }, presentChain],
+      listener,
+      { intervalMs: 20 }
+    );
+
+    await new Promise((r) => setTimeout(r, 55));
+    const withCpu = listener.mock.calls.map((c) => c[0]?.os?.cpuPercent).filter((x) => x !== undefined);
+    expect(withCpu.length).toBeGreaterThan(0);
+    expect(withCpu[0]).toBeGreaterThan(0);
+
+    unsub();
+  });
+
   it("does not start PresentMon when not running", async () => {
     const cs2Process: Cs2ProcessPort = {
       isRunning: async () => false,

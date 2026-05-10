@@ -1,7 +1,10 @@
+import { cpus } from "node:os";
 import type { UseCase } from "@cs2helper/shared";
 import {
   DEFAULT_CS2_PROCESS_TRACKING_INTERVAL_MS,
+  DEFAULT_PRESENT_TELEMETRY_THROTTLE_MS,
   type Cs2ProcessTrackingSnapshot,
+  type OsProcessMetricsSample,
 } from "../../domain/telemetry";
 import type {
   Cs2ProcessPort,
@@ -16,6 +19,53 @@ export interface SubscribeCs2ProcessTrackingOptions {
    * Defaults to {@link DEFAULT_CS2_PROCESS_TRACKING_INTERVAL_MS}.
    */
   intervalMs?: number;
+  /**
+   * Present-chain frames can arrive often; cap how frequently the listener is notified
+   * with updated `present` (and last OS/GPU samples) so UI can refresh FPS without
+   * polling PowerShell every frame.
+   * Defaults to {@link DEFAULT_PRESENT_TELEMETRY_THROTTLE_MS}.
+   */
+  presentTelemetryThrottleMs?: number;
+}
+
+function logicalCpuCount(): number {
+  const n = cpus().length;
+  return n > 0 ? n : 1;
+}
+
+function cpuPercentSinceLastSample(
+  current: OsProcessMetricsSample,
+  previous: OsProcessMetricsSample,
+  wallMs: number,
+  logicalCpus: number
+): number | undefined {
+  const k = current.kernelTimeMs;
+  const u = current.userTimeMs;
+  const pk = previous.kernelTimeMs;
+  const pu = previous.userTimeMs;
+  if (k === undefined || u === undefined || pk === undefined || pu === undefined) {
+    return undefined;
+  }
+  if (wallMs < 1) return undefined;
+  const deltaCpuMs = k + u - pk - pu;
+  if (deltaCpuMs < 0) return undefined;
+  const n = Math.max(1, logicalCpus);
+  return Math.min(100 * n, (100 * deltaCpuMs) / (wallMs * n));
+}
+
+function withDerivedCpuPercent(
+  raw: OsProcessMetricsSample,
+  previousRaw: OsProcessMetricsSample | undefined,
+  previousAtMs: number | undefined,
+  nowMs: number,
+  logicalCpus: number
+): OsProcessMetricsSample {
+  if (previousRaw === undefined || previousAtMs === undefined) {
+    return raw;
+  }
+  const wall = nowMs - previousAtMs;
+  const pct = cpuPercentSinceLastSample(raw, previousRaw, wall, logicalCpus);
+  return pct === undefined ? raw : { ...raw, cpuPercent: pct };
 }
 
 function statusKey(running: boolean, pid: number | undefined): string {
@@ -38,6 +88,9 @@ export const subscribeCs2ProcessTracking: UseCase<
 > = (ports, listener, options) => {
   const [cs2Process, osMetrics, gpuMetrics, presentChain] = ports;
   const intervalMs = options?.intervalMs ?? DEFAULT_CS2_PROCESS_TRACKING_INTERVAL_MS;
+  const presentTelemetryThrottleMs =
+    options?.presentTelemetryThrottleMs ?? DEFAULT_PRESENT_TELEMETRY_THROTTLE_MS;
+  const cpusN = logicalCpuCount();
   let cancelled = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
   let lastIdleKey: string | null = null;
@@ -46,6 +99,14 @@ export const subscribeCs2ProcessTracking: UseCase<
   let sessionPid: number | null = null;
   let lastPresent: Cs2ProcessTrackingSnapshot["present"];
   let presentChainError: string | undefined;
+  let lastPresentListenerAtMs = 0;
+
+  let prevOsRaw: OsProcessMetricsSample | undefined;
+  let prevOsRawAtMs: number | undefined;
+  let prevOsPid: number | undefined;
+
+  let lastTickOs: Cs2ProcessTrackingSnapshot["os"];
+  let lastTickGpu: Cs2ProcessTrackingSnapshot["gpu"];
 
   const tearDownPresent = async (): Promise<void> => {
     if (presentSession) {
@@ -59,6 +120,18 @@ export const subscribeCs2ProcessTracking: UseCase<
     sessionPid = null;
     lastPresent = undefined;
     presentChainError = undefined;
+    lastPresentListenerAtMs = 0;
+  };
+
+  const emitRunning = (pid: number): void => {
+    listener({
+      running: true,
+      pid,
+      os: lastTickOs,
+      gpu: lastTickGpu,
+      present: lastPresent,
+      presentChainError,
+    });
   };
 
   const ensurePresent = async (pid: number): Promise<void> => {
@@ -71,6 +144,11 @@ export const subscribeCs2ProcessTracking: UseCase<
         pid,
         onFrame: (s) => {
           lastPresent = s;
+          if (cancelled) return;
+          const now = Date.now();
+          if (now - lastPresentListenerAtMs < presentTelemetryThrottleMs) return;
+          lastPresentListenerAtMs = now;
+          emitRunning(pid);
         },
       });
       sessionPid = pid;
@@ -96,6 +174,12 @@ export const subscribeCs2ProcessTracking: UseCase<
         await ensurePresent(pid);
         if (cancelled) return;
 
+        if (prevOsPid !== pid) {
+          prevOsRaw = undefined;
+          prevOsRawAtMs = undefined;
+          prevOsPid = pid;
+        }
+
         let os: Cs2ProcessTrackingSnapshot["os"];
         let gpu: Cs2ProcessTrackingSnapshot["gpu"];
         try {
@@ -109,18 +193,26 @@ export const subscribeCs2ProcessTracking: UseCase<
           gpu = undefined;
         }
 
-        listener({
-          running: true,
-          pid,
-          os,
-          gpu,
-          present: lastPresent,
-          presentChainError,
-        });
+        const nowMs = Date.now();
+        if (os !== undefined) {
+          const rawOs = os;
+          os = withDerivedCpuPercent(rawOs, prevOsRaw, prevOsRawAtMs, nowMs, cpusN);
+          prevOsRaw = rawOs;
+          prevOsRawAtMs = nowMs;
+        }
+
+        lastTickOs = os;
+        lastTickGpu = gpu;
+        emitRunning(pid);
+        lastPresentListenerAtMs = Date.now();
         lastIdleKey = key;
       } else {
         await tearDownPresent();
         if (cancelled) return;
+
+        prevOsRaw = undefined;
+        prevOsRawAtMs = undefined;
+        prevOsPid = undefined;
 
         const snapshot: Cs2ProcessTrackingSnapshot = { running, pid };
         if (lastIdleKey !== key) {

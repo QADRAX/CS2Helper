@@ -21,6 +21,11 @@ export const msgKeys = {
       steamWebApiOk: "cli.status.steamWebApiOk",
       steamWebApiFail: "cli.status.steamWebApiFail",
       steamWebApiPending: "cli.status.steamWebApiPending",
+      trackingCpu: "cli.status.trackingCpu",
+      trackingRam: "cli.status.trackingRam",
+      trackingGpu: "cli.status.trackingGpu",
+      trackingFps: "cli.status.trackingFps",
+      trackingNa: "cli.status.trackingNa",
     },
     menu: {
       title: "cli.menu.title",

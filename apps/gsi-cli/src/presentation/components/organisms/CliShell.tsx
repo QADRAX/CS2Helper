@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Box } from "ink";
-import type { Cs2ProcessStatus } from "../../../application/ports";
 import type { SteamStatus } from "../../../application/useCases/getSteamStatus";
 import type { CliStatus } from "../../../domain/cli";
+import type { Cs2ProcessTrackingSnapshot } from "../../../domain/telemetry/cs2Process";
 import type { NotificationItem } from "../../store";
 import type { SteamWebApiUiSlice } from "../../store/slices/ui/types";
 import { CliSectionDivider } from "../atoms/CliSectionDivider";
@@ -11,9 +11,7 @@ import { NotificationsStack } from "../molecules/NotificationsStack";
 
 interface CliShellProps {
   steamStatus: SteamStatus;
-  cs2Status: Cs2ProcessStatus;
-  /** PresentMon / present-chain error while CS2 is running (optional). */
-  cs2PresentChainError?: string;
+  cs2Tracking: Cs2ProcessTrackingSnapshot;
   gatewayStatus: CliStatus;
   steamWebApi: SteamWebApiUiSlice;
   gatewaySlot?: ReactNode;
@@ -23,8 +21,7 @@ interface CliShellProps {
 
 export function CliShell({
   steamStatus,
-  cs2Status,
-  cs2PresentChainError,
+  cs2Tracking,
   gatewayStatus,
   steamWebApi,
   gatewaySlot,
@@ -38,8 +35,7 @@ export function CliShell({
       <Box paddingX={1}>
         <CliHeaderPanel
           steamStatus={steamStatus}
-          cs2Status={cs2Status}
-          cs2PresentChainError={cs2PresentChainError}
+          cs2Tracking={cs2Tracking}
           gatewayStatus={gatewayStatus}
           steamWebApi={steamWebApi}
         />

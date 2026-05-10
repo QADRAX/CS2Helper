@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useInput } from "ink";
-import { useCs2PresentChainError } from "../../hooks/useCs2PresentChainError";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import {
   clearError,
@@ -18,7 +17,7 @@ import {
   openDataFolder,
   saveCliConfig,
   selectCliConfig,
-  selectCs2Status,
+  selectCs2Tracking,
   selectGatewayDiagnostics,
   selectGatewayWarning,
   selectGsiState,
@@ -54,8 +53,7 @@ export function InteractiveCli() {
   const uiStatus = useAppSelector(selectUiStatus);
   const steamStatus = useAppSelector(selectSteamStatus);
   const steamWebApiUi = useAppSelector(selectSteamWebApiUi);
-  const cs2Status = useAppSelector(selectCs2Status);
-  const cs2PresentChainError = useCs2PresentChainError();
+  const cs2Tracking = useAppSelector(selectCs2Tracking);
   const errorDisplay = useAppSelector(selectUiErrorDisplay);
   const gatewayDiagnostics = useAppSelector(selectGatewayDiagnostics);
   const gatewayWarning = useAppSelector(selectGatewayWarning);
@@ -164,8 +162,7 @@ export function InteractiveCli() {
   return (
     <CliShell
       steamStatus={steamStatus}
-      cs2Status={cs2Status}
-      cs2PresentChainError={cs2PresentChainError}
+      cs2Tracking={cs2Tracking}
       gatewayStatus={uiStatus}
       steamWebApi={steamWebApiUi}
       gatewaySlot={
@@ -173,7 +170,7 @@ export function InteractiveCli() {
           <GatewayContentBox
             gsiState={gsiState}
             gatewayDiagnostics={gatewayDiagnostics}
-            cs2Running={cs2Status.running}
+            cs2Running={cs2Tracking.running}
             gatewayWarning={gatewayWarning}
           />
         ) : null
