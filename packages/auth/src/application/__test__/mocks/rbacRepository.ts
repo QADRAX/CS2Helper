@@ -16,6 +16,7 @@ export function createRbacRepositoryFake(
     revokePermissionFromRoleByNames: vi.fn(async () => {}),
     listRoles: vi.fn(async () => []),
     listPermissions: vi.fn(async () => []),
+    existsUserWithRole: vi.fn(async () => false),
     ...overrides,
   };
 }

@@ -4,8 +4,10 @@
  */
 
 export { AuthService, type AuthServiceOptions } from "./infrastructure/AuthService";
-export { createAuthDb, type AuthDb } from "./infrastructure/db/createAuthDb";
+export { createAuthDb, createAuthDbFromPglite, type AuthDb } from "./infrastructure/db/createAuthDb";
 export { runAuthMigrations } from "./infrastructure/db/runAuthMigrations";
+export { runAuthMigrationsPglite } from "./infrastructure/db/runAuthMigrationsPglite";
+export { PGlite } from "@electric-sql/pglite";
 export { authSchema } from "./infrastructure/db/schema";
 
 export type { AuthApp } from "./application/AuthApp";

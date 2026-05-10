@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import type { User } from "../../domain";
 import type { UserRepositoryPort, UserWithPassword } from "../../application/ports";
 import type { AuthDb } from "../db/createAuthDb";
@@ -11,7 +11,7 @@ export class DrizzleUserRepository implements UserRepositoryPort {
     const [row] = await this.db
       .insert(users)
       .values({ email: input.email, passwordHash: input.passwordHash })
-      .returning({ id: users.id });
+      .returning();
     if (!row) {
       throw new Error("Failed to create user");
     }
@@ -39,5 +39,23 @@ export class DrizzleUserRepository implements UserRepositoryPort {
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };
+  }
+
+  async listUsers(): Promise<User[]> {
+    const rows = await this.db.select().from(users).orderBy(asc(users.email));
+    return rows.map((row) => ({
+      id: row.id,
+      email: row.email,
+      isActive: row.isActive,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }));
+  }
+
+  async updatePasswordHash(userId: string, passwordHash: string): Promise<void> {
+    await this.db
+      .update(users)
+      .set({ passwordHash, updatedAt: new Date() })
+      .where(eq(users.id, userId));
   }
 }

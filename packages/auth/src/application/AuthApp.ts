@@ -3,11 +3,13 @@ import type {
   AuthTokens,
   CreatePersonalAccessTokenInput,
   HostCreateInvitationInput,
+  InvitationListItem,
   Permission,
   PersonalAccessTokenCreated,
   PersonalAccessTokenSummary,
   RegisterUserInput,
   Role,
+  User,
   UserProfile,
   UserProfileUpdate,
 } from "../domain";
@@ -69,6 +71,20 @@ export interface AuthApp {
     input: HostCreateInvitationInput
   ): Promise<{ plainCode: string; invitationId: string; expiresAt: Date }>;
   revokeInvitation(actorUserId: string, invitationId: string): Promise<void>;
+  listInvitations(actorUserId: string): Promise<InvitationListItem[]>;
+  listUsers(actorUserId: string): Promise<User[]>;
+
+  /**
+   * Trusted-host only: create first admin when none exists. Idempotent when an admin is present.
+   */
+  ensureRootUserFromBootstrap(input: { email: string; password: string }): Promise<{ created: boolean }>;
+  /**
+   * Trusted-host only: reset password for an existing admin user by email.
+   */
+  resetRootAdminPasswordFromBootstrap(
+    email: string,
+    newPassword: string
+  ): Promise<{ updated: boolean }>;
 
   createPersonalAccessToken(
     actorUserId: string,

@@ -1,3 +1,7 @@
+export * from "./listInvitations";
+export * from "./listUsers";
+export * from "./bootstrapRootUserIfEmpty";
+export * from "./resetRootAdminPassword";
 export * from "./issueSessionForUser";
 export * from "./registerUser";
 export * from "./createInvitation";

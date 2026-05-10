@@ -1,4 +1,5 @@
 import { withPortsAsync } from "@cs2helper/shared";
+import { PGlite } from "@electric-sql/pglite";
 import type { Pool } from "pg";
 import type { AuthApp } from "../application/AuthApp";
 import {
@@ -8,11 +9,13 @@ import {
   type CreateInvitationInput,
   type CreatePersonalAccessTokenInput,
   type HostCreateInvitationInput,
+  type InvitationListItem,
   type Permission,
   type PersonalAccessTokenCreated,
   type PersonalAccessTokenSummary,
   type RegisterUserInput,
   type Role,
+  type User,
   type UserProfile,
   type UserProfileUpdate,
 } from "../domain";
@@ -25,6 +28,7 @@ import { assertUserHasPermission } from "../application/useCases/assertUserHasPe
 import { assignPermissionToRole } from "../application/useCases/assignPermissionToRole";
 import { assignRoleToUser } from "../application/useCases/assignRoleToUser";
 import { authenticateUser } from "../application/useCases/authenticateUser";
+import { bootstrapRootUserIfEmpty } from "../application/useCases/bootstrapRootUserIfEmpty";
 import { createInvitation } from "../application/useCases/createInvitation";
 import { createPersonalAccessToken } from "../application/useCases/createPersonalAccessToken";
 import { createPermission } from "../application/useCases/createPermission";
@@ -32,13 +36,16 @@ import { createRole } from "../application/useCases/createRole";
 import { deleteRole } from "../application/useCases/deleteRole";
 import { getEffectivePermissions } from "../application/useCases/getEffectivePermissions";
 import { getUserProfile } from "../application/useCases/getUserProfile";
+import { listInvitations } from "../application/useCases/listInvitations";
 import { listPermissions } from "../application/useCases/listPermissions";
 import { listPersonalAccessTokens } from "../application/useCases/listPersonalAccessTokens";
 import { listRoles } from "../application/useCases/listRoles";
+import { listUsers } from "../application/useCases/listUsers";
 import { logoutUser } from "../application/useCases/logoutUser";
 import { refreshAccessToken } from "../application/useCases/refreshAccessToken";
 import { registerUser } from "../application/useCases/registerUser";
 import { removeRoleFromUser } from "../application/useCases/removeRoleFromUser";
+import { resetRootAdminPassword } from "../application/useCases/resetRootAdminPassword";
 import { revokeInvitation } from "../application/useCases/revokeInvitation";
 import { revokePersonalAccessToken } from "../application/useCases/revokePersonalAccessToken";
 import { revokePermissionFromRole } from "../application/useCases/revokePermissionFromRole";
@@ -55,7 +62,7 @@ import { JoseJwtAdapter } from "./adapters/JoseJwtAdapter";
 import { NodeSecureRandomAdapter } from "./adapters/NodeSecureRandomAdapter";
 import { ScryptPasswordHasher } from "./adapters/ScryptPasswordHasher";
 import { SystemClockAdapter } from "./adapters/SystemClockAdapter";
-import { createAuthDb } from "./db/createAuthDb";
+import { createAuthDb, createAuthDbFromPglite } from "./db/createAuthDb";
 
 export type AuthServiceOptions = {
   jwtSecret: string;
@@ -120,6 +127,16 @@ export class AuthService implements AuthApp {
     input: CreateInvitationInput
   ) => Promise<{ plainCode: string; invitationId: string; expiresAt: Date }>;
   private readonly inviteRevoke: (invitationId: string) => Promise<void>;
+  private readonly inviteList: () => Promise<InvitationListItem[]>;
+  private readonly usersList: () => Promise<User[]>;
+  private readonly bootstrapRoot: (input: {
+    email: string;
+    password: string;
+  }) => Promise<{ created: boolean }>;
+  private readonly resetRootPassword: (
+    email: string,
+    newPassword: string
+  ) => Promise<{ updated: boolean }>;
 
   private readonly patCreate: (
     userId: string,
@@ -128,8 +145,9 @@ export class AuthService implements AuthApp {
   private readonly patList: (userId: string) => Promise<PersonalAccessTokenSummary[]>;
   private readonly patRevoke: (userId: string, tokenId: string) => Promise<void>;
 
-  constructor(pool: Pool, options: AuthServiceOptions) {
-    const db = createAuthDb(pool);
+  constructor(connection: Pool | PGlite, options: AuthServiceOptions) {
+    const db =
+      connection instanceof PGlite ? createAuthDbFromPglite(connection) : createAuthDb(connection);
     this.clock = new SystemClockAdapter();
     this.users = new DrizzleUserRepository(db);
     this.profiles = new DrizzleUserProfileRepository(db);
@@ -214,6 +232,19 @@ export class AuthService implements AuthApp {
       this.clock,
     ]);
     this.inviteRevoke = withPortsAsync(revokeInvitation, [this.invitations]);
+    this.inviteList = withPortsAsync(listInvitations, [this.invitations]);
+    this.usersList = withPortsAsync(listUsers, [this.users]);
+    this.bootstrapRoot = withPortsAsync(bootstrapRootUserIfEmpty, [
+      this.users,
+      this.profiles,
+      this.rbac,
+      this.passwordHasher,
+    ]);
+    this.resetRootPassword = withPortsAsync(resetRootAdminPassword, [
+      this.users,
+      this.passwordHasher,
+      this.rbac,
+    ]);
 
     this.patCreate = withPortsAsync(createPersonalAccessToken, [
       this.patTokens,
@@ -359,6 +390,30 @@ export class AuthService implements AuthApp {
   async revokeInvitation(actorUserId: string, invitationId: string): Promise<void> {
     await this.assertPermission(actorUserId, AUTH_INVITATIONS_MANAGE_PERMISSION);
     return this.inviteRevoke(invitationId);
+  }
+
+  async listInvitations(actorUserId: string): Promise<InvitationListItem[]> {
+    await this.assertPermission(actorUserId, AUTH_INVITATIONS_MANAGE_PERMISSION);
+    return this.inviteList();
+  }
+
+  async listUsers(actorUserId: string): Promise<User[]> {
+    await this.assertPermission(actorUserId, AUTH_RBAC_MANAGE_PERMISSION);
+    return this.usersList();
+  }
+
+  ensureRootUserFromBootstrap(input: {
+    email: string;
+    password: string;
+  }): Promise<{ created: boolean }> {
+    return this.bootstrapRoot(input);
+  }
+
+  resetRootAdminPasswordFromBootstrap(
+    email: string,
+    newPassword: string
+  ): Promise<{ updated: boolean }> {
+    return this.resetRootPassword(email, newPassword);
   }
 
   createPersonalAccessToken(

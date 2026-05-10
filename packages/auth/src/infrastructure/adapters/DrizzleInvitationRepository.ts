@@ -1,5 +1,6 @@
-import { and, eq, gt, isNull, lt, sql } from "drizzle-orm";
+import { desc, and, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import { refreshTokenStorageHash } from "../../domain";
+import type { InvitationListItem } from "../../domain";
 import type {
   ClockPort,
   InvitationClaimSnapshot,
@@ -30,7 +31,7 @@ export class DrizzleInvitationRepository implements InvitationRepositoryPort {
         maxUses: input.maxUses,
         extraRoleName: input.extraRoleName,
       })
-      .returning({ id: invitations.id });
+      .returning();
     if (!row) {
       throw new Error("Failed to create invitation");
     }
@@ -51,10 +52,7 @@ export class DrizzleInvitationRepository implements InvitationRepositoryPort {
           lt(invitations.usesCount, invitations.maxUses)
         )
       )
-      .returning({
-        id: invitations.id,
-        extraRoleName: invitations.extraRoleName,
-      });
+      .returning();
     if (!row) {
       return null;
     }
@@ -78,5 +76,22 @@ export class DrizzleInvitationRepository implements InvitationRepositoryPort {
       .update(invitations)
       .set({ revokedAt: this.clock.now() })
       .where(and(eq(invitations.id, invitationId), isNull(invitations.revokedAt)));
+  }
+
+  async listInvitations(): Promise<InvitationListItem[]> {
+    const rows = await this.db
+      .select({
+        id: invitations.id,
+        createdByUserId: invitations.createdByUserId,
+        expiresAt: invitations.expiresAt,
+        maxUses: invitations.maxUses,
+        usesCount: invitations.usesCount,
+        extraRoleName: invitations.extraRoleName,
+        revokedAt: invitations.revokedAt,
+        createdAt: invitations.createdAt,
+      })
+      .from(invitations)
+      .orderBy(desc(invitations.createdAt));
+    return rows;
   }
 }

@@ -15,7 +15,8 @@ export type AuthErrorCode =
   | "INVITATION_REQUIRED"
   | "INVITATION_INVALID"
   | "INVITATION_NOT_FOUND"
-  | "PERSONAL_ACCESS_TOKEN_NOT_FOUND";
+  | "PERSONAL_ACCESS_TOKEN_NOT_FOUND"
+  | "NOT_ADMIN";
 
 export class AuthDomainError extends Error {
   readonly code: AuthErrorCode;

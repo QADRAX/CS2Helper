@@ -9,6 +9,7 @@ export function createInvitationRepositoryFake(
     claimOneUseIfValid: vi.fn(async () => null),
     releaseClaimedUse: vi.fn(async () => {}),
     revokeInvitation: vi.fn(async () => {}),
+    listInvitations: vi.fn(async () => []),
     ...overrides,
   };
 }

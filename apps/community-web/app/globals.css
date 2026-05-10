@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* Neo-brutalist palette (aligned with neobrutalism.dev aesthetic) */
+:root {
+  --background: #fffdf5;
+  --foreground: #0a0a0a;
+  --accent: #facc15;
+  --border: #0a0a0a;
+  --card: #ffffff;
+  --ring: #0a0a0a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1a1a;
+    --foreground: #fafafa;
+    --accent: #fde047;
+    --border: #fafafa;
+    --card: #262626;
+    --ring: #fafafa;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.nb-shadow {
+  box-shadow: 4px 4px 0 0 var(--border);
+}
+
+.nb-shadow-sm {
+  box-shadow: 3px 3px 0 0 var(--border);
+}
+
+.nb-border {
+  border: 3px solid var(--border);
+}

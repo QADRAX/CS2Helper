@@ -53,7 +53,7 @@ export class DrizzleRbacRepository implements RbacRepositoryPort {
     const [row] = await this.db
       .insert(roles)
       .values({ name, description: description ?? null })
-      .returning({ id: roles.id });
+      .returning();
     if (!row) {
       throw new Error("Failed to create role");
     }
@@ -72,7 +72,7 @@ export class DrizzleRbacRepository implements RbacRepositoryPort {
     const [row] = await this.db
       .insert(permissions)
       .values({ key, description: description ?? null })
-      .returning({ id: permissions.id });
+      .returning();
     if (!row) {
       throw new Error("Failed to create permission");
     }
@@ -141,6 +141,16 @@ export class DrizzleRbacRepository implements RbacRepositoryPort {
         createdAt: p.createdAt,
       }))
       .sort((a, b) => a.key.localeCompare(b.key));
+  }
+
+  async existsUserWithRole(roleName: string): Promise<boolean> {
+    const rows = await this.db
+      .select({ userId: userRoles.userId })
+      .from(userRoles)
+      .innerJoin(roles, eq(roles.id, userRoles.roleId))
+      .where(eq(roles.name, roleName))
+      .limit(1);
+    return rows.length > 0;
   }
 
   private async findRoleByName(name: string): Promise<{ id: string } | null> {

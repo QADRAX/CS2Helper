@@ -12,4 +12,6 @@ export interface RbacRepositoryPort {
   revokePermissionFromRoleByNames(roleName: string, permissionKey: string): Promise<void>;
   listRoles(): Promise<Role[]>;
   listPermissions(): Promise<Permission[]>;
+  /** True if at least one user has the given role name. */
+  existsUserWithRole(roleName: string): Promise<boolean>;
 }

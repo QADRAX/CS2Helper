@@ -26,11 +26,11 @@ export class DrizzlePersonalAccessTokenRepository implements PersonalAccessToken
         label: params.label,
         expiresAt: params.expiresAt,
       })
-      .returning({ id: personalAccessTokens.id, createdAt: personalAccessTokens.createdAt });
+      .returning();
     if (!row) {
       throw new Error("Failed to insert personal access token");
     }
-    return row;
+    return { id: row.id, createdAt: row.createdAt };
   }
 
   async listActiveForUser(userId: string): Promise<PersonalAccessTokenSummary[]> {
@@ -104,7 +104,7 @@ export class DrizzlePersonalAccessTokenRepository implements PersonalAccessToken
           isNull(personalAccessTokens.revokedAt)
         )
       )
-      .returning({ id: personalAccessTokens.id });
+      .returning();
     return updated.length > 0;
   }
 }

@@ -1,3 +1,5 @@
+import type { InvitationListItem } from "../../domain";
+
 export type InvitationClaimSnapshot = {
   id: string;
   extraRoleName: string | null;
@@ -23,4 +25,7 @@ export interface InvitationRepositoryPort {
   releaseClaimedUse(invitationId: string): Promise<void>;
 
   revokeInvitation(invitationId: string): Promise<void>;
+
+  /** All invitations, newest first (no plaintext code). */
+  listInvitations(): Promise<InvitationListItem[]>;
 }
