@@ -9,10 +9,10 @@ import type {
 const TICK_MS = 1_000;
 
 export const createPlaybackSession: UseCase<
-  {},
+  [],
   [replay: ReplayResult],
   ReplayPlaybackSession
-> = (_, replay) => {
+> = (_ports, replay) => {
   const currentTickIndex = -1;
   return {
     replay,
@@ -27,31 +27,31 @@ export const createPlaybackSession: UseCase<
 };
 
 export const setPlaybackSpeed: UseCase<
-  {},
+  [],
   [session: ReplayPlaybackSession, speed: ReplaySpeed],
   ReplayPlaybackSession
-> = (_, session, speed) => ({ ...session, speed });
+> = (_ports, session, speed) => ({ ...session, speed });
 
 export const togglePlayback: UseCase<
-  {},
+  [],
   [session: ReplayPlaybackSession],
   ReplayPlaybackSession
-> = (_, session) => ({ ...session, isPlaying: !session.isPlaying });
+> = (_ports, session) => ({ ...session, isPlaying: !session.isPlaying });
 
 export const toggleSeekMode: UseCase<
-  {},
+  [],
   [session: ReplayPlaybackSession],
   ReplayPlaybackSession
-> = (_, session) => ({
+> = (_ports, session) => ({
   ...session,
   seekMode: session.seekMode === "rebuild" ? "coldStart" : "rebuild",
 });
 
 export const seekPlaybackToSecond: UseCase<
-  {},
+  [],
   [session: ReplayPlaybackSession, second: number, mode?: ReplaySeekMode],
   ReplayPlaybackSession
-> = (_, session, second, mode = session.seekMode) => {
+> = (_ports, session, second, mode = session.seekMode) => {
   const boundedSecond = clamp(second, 0, session.replay.timeline.durationSeconds);
   const currentTickIndex = getTickIndexBySecond(session.replay, boundedSecond);
   const state = resolveState(session.replay, boundedSecond, currentTickIndex, mode);
@@ -66,10 +66,10 @@ export const seekPlaybackToSecond: UseCase<
 };
 
 export const advancePlayback: UseCase<
-  {},
+  [],
   [session: ReplayPlaybackSession, deltaMs: number],
   ReplayPlaybackSession
-> = (_, session, deltaMs) => {
+> = (_ports, session, deltaMs) => {
   if (!session.isPlaying) return session;
 
   const durationMs = session.replay.timeline.durationSeconds * TICK_MS;

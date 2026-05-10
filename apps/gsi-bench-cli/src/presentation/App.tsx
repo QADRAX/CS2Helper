@@ -1,4 +1,4 @@
-import type { BenchCliApp } from "../infrastructure/bench";
+import type { BenchCliApp } from "../application";
 import { InteractiveBenchCli } from "./components";
 
 export interface AppProps {

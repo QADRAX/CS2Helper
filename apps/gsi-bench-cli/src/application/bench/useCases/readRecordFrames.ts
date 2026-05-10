@@ -2,13 +2,13 @@ import type { UseCase } from "@cs2helper/shared";
 import type { GsiRecordFile, ReadRecordFramesResult } from "../../../domain/bench";
 import type { RecordReaderPort } from "../ports";
 
-export interface ReadRecordFramesPorts {
-  recordReader: RecordReaderPort;
-}
-
-/** Reads parsed frames and parse errors for one selected record. */
+/**
+ * Reads parsed frames and parse errors for one selected record.
+ *
+ * Ports tuple order: `[recordReader]`.
+ */
 export const readRecordFrames: UseCase<
-  ReadRecordFramesPorts,
+  [RecordReaderPort],
   [record: GsiRecordFile],
   Promise<ReadRecordFramesResult>
-> = ({ recordReader }, record) => recordReader.readFrames(record);
+> = ([recordReader], record) => recordReader.readFrames(record);

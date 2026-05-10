@@ -13,14 +13,21 @@ When planning or implementing in `packages/*` or `apps/*`, follow the repo layer
 - **domain/** — Pure domain: types, state machines, reducers, domain functions. No concrete adapters, no UI. Minimize framework/process coupling.
 - **application/useCases/** — Orchestration only. Use `UseCase` / `AsyncUseCase` from `@cs2helper/shared`.
 - **application/ports/** — Interfaces (ports) only.
-- **infrastructure/** — Adapters, HTTP, filesystem, clocks, and composition roots (`*Service`) that wire ports to use cases.
+- **infrastructure/** — Adapters, HTTP, filesystem, clocks, and **composition roots** (one `*Application` class per app) that wire ports to use cases via `withPorts` / `withPortsAsync` from `@cs2helper/shared`.
 - **presentation/** (apps) — UI / store; depends on application ports or package public APIs, not on skipping domain rules.
+
+## App composition root (CLI / apps)
+
+- **Application API**: declare a single interface under **application/** (e.g. `CliApp`, `BenchCliApp`) with the operations the presentation layer needs.
+- **Infrastructure class**: one **`SomethingApplication`** class under **infrastructure/** that `implements` that interface (see `GsiCliApplication`, `BenchCliApplication`).
+- **Wiring**: private adapter fields; in the **constructor**, assign each method with `withPorts(useCase, [...adapters])` or `withPortsAsync(...)` — do not hand-roll `return useCase([...], ...)` per method unless there is a strong reason.
+- **Naming**: prefer `*Application` for the composition root, not `*AppService`, so apps stay consistent.
 
 ## Use case shape
 
-- Prefer **tuple ports**: `UseCase<[PortA, PortB], [...args], Result>`.
+- **Ports are always a tuple**: `UseCase<[PortA, PortB], [...args], Result>`. Use `[]` when there are no ports.
 - First parameter is always the ports tuple: `(ports, ...args)`.
-- Document order: `Ports tuple order: \`[a, b]\`.` (match `apps/gsi-cli` / `gsi-gateway` / `gsi-processor`).
+- Document order: `Ports tuple order: \`[a, b]\`.` (see `apps/gsi-cli`, `gsi-gateway`, `gsi-processor`).
 
 ## Dependencies (allowed direction)
 

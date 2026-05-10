@@ -4,7 +4,7 @@ import {
   GsiProcessorStatusBox,
   type GsiProcessorStatusLabels,
 } from "@cs2helper/gsi-processor-ink";
-import type { BenchCliApp } from "../../../infrastructure/bench";
+import type { BenchCliApp } from "../../../application";
 import type { GsiRecordFile, ReplayPlaybackSession, ReplayResult } from "../../../domain/bench";
 import { MenuOptionLine } from "../atoms";
 

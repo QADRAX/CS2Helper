@@ -1,12 +1,12 @@
 import React from "react";
 import { render } from "ink";
-import { BenchCliAppService } from "./infrastructure/bench/BenchCliAppService.js";
+import { BenchCliApplication } from "./infrastructure/bench/BenchCliApplication.js";
 import { App } from "./presentation/App.js";
 
 const CLEAR_TERMINAL = "\x1B[2J\x1B[3J\x1B[H";
 
 function main() {
-  const benchApp = new BenchCliAppService();
+  const benchApp = new BenchCliApplication();
   const element = React.createElement(App, { benchApp });
 
   process.stdout.write(CLEAR_TERMINAL);

@@ -10,14 +10,14 @@ Orden de dependencia permitido (**hacia dentro**): *presentation (solo apps con 
 |------|-----------------|--------|
 | **domain** | Tipos de dominio, reglas puras, reducers/máquinas de estado, funciones sin efectos laterales acoplados a frameworks | Importar desde `application`, `infrastructure`, SDKs de UI, Node “de proceso” salvo lo mínimo y justificado |
 | **application** | Casos de uso (`UseCase` / `AsyncUseCase` de `@cs2helper/shared`), **ports** (interfaces), orquestación | Implementar detalles de IO; importar adapters concretos |
-| **infrastructure** | Adapters que implementan ports, servicios de composición (`*Service`), HTTP, disco, reloj, etc. | Definir nuevas reglas de negocio que pertenezcan a domain |
+| **infrastructure** | Adapters, IO, y **una clase `*Application` por app** que cablea casos de uso con `withPorts` / `withPortsAsync` (`@cs2helper/shared`) | Definir reglas de negocio que pertenezcan a `domain` |
 | **presentation** (apps, p. ej. Ink/React) | UI, store, componentes; compone casos de uso vía puertos/adapters | Contener lógica de dominio sustitutiva de `domain/` |
 
 Los **bordes del paquete** se exponen desde `src/index.ts` (o subpaths documentados). Evita que consumidores dependan de rutas internas (`**/useCases/**` directo) salvo convención explícita del paquete.
 
 ## Casos de uso y puertos
 
-- Firma: `UseCase<TPorts, TArgs, TResult>` donde `TPorts` es preferiblemente una **tupla** de puertos en **orden fijado** y documentado en un comentario (*Ports tuple order: `[…]`*).
+- Firma: `UseCase<TPorts, TArgs, TResult>` con **`TPorts` siempre una tupla** (`[]` si no hay puertos). Orden documentado (*Ports tuple order: `[…]`*).
 - El primer argumento del caso de uso es siempre `ports`; el resto son argumentos de negocio (`TArgs`).
 - Los **ports** viven en `application/ports/` (interfaces). Las implementaciones viven en `infrastructure/adapters/` o clases servicio que cumplen el contrato.
 
@@ -31,7 +31,8 @@ Los **bordes del paquete** se exponen desde `src/index.ts` (o subpaths documenta
 
 ## Referencias en el repo
 
-- `packages/shared` — tipos `UseCase` / `AsyncUseCase`.
-- Ejemplos recientes: `packages/gsi-gateway`, `packages/gsi-processor`, `apps/gsi-cli` (use cases con tuplas de puertos).
+- `packages/shared` — tipos `UseCase` / `AsyncUseCase` y helpers `withPorts` / `withPortsAsync`.
+- Apps CLI: interfaz de aplicación (`CliApp`, `BenchCliApp`) en **application/**; compositor `GsiCliApplication` / `BenchCliApplication` en **infrastructure/**.
+- Ejemplos: `packages/gsi-gateway`, `packages/gsi-processor`, `apps/gsi-cli`, `apps/gsi-bench-cli`.
 
 Si una tarea cruza capas al revés, **propón refactor** o mover código antes de acoplar.

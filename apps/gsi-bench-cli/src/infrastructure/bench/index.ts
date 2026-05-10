@@ -1,2 +1,1 @@
-export * from "./BenchCliAppService";
-export * from "./adapters";
+export * from "./BenchCliApplication";

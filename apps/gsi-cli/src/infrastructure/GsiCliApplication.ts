@@ -40,7 +40,7 @@ import type { GatewayStartInfo } from "../application/ports/GatewayPort";
 import type { GatewayDiagnostics } from "../application/ports/GatewayPort";
 import type { CliConfig } from "../domain/cli/config";
 import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "../domain/telemetry/cs2Process";
-import { withPorts, withPortsAsync } from "../domain/withPorts";
+import { withPorts, withPortsAsync } from "@cs2helper/shared";
 import { CliAppService } from "./CliAppService";
 import { ManagedPresentMonBootstrapAdapter } from "./adapters/ManagedPresentMonBootstrapAdapter";
 import { FileConfigAdapter } from "./adapters/FileConfigAdapter";

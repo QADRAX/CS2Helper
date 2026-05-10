@@ -12,10 +12,10 @@ import type { ReplayResult } from "../../../../domain/bench";
 describe("playbackSession", () => {
   it("advances with speed and pauses at end", () => {
     const replay = createReplayResult();
-    let session = createPlaybackSession({}, replay);
-    session = togglePlayback({}, session);
-    session = setPlaybackSpeed({}, session, 2);
-    session = advancePlayback({}, session, 2_000);
+    let session = createPlaybackSession([], replay);
+    session = togglePlayback([], session);
+    session = setPlaybackSpeed([], session, 2);
+    session = advancePlayback([], session, 2_000);
 
     expect(session.currentSecond).toBe(4);
     expect(session.currentTickIndex).toBe(4);
@@ -24,19 +24,19 @@ describe("playbackSession", () => {
 
   it("supports seek with rebuild and coldStart modes", () => {
     const replay = createReplayResult();
-    let session = createPlaybackSession({}, replay);
-    session = seekPlaybackToSecond({}, session, 2, "rebuild");
+    let session = createPlaybackSession([], replay);
+    session = seekPlaybackToSecond([], session, 2, "rebuild");
     expect(session.currentTickIndex).toBe(2);
     expect(session.state.totalTicks).toBe(3);
 
-    session = seekPlaybackToSecond({}, session, 3, "coldStart");
+    session = seekPlaybackToSecond([], session, 3, "coldStart");
     expect(session.seekMode).toBe("coldStart");
     expect(session.state.totalTicks).toBe(1);
   });
 
   it("toggles seek mode", () => {
     const replay = createReplayResult();
-    const toggled = toggleSeekMode({}, createPlaybackSession({}, replay));
+    const toggled = toggleSeekMode([], createPlaybackSession([], replay));
     expect(toggled.seekMode).toBe("coldStart");
   });
 });
