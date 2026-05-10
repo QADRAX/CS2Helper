@@ -1,10 +1,4 @@
-import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import type {
-  Cs2ProcessStatus,
-  Cs2ProcessTrackingPollOptions,
-  Cs2ProcessTrackingSnapshot,
-  PresentMonBootstrapOptions,
-} from "@cs2helper/performance-processor";
+import type { PresentMonBootstrapOptions, TickFrame } from "@cs2helper/cs2-client-listener";
 import type { CreateOrUpdateGsiConfigResult } from "./useCases/createOrUpdateGsiConfig";
 import type { VerifyGsiConfigResult } from "./useCases/verifyGsiConfig";
 import type { SteamStatus } from "./useCases/getSteamStatus";
@@ -12,13 +6,11 @@ import type { SubscribeSteamStatusOptions } from "./useCases/subscribeSteamStatu
 import type { ValidateSteamApiKeyOutcome } from "./ports/SteamWebApiClientPort";
 import type { GatewayStartInfo, GatewayDiagnostics } from "./ports/GatewayPort";
 import type { CliConfig } from "../domain/cli/config";
-
 export interface CliApp {
   startGateway: () => Promise<GatewayStartInfo>;
   stopGateway: () => Promise<void>;
-  getGatewayState: () => Readonly<GsiProcessorState> | null;
   getGatewayDiagnostics: () => Readonly<GatewayDiagnostics>;
-  subscribeGatewayState: (listener: (state: Readonly<GsiProcessorState>) => void) => () => void;
+  subscribeTickFrames: (listener: (frame: TickFrame) => void) => () => void;
   getConfig: () => Promise<CliConfig>;
   saveConfig: (config: Partial<CliConfig>) => Promise<CliConfig>;
   launchCs2: () => Promise<void>;
@@ -27,11 +19,6 @@ export interface CliApp {
   createOrUpdateGsiConfig: () => Promise<CreateOrUpdateGsiConfigResult>;
   startRecording: (filename: string) => Promise<void>;
   stopRecording: () => Promise<void>;
-  getCs2Status: () => Promise<Cs2ProcessStatus>;
-  subscribeCs2ProcessTracking: (
-    listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
-    options?: Cs2ProcessTrackingPollOptions
-  ) => () => void;
   getSteamStatus: () => Promise<SteamStatus>;
   subscribeSteamStatus: (
     listener: (status: SteamStatus) => void,

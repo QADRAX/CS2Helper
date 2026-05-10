@@ -1,3 +1,5 @@
+import type { GsiGatewayOptions } from "@cs2helper/gsi-gateway";
+import type { PresentMonBootstrapOptions } from "@cs2helper/performance-processor";
 import type { PowerShellCommandPort } from "@cs2helper/shared";
 import { withPortsAsync } from "@cs2helper/shared";
 import type { TickFrame } from "@cs2helper/tick-hub";
@@ -18,7 +20,7 @@ export class Cs2ClientListenerService implements Cs2ClientListenerSdk {
   private readonly engine: Cs2ClientListenerEngine;
   private readonly control: Cs2ClientListenerControlAdapter;
 
-  readonly start: () => Promise<Cs2ClientListenerStartResult>;
+  readonly start: (gatewayOptions?: GsiGatewayOptions) => Promise<Cs2ClientListenerStartResult>;
   readonly stop: () => Promise<void>;
 
   constructor(powershell: PowerShellCommandPort, options: Cs2ClientListenerOptions = {}) {
@@ -38,5 +40,17 @@ export class Cs2ClientListenerService implements Cs2ClientListenerSdk {
 
   subscribeTickFrames(listener: (frame: TickFrame) => void): () => void {
     return this.engine.subscribeTickFrames(listener);
+  }
+
+  isRunning(): boolean {
+    return this.engine.isRunning();
+  }
+
+  getGatewayDiagnostics() {
+    return this.engine.getGatewayDiagnostics();
+  }
+
+  ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void> {
+    return this.engine.ensurePresentMonBootstrap(options);
   }
 }

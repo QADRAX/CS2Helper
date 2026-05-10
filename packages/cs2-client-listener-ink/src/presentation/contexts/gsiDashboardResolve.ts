@@ -1,5 +1,8 @@
 import type { GsiProcessorState, WatcherProvider } from "@cs2helper/gsi-processor";
-import type { GsiGatewayDiagnosticsView, GsiProcessorStatusLabels } from "../components/molecules/gsiProcessorStatusBox.types";
+import type {
+  Cs2ClientListenerDashboardLabels,
+  GsiGatewayDiagnosticsView,
+} from "../components/molecules/cs2ClientListenerDashboard.types";
 import { formatGsiProviderClockHuman, formatGsiProviderNameAppVersionLine } from "../utils/formatGsiProvider";
 import {
   formatHudPovLine,
@@ -20,7 +23,7 @@ import type {
 export interface GsiDashboardResolveContext {
   gsiState: Readonly<GsiProcessorState> | null;
   gatewayDiagnostics: GsiGatewayDiagnosticsView;
-  labels: GsiProcessorStatusLabels;
+  labels: Cs2ClientListenerDashboardLabels;
   formatTimestamp: (timestamp: number) => string;
   providerTimeLocale?: Intl.LocalesArgument;
   payload: unknown | null;
@@ -47,7 +50,7 @@ function resolveGatewayScalar(key: GsiDashboardGatewayKey, gateway: GsiGatewayDi
 }
 
 function resolveComputed(id: GsiDashboardComputedBindingId, ctx: GsiDashboardResolveContext): unknown {
-  const { gsiState, labels, payload, provider, formatTimestamp, providerTimeLocale } = ctx;
+  const { gsiState, labels, payload, provider } = ctx;
   switch (id) {
     case "lastGameStateAvailability":
       return payload ? labels.valueAvailable : labels.valueNull;
@@ -88,7 +91,7 @@ function resolveBindingRaw(binding: GsiDashboardDataBinding, ctx: GsiDashboardRe
 function applyPresent(
   present: GsiDashboardPresentKind,
   raw: unknown,
-  labels: GsiProcessorStatusLabels,
+  labels: Cs2ClientListenerDashboardLabels,
   formatTimestamp: (timestamp: number) => string,
   providerTimeLocale: Intl.LocalesArgument | undefined
 ): string {

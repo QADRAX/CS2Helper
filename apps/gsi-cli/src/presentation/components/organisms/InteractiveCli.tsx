@@ -20,7 +20,7 @@ import {
   selectCs2Tracking,
   selectGatewayDiagnostics,
   selectGatewayWarning,
-  selectGsiState,
+  selectLastClientTickFrame,
   selectInteractiveConfigDraft,
   selectInteractiveConfigCursor,
   selectInteractiveMode,
@@ -57,7 +57,7 @@ export function InteractiveCli() {
   const errorDisplay = useAppSelector(selectUiErrorDisplay);
   const gatewayDiagnostics = useAppSelector(selectGatewayDiagnostics);
   const gatewayWarning = useAppSelector(selectGatewayWarning);
-  const gsiState = useAppSelector(selectGsiState);
+  const lastClientTickFrame = useAppSelector(selectLastClientTickFrame);
   const notifications = useAppSelector(selectNotifications);
   const config = useAppSelector(selectCliConfig);
 
@@ -84,7 +84,7 @@ export function InteractiveCli() {
     config.gsiThrottleSec,
     config.gsiHeartbeatSec,
     config.locale,
-    config.autoRecordRawGsiOnStart,
+    config.autoRecordClientTicksOnStart,
     dispatch,
   ]);
 
@@ -104,7 +104,7 @@ export function InteractiveCli() {
         port: parsedPort,
         gsiThrottleSec: parsedThrottle,
         gsiHeartbeatSec: parsedHeartbeat,
-        autoRecordRawGsiOnStart: draft.autoRecordRawGsiOnStart,
+        autoRecordClientTicksOnStart: draft.autoRecordClientTicksOnStart,
         locale: draft.locale,
       })
     );
@@ -168,7 +168,7 @@ export function InteractiveCli() {
       gatewaySlot={
         gatewayOnline ? (
           <GatewayContentBox
-            gsiState={gsiState}
+            tickFrame={lastClientTickFrame}
             gatewayDiagnostics={gatewayDiagnostics}
             cs2Running={cs2Tracking.running}
             gatewayWarning={gatewayWarning}

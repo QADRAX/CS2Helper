@@ -1,29 +1,18 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
-import type { GatewayPort } from "../ports/GatewayPort";
-import type { RecorderPort } from "../ports/RecorderPort";
+import type { Cs2ClientListenerCliPort } from "../ports/Cs2ClientListenerCliPort";
 
 /**
- * Begins recording raw CS2 GSI payloads to a file.
- * Each tick is the unprocessed JSON body sent by CS2 via HTTP POST.
+ * Begins JSONL recording of {@link TickFrame} lines via the client listener tick hub.
  *
- * Ports tuple order: `[gateway, recorder]`.
+ * Ports tuple order: `[listener]`.
  */
-export const startRecording: AsyncUseCase<
-  [GatewayPort, RecorderPort],
-  [filename: string],
-  void
-> = async ([gateway, recorder], filename) => {
-  if (!gateway.isRunning()) {
-    throw new Error("Cannot start recording: GSI Gateway is not running.");
+export const startRecording: AsyncUseCase<[Cs2ClientListenerCliPort], [filename: string], void> = async (
+  [listener],
+  filename
+) => {
+  if (!listener.isRunning()) {
+    throw new Error("Cannot start recording: CS2 client listener is not running.");
   }
 
-  await recorder.open(filename);
-
-  const unsub = gateway.subscribeRawTicks((raw) => {
-    recorder.writeTick(raw).catch(() => {});
-  });
-
-  if (unsub) {
-    recorder.setUnsubscribe(unsub);
-  }
+  listener.startRecording(filename);
 };

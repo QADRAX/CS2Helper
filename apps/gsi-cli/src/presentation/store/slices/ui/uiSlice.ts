@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
+import type { TickFrame } from "@cs2helper/cs2-client-listener";
 import type { GatewayDiagnostics } from "../../../../application/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
 import { msgKeys } from "../../../i18n/msgKeys";
@@ -23,8 +23,8 @@ const uiSlice = createSlice({
   name: "ui",
   initialState: uiInitialState,
   reducers: {
-    gsiStateUpdated: (state, action: PayloadAction<Readonly<GsiProcessorState> | null>) => {
-      state.gsiState = action.payload;
+    clientListenerTickFrameUpdated: (state, action: PayloadAction<TickFrame | null>) => {
+      state.lastClientTickFrame = action.payload;
     },
     gatewayDiagnosticsUpdated: (state, action: PayloadAction<GatewayDiagnostics>) => {
       state.gatewayDiagnostics = action.payload;
@@ -68,6 +68,8 @@ const uiSlice = createSlice({
         state.port = action.payload.port;
         state.error = undefined;
         state.gatewayWarning = action.payload.gsiWarning;
+        state.lastClientTickFrame = null;
+        state.cs2Tracking = { running: false };
       })
       .addCase(startGateway.rejected, (state, action) => {
         state.status = "ERROR";
@@ -81,6 +83,7 @@ const uiSlice = createSlice({
         state.port = undefined;
         state.gatewayWarning = undefined;
         state.gatewayDiagnostics = { receivedRequests: 0, rejectedRequests: 0 };
+        state.lastClientTickFrame = null;
       })
       .addCase(saveCliConfig.fulfilled, (state, action) => {
         state.config = action.payload;
@@ -142,7 +145,7 @@ const uiSlice = createSlice({
 });
 
 export const {
-  gsiStateUpdated,
+  clientListenerTickFrameUpdated,
   gatewayDiagnosticsUpdated,
   setUiError,
   clearError,

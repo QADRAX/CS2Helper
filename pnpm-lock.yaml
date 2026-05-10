@@ -47,15 +47,21 @@ importers:
       '@cs2helper/cli-common':
         specifier: workspace:*
         version: link:../../packages/cli-common
+      '@cs2helper/cs2-client-listener':
+        specifier: workspace:*
+        version: link:../../packages/cs2-client-listener
+      '@cs2helper/cs2-client-listener-ink':
+        specifier: workspace:*
+        version: link:../../packages/cs2-client-listener-ink
       '@cs2helper/gsi-processor':
         specifier: workspace:*
         version: link:../../packages/gsi-processor
-      '@cs2helper/gsi-processor-ink':
-        specifier: workspace:*
-        version: link:../../packages/gsi-processor-ink
       '@cs2helper/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@cs2helper/tick-hub':
+        specifier: workspace:*
+        version: link:../../packages/tick-hub
       ink:
         specifier: ^4.4.1
         version: 4.4.1(@types/react@18.3.28)(react@18.3.1)
@@ -84,15 +90,15 @@ importers:
       '@cs2helper/cli-common':
         specifier: workspace:*
         version: link:../../packages/cli-common
-      '@cs2helper/gsi-gateway':
+      '@cs2helper/cs2-client-listener':
         specifier: workspace:*
-        version: link:../../packages/gsi-gateway
+        version: link:../../packages/cs2-client-listener
+      '@cs2helper/cs2-client-listener-ink':
+        specifier: workspace:*
+        version: link:../../packages/cs2-client-listener-ink
       '@cs2helper/gsi-processor':
         specifier: workspace:*
         version: link:../../packages/gsi-processor
-      '@cs2helper/gsi-processor-ink':
-        specifier: workspace:*
-        version: link:../../packages/gsi-processor-ink
       '@cs2helper/performance-processor':
         specifier: workspace:*
         version: link:../../packages/performance-processor
@@ -205,6 +211,31 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5(@types/node@24.12.3)(@vitest/coverage-v8@4.1.5)(vite@8.0.11(@types/node@24.12.3)(esbuild@0.27.7)(tsx@4.21.0))
 
+  packages/cs2-client-listener-ink:
+    dependencies:
+      '@cs2helper/cs2-client-listener':
+        specifier: workspace:*
+        version: link:../cs2-client-listener
+      '@cs2helper/gsi-processor':
+        specifier: workspace:*
+        version: link:../gsi-processor
+      '@cs2helper/tick-hub':
+        specifier: workspace:*
+        version: link:../tick-hub
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      ink:
+        specifier: ^4.4.1
+        version: 4.4.1(@types/react@18.3.28)(react@18.3.1)
+      vite:
+        specifier: ^8.0.10
+        version: 8.0.11(@types/node@24.12.3)(esbuild@0.27.7)(tsx@4.21.0)
+
   packages/gsi-gateway:
     dependencies:
       '@cs2helper/gsi-processor':
@@ -219,25 +250,6 @@ importers:
       '@cs2helper/shared':
         specifier: workspace:*
         version: link:../shared
-
-  packages/gsi-processor-ink:
-    dependencies:
-      '@cs2helper/gsi-processor':
-        specifier: workspace:*
-        version: link:../gsi-processor
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.0
-        version: 18.3.28
-      ink:
-        specifier: ^4.4.1
-        version: 4.4.1(@types/react@18.3.28)(react@18.3.1)
-      vite:
-        specifier: ^8.0.10
-        version: 8.0.11(@types/node@24.12.3)(esbuild@0.27.7)(tsx@4.21.0)
 
   packages/performance-processor:
     dependencies:

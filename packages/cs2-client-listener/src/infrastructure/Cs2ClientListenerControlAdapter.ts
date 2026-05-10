@@ -1,3 +1,4 @@
+import type { GsiGatewayOptions } from "@cs2helper/gsi-gateway";
 import type { Cs2ClientListenerControlPort } from "../application/ports/Cs2ClientListenerControlPort";
 import type { Cs2ClientListenerStartResult } from "../domain/cs2ClientListenerStartResult";
 import type { Cs2ClientListenerEngine } from "./Cs2ClientListenerEngine";
@@ -13,8 +14,8 @@ export class Cs2ClientListenerControlAdapter implements Cs2ClientListenerControl
     return this.engine.isRunning();
   }
 
-  enterRunningMode(): Promise<Cs2ClientListenerStartResult> {
-    return this.engine.enterRunningMode();
+  enterRunningMode(gatewayOptions?: GsiGatewayOptions): Promise<Cs2ClientListenerStartResult> {
+    return this.engine.enterRunningMode(gatewayOptions);
   }
 
   exitRunningMode(): Promise<void> {

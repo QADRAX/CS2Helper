@@ -8,3 +8,11 @@ export interface Cs2TickMasterData {
   readonly state: Readonly<GsiProcessorState>;
   readonly raw: string;
 }
+
+export function isCs2TickMasterData(value: unknown): value is Cs2TickMasterData {
+  if (value === null || typeof value !== "object") {
+    return false;
+  }
+  const o = value as Record<string, unknown>;
+  return typeof o.raw === "string" && o.state !== undefined && typeof o.state === "object";
+}

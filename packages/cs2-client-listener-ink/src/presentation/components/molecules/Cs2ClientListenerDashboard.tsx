@@ -1,4 +1,6 @@
 import { Box } from "ink";
+import { useMemo } from "react";
+import { isCs2TickMasterData } from "@cs2helper/cs2-client-listener";
 import { GsiDashboardProvider } from "../../contexts/gsiDashboardContext";
 import {
   GsiDashboardChromeSection,
@@ -6,13 +8,13 @@ import {
   GsiDashboardProcessingSection,
   GsiDashboardTabsSection,
 } from "./gsiDashboardSections";
-import type { GsiProcessorStatusBoxProps } from "./gsiProcessorStatusBox.types";
+import type { Cs2ClientListenerDashboardProps } from "./cs2ClientListenerDashboard.types";
 import { defaultFormatProcessorTimestamp } from "../../utils/gsiStatusDashboardFormat";
 
-/** Displays the current GSI processor stream, gateway, and payload summary. */
-export function GsiProcessorStatusBox(props: GsiProcessorStatusBoxProps) {
+/** Displays GSI processor stream, gateway counters, and payload summary from a {@link TickFrame} stream. */
+export function Cs2ClientListenerDashboard(props: Cs2ClientListenerDashboardProps) {
   const {
-    gsiState,
+    tickFrame,
     gatewayDiagnostics,
     cs2Running,
     labels,
@@ -20,6 +22,13 @@ export function GsiProcessorStatusBox(props: GsiProcessorStatusBoxProps) {
     formatTimestamp = defaultFormatProcessorTimestamp,
     providerTimeLocale,
   } = props;
+
+  const gsiState = useMemo(() => {
+    if (!tickFrame) {
+      return null;
+    }
+    return isCs2TickMasterData(tickFrame.master) ? tickFrame.master.state : null;
+  }, [tickFrame]);
 
   return (
     <GsiDashboardProvider

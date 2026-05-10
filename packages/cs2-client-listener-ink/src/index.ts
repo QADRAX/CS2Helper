@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Ink components for displaying CS2 GSI processor state.
+ * Ink dashboard for CS2 client listener tick streams (GSI + aligned sources).
  */
 
 export * from "./presentation/contexts";

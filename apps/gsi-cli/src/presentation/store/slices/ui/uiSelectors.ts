@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
-import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
+import type { TickFrame } from "@cs2helper/cs2-client-listener";
 import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
 import type { SteamWebApiUiSlice } from "./types";
 import type { CliConfig } from "../../../../domain/cli/config";
@@ -49,8 +49,8 @@ export const selectUiErrorDisplay = createSelector(
   }
 );
 
-export function selectGsiState(state: RootState): Readonly<GsiProcessorState> | null {
-  return state.ui.gsiState;
+export function selectLastClientTickFrame(state: RootState): TickFrame | null {
+  return state.ui.lastClientTickFrame;
 }
 
 export function selectGatewayDiagnostics(state: RootState): GatewayDiagnostics {

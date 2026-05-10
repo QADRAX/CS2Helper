@@ -1,5 +1,5 @@
-import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
+import type { TickFrame } from "@cs2helper/cs2-client-listener";
 import type { GatewayDiagnostics } from "../../../../application/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
 import type { CliStatus } from "../../../../domain/cli";
@@ -34,7 +34,7 @@ export interface UiState {
   status: CliStatus;
   error?: UiErrorDescriptor;
   gatewayWarning?: string;
-  gsiState: Readonly<GsiProcessorState> | null;
+  lastClientTickFrame: TickFrame | null;
   gatewayDiagnostics: GatewayDiagnostics;
   port?: number;
   recordingPath?: string;
@@ -54,7 +54,7 @@ const steamStatusInitial: SteamStatus = {
 
 export const uiInitialState: UiState = {
   status: "IDLE",
-  gsiState: null,
+  lastClientTickFrame: null,
   gatewayDiagnostics: { receivedRequests: 0, rejectedRequests: 0 },
   config: {},
   cs2Tracking: cs2TrackingInitial,

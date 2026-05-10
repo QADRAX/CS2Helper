@@ -1,3 +1,4 @@
+import type { GsiGatewayOptions } from "@cs2helper/gsi-gateway";
 import type { Cs2ClientListenerStartResult } from "../../domain";
 
 /**
@@ -5,6 +6,6 @@ import type { Cs2ClientListenerStartResult } from "../../domain";
  */
 export interface Cs2ClientListenerControlPort {
   isRunning(): boolean;
-  enterRunningMode(): Promise<Cs2ClientListenerStartResult>;
+  enterRunningMode(gatewayOptions?: GsiGatewayOptions): Promise<Cs2ClientListenerStartResult>;
   exitRunningMode(): Promise<void>;
 }

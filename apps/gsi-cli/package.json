@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "@cs2helper/cli-common": "workspace:*",
-    "@cs2helper/gsi-gateway": "workspace:*",
+    "@cs2helper/cs2-client-listener": "workspace:*",
+    "@cs2helper/cs2-client-listener-ink": "workspace:*",
     "@cs2helper/gsi-processor": "workspace:*",
-    "@cs2helper/gsi-processor-ink": "workspace:*",
     "@cs2helper/performance-processor": "workspace:*",
     "@cs2helper/shared": "workspace:*",
     "@node-steam/vdf": "^2.2.0",

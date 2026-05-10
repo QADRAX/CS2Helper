@@ -1,7 +1,7 @@
 {
-  "name": "@cs2helper/gsi-processor-ink",
+  "name": "@cs2helper/cs2-client-listener-ink",
   "version": "1.0.0",
-  "description": "Ink presentation components for CS2 GSI processor state.",
+  "description": "Ink dashboard for CS2 client listener tick streams (GSI + aligned telemetry).",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -11,7 +11,9 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@cs2helper/gsi-processor": "workspace:*"
+    "@cs2helper/cs2-client-listener": "workspace:*",
+    "@cs2helper/gsi-processor": "workspace:*",
+    "@cs2helper/tick-hub": "workspace:*"
   },
   "peerDependencies": {
     "ink": "^4.4.1",

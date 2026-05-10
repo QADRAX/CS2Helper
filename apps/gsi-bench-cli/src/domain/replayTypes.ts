@@ -1,4 +1,5 @@
 import type { GsiProcessorEvent, GsiProcessorState } from "@cs2helper/gsi-processor";
+import type { TickFrame } from "@cs2helper/tick-hub";
 import type { GsiRecordFile, GsiRecordParseError } from "./recordTypes";
 
 /** Projection of processor state that makes timeline rows easy to inspect. */
@@ -30,6 +31,22 @@ export interface ReplayTimelineMetadata {
 export type ReplaySeekMode = "rebuild" | "coldStart";
 export type ReplaySpeed = 1 | 2;
 
+/** Full replay result for a selected record. */
+export interface ReplayResult {
+  record: GsiRecordFile;
+  processedTicks: number;
+  parseErrors: readonly GsiRecordParseError[];
+  steps: readonly ReplayStep[];
+  events: readonly GsiProcessorEvent[];
+  initialState: Readonly<GsiProcessorState>;
+  stateByTick: readonly Readonly<GsiProcessorState>[];
+  /** Original tick frames from the recording (same order as processing). */
+  tickFrames: readonly TickFrame[];
+  coldStartStateBySecond: Readonly<Record<number, Readonly<GsiProcessorState>>>;
+  timeline: ReplayTimelineMetadata;
+  finalState: Readonly<GsiProcessorState>;
+}
+
 /** Runtime playback session state for the interactive bench player. */
 export interface ReplayPlaybackSession {
   replay: ReplayResult;
@@ -40,18 +57,4 @@ export interface ReplayPlaybackSession {
   currentTickIndex: number;
   elapsedMs: number;
   state: Readonly<GsiProcessorState>;
-}
-
-/** Full replay result for a selected record. */
-export interface ReplayResult {
-  record: GsiRecordFile;
-  processedTicks: number;
-  parseErrors: readonly GsiRecordParseError[];
-  steps: readonly ReplayStep[];
-  events: readonly GsiProcessorEvent[];
-  initialState: Readonly<GsiProcessorState>;
-  stateByTick: readonly Readonly<GsiProcessorState>[];
-  coldStartStateBySecond: Readonly<Record<number, Readonly<GsiProcessorState>>>;
-  timeline: ReplayTimelineMetadata;
-  finalState: Readonly<GsiProcessorState>;
 }

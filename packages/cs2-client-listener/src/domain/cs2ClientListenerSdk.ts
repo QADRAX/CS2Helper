@@ -1,3 +1,5 @@
+import type { GsiGatewayDiagnostics, GsiGatewayOptions } from "@cs2helper/gsi-gateway";
+import type { PresentMonBootstrapOptions } from "@cs2helper/performance-processor";
 import type { TickFrame } from "@cs2helper/tick-hub";
 import type { Cs2ClientListenerStartResult } from "./cs2ClientListenerStartResult";
 
@@ -6,8 +8,11 @@ import type { Cs2ClientListenerStartResult } from "./cs2ClientListenerStartResul
  * Lifecycle and recording are expressed with domain types — not application ports.
  */
 export interface Cs2ClientListenerSdk {
-  readonly start: () => Promise<Cs2ClientListenerStartResult>;
+  readonly start: (gatewayOptions?: GsiGatewayOptions) => Promise<Cs2ClientListenerStartResult>;
   readonly stop: () => Promise<void>;
+  isRunning(): boolean;
+  getGatewayDiagnostics(): Readonly<GsiGatewayDiagnostics>;
+  ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void>;
   subscribeTickFrames(listener: (frame: TickFrame) => void): () => void;
   /** JSONL recording; delegates to the inner {@link TickHub}. */
   startRecording(filePath: string): void;

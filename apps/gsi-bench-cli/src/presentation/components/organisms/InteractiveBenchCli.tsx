@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Text, useApp, useInput } from "ink";
+import { isCs2TickMasterData } from "@cs2helper/cs2-client-listener";
 import {
-  GsiProcessorStatusBox,
-  type GsiProcessorStatusLabels,
-} from "@cs2helper/gsi-processor-ink";
+  Cs2ClientListenerDashboard,
+  type Cs2ClientListenerDashboardLabels,
+} from "@cs2helper/cs2-client-listener-ink";
 import type { BenchCliApp } from "../../../application";
 import type { GsiRecordFile, ReplayPlaybackSession, ReplayResult } from "../../../domain";
 import { MenuOptionLine } from "../atoms";
@@ -14,8 +15,8 @@ interface InteractiveBenchCliProps {
   benchApp: BenchCliApp;
 }
 
-const labels: GsiProcessorStatusLabels = {
-  title: "GSI processor demo",
+const labels: Cs2ClientListenerDashboardLabels = {
+  title: "CS2 client listener replay",
   warningPrefix: "Warning:",
   spinner: (frame) => `${frame} Waiting for replay data...`,
   tabProcessing: "Processing",
@@ -274,6 +275,20 @@ function ReplayPlayer({
     ? 100
     : Math.round((session.currentSecond / result.timeline.durationSeconds) * 100);
 
+  const dashboardTickFrame = useMemo(() => {
+    if (session.currentTickIndex < 0) {
+      return null;
+    }
+    const stored = result.tickFrames[session.currentTickIndex];
+    if (!stored || !isCs2TickMasterData(stored.master)) {
+      return null;
+    }
+    return {
+      ...stored,
+      master: { raw: stored.master.raw, state: session.state },
+    };
+  }, [result.tickFrames, session.currentTickIndex, session.state]);
+
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text bold>{result.record.name}</Text>
@@ -285,8 +300,8 @@ function ReplayPlayer({
       {isSeekInputActive ? (
         <Text color="yellow">Seek second (enter confirm, esc cancel): {seekInput || "_"}</Text>
       ) : null}
-      <GsiProcessorStatusBox
-        gsiState={session.state}
+      <Cs2ClientListenerDashboard
+        tickFrame={dashboardTickFrame}
         gatewayDiagnostics={{
           receivedRequests: visibleSteps.length,
           rejectedRequests: result.parseErrors.length,

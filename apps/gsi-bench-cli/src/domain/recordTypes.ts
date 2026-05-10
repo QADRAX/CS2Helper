@@ -1,4 +1,4 @@
-import type { CS2GameState } from "@cs2helper/gsi-processor";
+import type { TickFrame } from "@cs2helper/tick-hub";
 
 /** Raw GSI record file discovered in the shared recordings folder. */
 export interface GsiRecordFile {
@@ -9,14 +9,14 @@ export interface GsiRecordFile {
   modifiedAt: number;
 }
 
-/** Parsed NDJSON frame from one recorded raw GSI payload line. */
+/** Parsed JSONL line: one {@link TickFrame} from cs2-client-listener recording. */
 export interface GsiRecordFrame {
   lineNumber: number;
   raw: string;
-  tick: CS2GameState;
+  tick: TickFrame;
 }
 
-/** Parse error for one invalid NDJSON record line. */
+/** Parse error for one invalid record line. */
 export interface GsiRecordParseError {
   lineNumber: number;
   raw: string;

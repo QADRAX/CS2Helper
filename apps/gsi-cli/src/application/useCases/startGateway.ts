@@ -1,25 +1,25 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
-import type { GatewayPort, GatewayStartInfo } from "../ports/GatewayPort";
+import type { GatewayStartInfo } from "../ports/GatewayPort";
 import type { ConfigPort } from "../ports/ConfigPort";
+import type { Cs2ClientListenerCliPort } from "../ports/Cs2ClientListenerCliPort";
 import type { Cs2InstallLocatorPort } from "../ports/Cs2InstallLocatorPort";
 import type { GsiConfigFilePort } from "../ports/GsiConfigFilePort";
-import type { RecorderPort } from "../ports/RecorderPort";
 import { buildRecordingFilePath } from "../../infrastructure/adapters/appDataPaths";
 import { startRecording } from "./startRecording";
 import { verifyGsiConfig } from "./verifyGsiConfig";
 
 /**
- * Initializes and starts the GSI Gateway service.
+ * Initializes and starts the CS2 client listener (GSI gateway + aligned performance + tick hub).
  *
- * Ports tuple order: `[gateway, config, cs2Install, gsiConfigFile, recorder]`.
+ * Ports tuple order: `[listener, config, cs2Install, gsiConfigFile]`.
  */
 export const startGateway: AsyncUseCase<
-  [GatewayPort, ConfigPort, Cs2InstallLocatorPort, GsiConfigFilePort, RecorderPort],
+  [Cs2ClientListenerCliPort, ConfigPort, Cs2InstallLocatorPort, GsiConfigFilePort],
   [],
   GatewayStartInfo
-> = async ([gateway, config, cs2Install, gsiConfigFile, recorder]) => {
-  if (gateway.isRunning()) {
-    await gateway.stop();
+> = async ([listener, config, cs2Install, gsiConfigFile]) => {
+  if (listener.isRunning()) {
+    await listener.stop();
   }
 
   let gsiWarning: string | undefined;
@@ -32,9 +32,9 @@ export const startGateway: AsyncUseCase<
   }
 
   const currentConfig = await config.getConfig();
-  const startInfo = await gateway.start({ port: currentConfig.port });
-  if (currentConfig.autoRecordRawGsiOnStart) {
-    await startRecording([gateway, recorder], buildRecordingFilePath());
+  const startInfo = await listener.start({ port: currentConfig.port });
+  if (currentConfig.autoRecordClientTicksOnStart) {
+    await startRecording([listener], buildRecordingFilePath());
   }
-  return { ...startInfo, gsiWarning };
+  return { port: startInfo.gatewayPort, gsiWarning };
 };

@@ -50,7 +50,8 @@ const cliSessionSlice = createSlice({
       Object.assign(state.configDraft, action.payload);
     },
     configDraftAutoRecordToggled: (state) => {
-      state.configDraft.autoRecordRawGsiOnStart = !state.configDraft.autoRecordRawGsiOnStart;
+      state.configDraft.autoRecordClientTicksOnStart =
+        !state.configDraft.autoRecordClientTicksOnStart;
     },
     configDraftLocaleToggled: (state) => {
       state.configDraft.locale = state.configDraft.locale === "en" ? "es" : "en";

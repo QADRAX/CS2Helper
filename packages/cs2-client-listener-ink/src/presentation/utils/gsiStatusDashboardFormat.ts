@@ -1,5 +1,5 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import type { GsiProcessorStatusLabels } from "../components/molecules/gsiProcessorStatusBox.types";
+import type { Cs2ClientListenerDashboardLabels } from "../components/molecules/cs2ClientListenerDashboard.types";
 
 export function formatMatchSummaryLine(gsiState: Readonly<GsiProcessorState> | null): string {
   const map = gsiState?.lastSnapshot?.map;
@@ -22,7 +22,7 @@ export function formatHudPovLine(gsiState: Readonly<GsiProcessorState> | null): 
 }
 
 export function watcherModeDisplayValue(
-  labels: GsiProcessorStatusLabels,
+  labels: Cs2ClientListenerDashboardLabels,
   mode: string | null | undefined
 ): string {
   if (mode == null || mode === "") {

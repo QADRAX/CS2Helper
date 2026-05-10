@@ -1,24 +1,27 @@
-import { GsiProcessorStatusBox, type GsiProcessorStatusLabels } from "@cs2helper/gsi-processor-ink";
-import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import {
+  Cs2ClientListenerDashboard,
+  type Cs2ClientListenerDashboardLabels,
+} from "@cs2helper/cs2-client-listener-ink";
+import type { TickFrame } from "@cs2helper/cs2-client-listener";
 import type { GatewayDiagnostics } from "../../../application/ports/GatewayPort";
 import { msgKeys } from "../../i18n/msgKeys";
 import { useTranslation } from "../../i18n/useTranslation";
 
 interface GatewayContentBoxProps {
-  gsiState: Readonly<GsiProcessorState> | null;
+  tickFrame: TickFrame | null;
   gatewayDiagnostics: GatewayDiagnostics;
   cs2Running: boolean;
   gatewayWarning?: string;
 }
 
 export function GatewayContentBox({
-  gsiState,
+  tickFrame,
   gatewayDiagnostics,
   cs2Running,
   gatewayWarning,
 }: GatewayContentBoxProps) {
   const { t, locale } = useTranslation();
-  const labels: GsiProcessorStatusLabels = {
+  const labels: Cs2ClientListenerDashboardLabels = {
     title: t(msgKeys.cli.gateway.title),
     warningPrefix: t(msgKeys.cli.gateway.warningPrefix),
     spinner: (frame) => t(msgKeys.cli.gateway.spinner, { frame }),
@@ -51,8 +54,8 @@ export function GatewayContentBox({
   };
 
   return (
-    <GsiProcessorStatusBox
-      gsiState={gsiState}
+    <Cs2ClientListenerDashboard
+      tickFrame={tickFrame}
       gatewayDiagnostics={gatewayDiagnostics}
       cs2Running={cs2Running}
       gatewayWarning={gatewayWarning}

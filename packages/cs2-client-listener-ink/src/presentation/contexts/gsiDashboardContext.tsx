@@ -2,14 +2,21 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { useInput } from "ink";
 import { buildGsiDashboardContextValue } from "./gsiDashboardSelectors";
 import type { GsiDashboardContextValue, GsiDashboardTabIndex } from "./gsiDashboardTypes";
-import type { GsiProcessorStatusBoxProps } from "../components/molecules/gsiProcessorStatusBox.types";
+import type { Cs2ClientListenerDashboardLabels } from "../components/molecules/cs2ClientListenerDashboard.types";
 import { defaultFormatProcessorTimestamp } from "../utils/gsiStatusDashboardFormat";
 
 const GsiDashboardContext = createContext<GsiDashboardContextValue | null>(null);
 
-export type GsiDashboardProviderProps = GsiProcessorStatusBoxProps & {
+export interface GsiDashboardProviderProps {
   children: ReactNode;
-};
+  gsiState: GsiDashboardContextValue["gsiState"];
+  gatewayDiagnostics: GsiDashboardContextValue["gatewayDiagnostics"];
+  cs2Running: boolean;
+  labels: Cs2ClientListenerDashboardLabels;
+  gatewayWarning?: string;
+  formatTimestamp?: (timestamp: number) => string;
+  providerTimeLocale?: Intl.LocalesArgument;
+}
 
 /** Holds memoised dashboard view-model + tab navigation for GSI processor Ink UI. */
 export function GsiDashboardProvider({

@@ -1,4 +1,4 @@
-import { Box, Text } from "ink";
+import { Box } from "ink";
 import TextInput from "ink-text-input";
 import { MenuFootnote } from "../atoms/MenuFootnote";
 import { MenuHeading } from "../atoms/MenuHeading";
@@ -53,7 +53,7 @@ export function ConfigEditor() {
         </Box>
         <MenuOptionLine label={`${t(msgKeys.cli.config.locale)} ${localeLabel}`} focused={configCursor === 3} />
         <MenuOptionLine
-          label={`${t(msgKeys.cli.config.autoRecord)} ${draft.autoRecordRawGsiOnStart ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
+          label={`${t(msgKeys.cli.config.autoRecord)} ${draft.autoRecordClientTicksOnStart ? t(msgKeys.cli.config.true) : t(msgKeys.cli.config.false)}`}
           focused={configCursor === 4}
         />
         <Box flexDirection="column" marginTop={1}>

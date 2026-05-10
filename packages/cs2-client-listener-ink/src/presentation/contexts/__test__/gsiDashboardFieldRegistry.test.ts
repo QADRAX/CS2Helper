@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { GsiProcessorStatusLabels } from "../../components/molecules/gsiProcessorStatusBox.types";
+import type { Cs2ClientListenerDashboardLabels } from "../../components/molecules/cs2ClientListenerDashboard.types";
 import { GSI_DASHBOARD_ALL_FIELDS } from "../gsiDashboardFieldRegistry";
 
-/** Minimal stub; `satisfies` ensures every `keyof GsiProcessorStatusLabels` is present. */
+/** Minimal stub; `satisfies` ensures every `keyof Cs2ClientListenerDashboardLabels` is present. */
 const labelStub = {
   title: "t",
   warningPrefix: "w",
@@ -33,10 +33,10 @@ const labelStub = {
   playerHudControlLocal: "phcl",
   playerHudControlSpectate: "phcs",
   playerHudPov: "php",
-} satisfies GsiProcessorStatusLabels;
+} satisfies Cs2ClientListenerDashboardLabels;
 
 describe("gsiDashboardFieldRegistry", () => {
-  it("each registry entry maps to a label slot on GsiProcessorStatusLabels", () => {
+  it("each registry entry maps to a label slot on Cs2ClientListenerDashboardLabels", () => {
     const seen = new Set<string>();
     for (const field of GSI_DASHBOARD_ALL_FIELDS) {
       expect(seen.has(field.id)).toBe(false);

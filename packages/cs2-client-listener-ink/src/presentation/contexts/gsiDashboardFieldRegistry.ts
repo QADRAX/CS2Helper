@@ -1,7 +1,7 @@
-import type { GsiProcessorStatusLabels } from "../components/molecules/gsiProcessorStatusBox.types";
+import type { Cs2ClientListenerDashboardLabels } from "../components/molecules/cs2ClientListenerDashboard.types";
 
 /** Label slots that render as column headers (excludes `spinner`, which is a formatter function). */
-export type GsiDashboardLabelKey = Exclude<keyof GsiProcessorStatusLabels, "spinner">;
+export type GsiDashboardLabelKey = Exclude<keyof Cs2ClientListenerDashboardLabels, "spinner">;
 
 /** Dashboard tab strip (Processing vs Game state). */
 export type GsiDashboardRegistryTab = "processing" | "gameState";
@@ -58,7 +58,7 @@ export type GsiDashboardPresentKind =
 
 /**
  * Single dashboard row definition: stable id, UI placement, label slot on
- * {@link GsiProcessorStatusLabels}, data binding, and presentation strategy.
+ * {@link Cs2ClientListenerDashboardLabels}, data binding, and presentation strategy.
  */
 export interface GsiDashboardFieldDefinition {
   /** Stable key for tests and documentation. */

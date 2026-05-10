@@ -1,9 +1,14 @@
-import { GsiGatewayService, type GsiGatewayOptions } from "@cs2helper/gsi-gateway";
+import {
+  GsiGatewayService,
+  type GsiGatewayDiagnostics,
+  type GsiGatewayOptions,
+} from "@cs2helper/gsi-gateway";
 import {
   PerformanceProcessorService,
   type Cs2ProcessTrackingAlignmentSubscription,
   type Cs2ProcessTrackingPollOptions,
   type Cs2ProcessTrackingSnapshot,
+  type PresentMonBootstrapOptions,
 } from "@cs2helper/performance-processor";
 import type { PowerShellCommandPort } from "@cs2helper/shared";
 import {
@@ -29,7 +34,7 @@ export interface Cs2ClientListenerOptions {
  */
 export class Cs2ClientListenerEngine {
   private gateway: GsiGatewayService | null = null;
-  private performance: PerformanceProcessorService | null = null;
+  private readonly performance: PerformanceProcessorService;
   private hub: TickHubService | null = null;
   private readonly sourcesPort = {
     getSources: () => this.buildSources(),
@@ -41,27 +46,41 @@ export class Cs2ClientListenerEngine {
   constructor(
     private readonly powershell: PowerShellCommandPort,
     private readonly options: Cs2ClientListenerOptions = {}
-  ) {}
+  ) {
+    this.performance = new PerformanceProcessorService({
+      powershell: this.powershell,
+      defaultSubscribeCs2ProcessTrackingOptions: this.options.performancePoll,
+    });
+  }
 
   isRunning(): boolean {
     return this.gateway !== null;
   }
 
-  async enterRunningMode(): Promise<Cs2ClientListenerStartResult> {
-    const gw = new GsiGatewayService(this.options.gateway ?? {});
+  getGatewayDiagnostics(): Readonly<GsiGatewayDiagnostics> {
+    if (!this.gateway) {
+      return { receivedRequests: 0, rejectedRequests: 0 };
+    }
+    return this.gateway.getDiagnostics();
+  }
+
+  ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void> {
+    return this.performance.ensurePresentMonBootstrap(options);
+  }
+
+  async enterRunningMode(gatewayOptions?: GsiGatewayOptions): Promise<Cs2ClientListenerStartResult> {
+    const gw = new GsiGatewayService({
+      ...(this.options.gateway ?? {}),
+      ...(gatewayOptions ?? {}),
+    });
     try {
       const { port } = await gw.start();
-      const perf = new PerformanceProcessorService({
-        powershell: this.powershell,
-        defaultSubscribeCs2ProcessTrackingOptions: this.options.performancePoll,
-      });
       const hub = new TickHubService(
         new GsiGatewayMasterClock(gw),
         this.sourcesPort,
         this.options.tickHub ?? {}
       );
       this.gateway = gw;
-      this.performance = perf;
       this.hub = hub;
       return { gatewayPort: port };
     } catch (err) {
@@ -83,13 +102,15 @@ export class Cs2ClientListenerEngine {
       await this.gateway.stop();
     }
     this.gateway = null;
-    this.performance = null;
     this.hub = null;
   }
 
   startRecording(filePath: string): void {
     this.requireRunning();
     this.hub!.startRecording(filePath);
+    if (!this.innerUnsub) {
+      this.attachTickPipeline(() => {});
+    }
   }
 
   async stopRecording(): Promise<void> {
@@ -105,15 +126,7 @@ export class Cs2ClientListenerEngine {
     this.perfSub?.unsubscribe();
     this.perfSub = null;
     this.lastPerf = undefined;
-
-    this.perfSub = this.performance!.subscribeCs2ProcessTrackingForAlignment(
-      (snapshot) => {
-        this.lastPerf = snapshot;
-      },
-      this.options.performancePoll
-    );
-
-    this.innerUnsub = this.hub!.subscribeTickFrames(listener);
+    this.attachTickPipeline(listener);
 
     return () => {
       this.innerUnsub?.();
@@ -123,8 +136,18 @@ export class Cs2ClientListenerEngine {
     };
   }
 
+  private attachTickPipeline(listener: (frame: TickFrame) => void): void {
+    this.perfSub = this.performance.subscribeCs2ProcessTrackingForAlignment(
+      (snapshot) => {
+        this.lastPerf = snapshot;
+      },
+      this.options.performancePoll
+    );
+    this.innerUnsub = this.hub!.subscribeTickFrames(listener);
+  }
+
   private requireRunning(): void {
-    if (!this.isRunning() || !this.hub || !this.performance) {
+    if (!this.isRunning() || !this.hub) {
       throw new Cs2ClientListenerNotRunningError();
     }
   }

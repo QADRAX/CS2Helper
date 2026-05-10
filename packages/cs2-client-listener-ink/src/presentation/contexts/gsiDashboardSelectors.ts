@@ -1,6 +1,6 @@
 import type { HotkeyTabDescriptor } from "../components/atoms/hotkeyTabStrip";
 import type { KeyValueRow } from "../components/atoms/gridRowList";
-import type { GsiProcessorStatusLabels } from "../components/molecules/gsiProcessorStatusBox.types";
+import type { Cs2ClientListenerDashboardLabels } from "../components/molecules/cs2ClientListenerDashboard.types";
 import {
   GSI_DASHBOARD_ALL_FIELDS,
   type GsiDashboardFieldDefinition,
@@ -18,7 +18,7 @@ import { resolveDashboardFieldValue, type GsiDashboardResolveContext } from "./g
 
 export type { GsiDashboardBuildInput } from "./gsiDashboardTypes";
 
-function selectHotkeyTabs(labels: GsiProcessorStatusLabels): readonly HotkeyTabDescriptor[] {
+function selectHotkeyTabs(labels: Cs2ClientListenerDashboardLabels): readonly HotkeyTabDescriptor[] {
   return [
     { hotkey: "7", label: labels.tabProcessing },
     { hotkey: "8", label: labels.tabGameState },
@@ -33,7 +33,7 @@ function matchesPlacement(
   return field.placement.tab === tab && field.placement.panel === panel;
 }
 
-function rowLabel(labels: Readonly<GsiProcessorStatusLabels>, key: GsiDashboardLabelKey): string {
+function rowLabel(labels: Readonly<Cs2ClientListenerDashboardLabels>, key: GsiDashboardLabelKey): string {
   return labels[key];
 }
 
@@ -41,7 +41,7 @@ function buildRowsFromRegistry(
   tab: GsiDashboardRegistryTab,
   panel: GsiDashboardRegistryPanel,
   resolveCtx: GsiDashboardResolveContext,
-  labels: GsiProcessorStatusLabels
+  labels: Cs2ClientListenerDashboardLabels
 ): KeyValueRow[] {
   return GSI_DASHBOARD_ALL_FIELDS.filter((f) => matchesPlacement(f, tab, panel)).map((field) => ({
     label: rowLabel(labels, field.labelKey),
@@ -51,7 +51,7 @@ function buildRowsFromRegistry(
 
 function buildGameStatePanel(
   resolveCtx: GsiDashboardResolveContext,
-  labels: GsiProcessorStatusLabels
+  labels: Cs2ClientListenerDashboardLabels
 ): GsiDashboardGameStatePanelModel {
   const mainRows = buildRowsFromRegistry("gameState", "main", resolveCtx, labels);
   const provider = resolveCtx.provider;

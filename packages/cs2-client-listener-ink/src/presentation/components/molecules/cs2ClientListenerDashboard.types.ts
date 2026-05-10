@@ -1,4 +1,4 @@
-import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import type { TickFrame } from "@cs2helper/tick-hub";
 
 /** Gateway counters displayed next to the processor state. */
 export interface GsiGatewayDiagnosticsView {
@@ -7,8 +7,8 @@ export interface GsiGatewayDiagnosticsView {
   lastRejectReason?: string;
 }
 
-/** Labels used by the terminal processor status component. */
-export interface GsiProcessorStatusLabels {
+/** Labels used by the CS2 client listener Ink dashboard. */
+export interface Cs2ClientListenerDashboardLabels {
   title: string;
   warningPrefix: string;
   spinner: (frame: string) => string;
@@ -42,12 +42,13 @@ export interface GsiProcessorStatusLabels {
   playerHudPov: string;
 }
 
-/** Props for the shared Ink GSI processor status panel. */
-export interface GsiProcessorStatusBoxProps {
-  gsiState: Readonly<GsiProcessorState> | null;
+/** Props for the shared Ink CS2 client listener dashboard (live or replayed ticks). */
+export interface Cs2ClientListenerDashboardProps {
+  /** Latest assembled tick (`TickFrame` from `@cs2helper/tick-hub` / `cs2-client-listener`). */
+  tickFrame: TickFrame | null;
   gatewayDiagnostics: GsiGatewayDiagnosticsView;
   cs2Running: boolean;
-  labels: GsiProcessorStatusLabels;
+  labels: Cs2ClientListenerDashboardLabels;
   gatewayWarning?: string;
   formatTimestamp?: (timestamp: number) => string;
   /** Passed to `Intl` when formatting `provider.timestamp` (GSI clock). */

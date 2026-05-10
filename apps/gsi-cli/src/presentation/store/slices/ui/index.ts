@@ -6,7 +6,7 @@ export {
   clearError,
   cs2TrackingUpdated,
   gatewayDiagnosticsUpdated,
-  gsiStateUpdated,
+  clientListenerTickFrameUpdated,
   setUiError,
   steamStatusUpdated,
   steamWebApiDisabled,

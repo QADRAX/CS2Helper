@@ -9,7 +9,9 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      external: ["@cs2helper/gsi-processor", "ink", "react", "react/jsx-runtime"],
+      // Keep workspace packages external so Node-only transitive deps (gateway, performance, etc.)
+      // are not walked for a "browser" bundle — avoids rolldown externalized-for-browser noise.
+      external: [/^@cs2helper\//, "ink", "react", "react/jsx-runtime"],
     },
     outDir: "dist",
     target: "node22",

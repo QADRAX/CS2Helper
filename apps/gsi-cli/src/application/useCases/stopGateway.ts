@@ -1,21 +1,14 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
-import type { GatewayPort } from "../ports/GatewayPort";
-import type { RecorderPort } from "../ports/RecorderPort";
-import { stopRecording } from "./stopRecording";
+import type { Cs2ClientListenerCliPort } from "../ports/Cs2ClientListenerCliPort";
 
 /**
- * Stops the currently active GSI Gateway service.
+ * Stops the CS2 client listener and any active tick recording.
  *
- * Ports tuple order: `[gateway, recorder]`.
+ * Ports tuple order: `[listener]`.
  */
-export const stopGateway: AsyncUseCase<[GatewayPort, RecorderPort], [], void> = async ([
-  gateway,
-  recorder,
-]) => {
-  if (recorder.isRecording()) {
-    await stopRecording([recorder]);
-  }
-  if (gateway.isRunning()) {
-    await gateway.stop();
+export const stopGateway: AsyncUseCase<[Cs2ClientListenerCliPort], [], void> = async ([listener]) => {
+  await listener.stopRecording();
+  if (listener.isRunning()) {
+    await listener.stop();
   }
 };

@@ -1,11 +1,11 @@
-import type { CS2GameState } from "@cs2helper/gsi-processor";
+import { TICK_HUB_SCHEMA_VERSION, type TickFrame } from "@cs2helper/tick-hub";
 import type { GsiRecordFrame, GsiRecordParseError, ReadRecordFramesResult } from "./recordTypes";
 
 /**
- * Parses the full text of one `.ndjson` record file into frames and parse errors.
- * Handles pretty-printed JSON split across multiple lines.
+ * Parses one client-listener `.jsonl` record file into {@link TickFrame} rows and parse errors.
+ * Handles pretty-printed JSON split across multiple lines (same framing as legacy NDJSON).
  */
-export function parseNdjsonRecordContents(contents: string): ReadRecordFramesResult {
+export function parseClientTickRecordContents(contents: string): ReadRecordFramesResult {
   const frames: GsiRecordFrame[] = [];
   const errors: GsiRecordParseError[] = [];
   let buffer = "";
@@ -45,11 +45,11 @@ function readBufferedFrame(
 
   try {
     const parsed = JSON.parse(trimmed) as unknown;
-    if (!isCs2GameState(parsed)) {
+    if (!isTickFrameRecord(parsed)) {
       errors.push({
         lineNumber,
         raw: trimmed,
-        message: "Invalid GSI payload JSON shape",
+        message: `Expected TickFrame with schemaVersion ${TICK_HUB_SCHEMA_VERSION}`,
       });
       return;
     }
@@ -62,6 +62,22 @@ function readBufferedFrame(
       message: error instanceof Error ? error.message : "Invalid JSON",
     });
   }
+}
+
+function isTickFrameRecord(value: unknown): value is TickFrame {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+  const o = value as Record<string, unknown>;
+  return (
+    o.schemaVersion === TICK_HUB_SCHEMA_VERSION &&
+    typeof o.sequence === "number" &&
+    typeof o.receivedAtMs === "number" &&
+    "master" in o &&
+    typeof o.sources === "object" &&
+    o.sources !== null &&
+    !Array.isArray(o.sources)
+  );
 }
 
 function isCompleteJsonText(raw: string): boolean {
@@ -118,8 +134,4 @@ function startsLikeJsonScalar(value: string): boolean {
     value.startsWith("\"") ||
     /^-?\d/.test(value)
   );
-}
-
-function isCs2GameState(value: unknown): value is CS2GameState {
-  return value === null || (typeof value === "object" && !Array.isArray(value));
 }

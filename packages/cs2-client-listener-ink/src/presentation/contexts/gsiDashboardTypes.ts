@@ -1,7 +1,10 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import type { HotkeyTabDescriptor } from "../components/atoms/hotkeyTabStrip";
 import type { KeyValueRow } from "../components/atoms/gridRowList";
-import type { GsiGatewayDiagnosticsView, GsiProcessorStatusLabels } from "../components/molecules/gsiProcessorStatusBox.types";
+import type {
+  Cs2ClientListenerDashboardLabels,
+  GsiGatewayDiagnosticsView,
+} from "../components/molecules/cs2ClientListenerDashboard.types";
 
 export type GsiDashboardTabIndex = 0 | 1;
 
@@ -10,7 +13,7 @@ export interface GsiDashboardBuildInput {
   gsiState: Readonly<GsiProcessorState> | null;
   gatewayDiagnostics: GsiGatewayDiagnosticsView;
   cs2Running: boolean;
-  labels: GsiProcessorStatusLabels;
+  labels: Cs2ClientListenerDashboardLabels;
   gatewayWarning?: string;
   formatTimestamp: (timestamp: number) => string;
   providerTimeLocale?: Intl.LocalesArgument;
@@ -29,7 +32,7 @@ export interface GsiDashboardGameStatePanelModel extends GsiDashboardPanelModel 
 
 /** Immutable view model for the GSI processor Ink dashboard. */
 export interface GsiDashboardContextValue {
-  labels: GsiProcessorStatusLabels;
+  labels: Cs2ClientListenerDashboardLabels;
   gsiState: Readonly<GsiProcessorState> | null;
   gatewayDiagnostics: GsiGatewayDiagnosticsView;
   gatewayWarning?: string;

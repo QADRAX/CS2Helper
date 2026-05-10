@@ -93,6 +93,7 @@ function createReplayResult(): ReplayResult {
       lastProcessedAt: null,
     },
     stateByTick,
+    tickFrames: [],
     coldStartStateBySecond: {
       0: stateByTick[0]!,
       1: stateByTick[0]!,

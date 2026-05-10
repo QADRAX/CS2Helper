@@ -3,6 +3,7 @@ import {
   type GsiProcessorEvent,
   type GsiProcessorState,
 } from "@cs2helper/gsi-processor";
+import { isCs2TickMasterData } from "@cs2helper/cs2-client-listener";
 import type { ProcessorReplayPort } from "../../application";
 import type {
   GsiRecordFile,
@@ -11,13 +12,12 @@ import type {
   ReplayStep,
 } from "../../domain";
 import {
-  REPLAY_TICK_TIMESTAMP_MS,
   buildReplayTimelineMetadata,
   cloneGsiProcessorState,
   summarizeReplayState,
 } from "../../domain/replayAggregation";
 
-/** Processor adapter that replays parsed frames through a fresh GSI engine. */
+/** Processor adapter that replays {@link TickFrame} records through a fresh GSI engine. */
 export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
   async replay(
     record: GsiRecordFile,
@@ -27,6 +27,7 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
     const steps: ReplayStep[] = [];
     const events: GsiProcessorEvent[] = [];
     const stateByTick: GsiProcessorState[] = [];
+    const tickFrames = framesResult.frames.map((f) => f.tick);
     let currentFrameEvents: GsiProcessorEvent[] = [];
     const initialState = cloneGsiProcessorState(processor.getState());
 
@@ -36,12 +37,25 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
     });
 
     try {
-      framesResult.frames.forEach((frame, tickIndex) => {
-        const timestamp = tickIndex * REPLAY_TICK_TIMESTAMP_MS;
+      for (let tickIndex = 0; tickIndex < framesResult.frames.length; tickIndex += 1) {
+        const frame = framesResult.frames[tickIndex]!;
+        const tickFrame = frame.tick;
         currentFrameEvents = [];
 
+        if (!isCs2TickMasterData(tickFrame.master)) {
+          continue;
+        }
+
+        let gameState: ReturnType<JSON["parse"]>;
+        try {
+          gameState = JSON.parse(tickFrame.master.raw);
+        } catch {
+          continue;
+        }
+
+        const timestamp = tickFrame.receivedAtMs;
         const before = summarizeReplayState(processor.getState());
-        processor.processTick(frame.tick, timestamp);
+        processor.processTick(gameState, timestamp);
         const after = summarizeReplayState(processor.getState());
 
         steps.push({
@@ -53,7 +67,7 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
           events: [...currentFrameEvents],
         });
         stateByTick.push(cloneGsiProcessorState(processor.getState()));
-      });
+      }
     } finally {
       unsubscribe();
     }
@@ -63,12 +77,13 @@ export class GsiProcessorReplayAdapter implements ProcessorReplayPort {
 
     return {
       record,
-      processedTicks: framesResult.frames.length,
+      processedTicks: steps.length,
       parseErrors: framesResult.errors,
       steps,
       events,
       initialState,
       stateByTick,
+      tickFrames,
       coldStartStateBySecond,
       timeline,
       finalState: cloneGsiProcessorState(processor.getState()),
@@ -86,8 +101,16 @@ function buildColdStartStatesBySecond(
   for (let second = 0; second <= durationSeconds; second += 1) {
     const frame = frames[second];
     if (!frame) continue;
+    const tickFrame = frame.tick;
+    if (!isCs2TickMasterData(tickFrame.master)) continue;
+    let gameState: ReturnType<JSON["parse"]>;
+    try {
+      gameState = JSON.parse(tickFrame.master.raw);
+    } catch {
+      continue;
+    }
     const processor = new GsiProcessorService();
-    processor.processTick(frame.tick, second * REPLAY_TICK_TIMESTAMP_MS);
+    processor.processTick(gameState, tickFrame.receivedAtMs);
     map[second] = cloneGsiProcessorState(processor.getState());
   }
 
