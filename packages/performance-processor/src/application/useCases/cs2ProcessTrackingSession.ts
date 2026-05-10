@@ -17,7 +17,13 @@ import type {
 
 export interface Cs2ProcessTrackingSession {
   startPollLoop: () => void;
+  /** Awaits one serialized align (for tests / manual flush). */
   alignToExternalTick: () => Promise<void>;
+  /**
+   * Enqueues an align on a serialized pipeline and returns immediately so the tick hub
+   * does not block on CIM/PresentMon; {@link listener} updates as each align completes.
+   */
+  scheduleAlignToExternalTick: () => void;
   dispose: () => void;
 }
 
@@ -139,7 +145,7 @@ export function createCs2ProcessTrackingSession(
     lastSystemSampleAtMs = nowMs;
   };
 
-  const alignToExternalTick = async (): Promise<void> => {
+  const runAlign = async (): Promise<void> => {
     if (cancelled) return;
     try {
       const status = await cs2Process.getStatus();
@@ -181,14 +187,32 @@ export function createCs2ProcessTrackingSession(
         lastSystemSampleAtMs = 0;
 
         const snapshot: Cs2ProcessTrackingSnapshot = { running, pid };
-        if (lastIdleKey !== key) {
-          listener(snapshot);
-          lastIdleKey = key;
-        }
+        // Align is driven by every GSI tick: always publish so `lastPerf` stays fresh after hub re-subscribe.
+        listener(snapshot);
+        lastIdleKey = key;
       }
-    } catch {
-      /* ignore transient failures on align */
+    } catch (err) {
+      if (cancelled) return;
+      listener({
+        running: false,
+        presentChainError: err instanceof Error ? err.message : String(err),
+      });
     }
+  };
+
+  /** Serialized so overlapping aligns never mutate session state concurrently. */
+  let alignPipeline: Promise<void> = Promise.resolve();
+
+  const scheduleAlignToExternalTick = (): void => {
+    alignPipeline = alignPipeline.then(() => runAlign()).catch(() => {});
+  };
+
+  const alignToExternalTick = (): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      alignPipeline = alignPipeline
+        .then(() => runAlign())
+        .then(() => resolve(), () => resolve());
+    });
   };
 
   const tick = async (): Promise<void> => {
@@ -261,5 +285,5 @@ export function createCs2ProcessTrackingSession(
     void tearDownPresent();
   };
 
-  return { startPollLoop, alignToExternalTick, dispose };
+  return { startPollLoop, alignToExternalTick, scheduleAlignToExternalTick, dispose };
 }

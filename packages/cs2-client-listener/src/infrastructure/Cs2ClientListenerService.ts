@@ -1,5 +1,5 @@
 import type { GsiGatewayOptions } from "@cs2helper/gsi-gateway";
-import type { PresentMonBootstrapOptions } from "@cs2helper/performance-processor";
+import type { Cs2ProcessStatus, PresentMonBootstrapOptions } from "@cs2helper/performance-processor";
 import type { PowerShellCommandPort } from "@cs2helper/shared";
 import { withPortsAsync } from "@cs2helper/shared";
 import type { TickFrame } from "@cs2helper/tick-hub";
@@ -52,5 +52,9 @@ export class Cs2ClientListenerService implements Cs2ClientListenerSdk {
 
   ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void> {
     return this.engine.ensurePresentMonBootstrap(options);
+  }
+
+  getCs2ProcessStatus(): Promise<Cs2ProcessStatus> {
+    return this.engine.getCs2ProcessStatus();
   }
 }

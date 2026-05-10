@@ -1,7 +1,9 @@
 import type { PresentMonBootstrapOptions, TickFrame } from "@cs2helper/cs2-client-listener";
+import type { Cs2ProcessStatus } from "@cs2helper/performance-processor";
 import type { CreateOrUpdateGsiConfigResult } from "./useCases/createOrUpdateGsiConfig";
 import type { VerifyGsiConfigResult } from "./useCases/verifyGsiConfig";
 import type { SteamStatus } from "./useCases/getSteamStatus";
+import type { SubscribeCs2ProcessStatusOptions } from "./useCases/subscribeCs2ProcessStatus";
 import type { SubscribeSteamStatusOptions } from "./useCases/subscribeSteamStatus";
 import type { ValidateSteamApiKeyOutcome } from "./ports/SteamWebApiClientPort";
 import type { GatewayStartInfo, GatewayDiagnostics } from "./ports/GatewayPort";
@@ -23,6 +25,10 @@ export interface CliApp {
   subscribeSteamStatus: (
     listener: (status: SteamStatus) => void,
     options?: SubscribeSteamStatusOptions
+  ) => () => void;
+  subscribeCs2ProcessStatus: (
+    listener: (status: Cs2ProcessStatus) => void,
+    options?: SubscribeCs2ProcessStatusOptions
   ) => () => void;
   /** Validates `CS2HELPER_STEAM_WEB_API_KEY` against Steam Web API (no-op if absent). */
   verifySteamWebApi: () => Promise<ValidateSteamApiKeyOutcome>;

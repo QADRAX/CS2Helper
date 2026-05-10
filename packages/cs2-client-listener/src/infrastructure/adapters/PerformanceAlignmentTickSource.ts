@@ -4,13 +4,16 @@ import type { TickSourcePort } from "@cs2helper/tick-hub";
 export class PerformanceAlignmentTickSource implements TickSourcePort {
   readonly id = "performance";
 
+  /**
+   * @param scheduleAlign - non-blocking enqueue (serialized in performance session); tick hub stays responsive.
+   */
   constructor(
-    private readonly alignToExternalTick: () => Promise<void>,
+    private readonly scheduleAlign: () => void,
     private readonly getLastSnapshot: () => Cs2ProcessTrackingSnapshot | undefined
   ) {}
 
   async captureOnTick(): Promise<unknown> {
-    await this.alignToExternalTick();
-    return this.getLastSnapshot();
+    this.scheduleAlign();
+    return this.getLastSnapshot() ?? { running: false };
   }
 }

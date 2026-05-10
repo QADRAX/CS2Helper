@@ -57,9 +57,19 @@ export function selectGatewayDiagnostics(state: RootState): GatewayDiagnostics {
   return state.ui.gatewayDiagnostics;
 }
 
-export function selectCs2Tracking(state: RootState): Cs2ProcessTrackingSnapshot {
-  return state.ui.cs2Tracking;
-}
+const selectCs2TrackingTick = (state: RootState) => state.ui.cs2Tracking;
+const selectCs2ProcessProbeState = (state: RootState) => state.ui.cs2ProcessProbe;
+
+/** Tick-aligned performance snapshot with `running` / `pid` overridden by the tasklist probe. */
+export const selectCs2Tracking = createSelector(
+  selectCs2TrackingTick,
+  selectCs2ProcessProbeState,
+  (tick, probe): Cs2ProcessTrackingSnapshot => ({
+    ...tick,
+    running: probe.running,
+    pid: probe.pid,
+  })
+);
 
 /** Single shared ref for the common idle shape (`useSelector` / strict mode use `Object.is`). */
 const CS2_PROCESS_STATUS_STOPPED: Cs2ProcessStatus = { running: false, pid: undefined };
@@ -80,12 +90,12 @@ function internCs2ProcessStatus(running: boolean, pid: number | undefined): Cs2P
 }
 
 export function selectCs2Running(state: RootState): boolean {
-  return state.ui.cs2Tracking.running;
+  return state.ui.cs2ProcessProbe.running;
 }
 
 /** Normalizes absent / nullish `pid` so intern keys match runtime snapshots. */
 export function selectCs2Pid(state: RootState): number | undefined {
-  return state.ui.cs2Tracking.pid ?? undefined;
+  return state.ui.cs2ProcessProbe.pid ?? undefined;
 }
 
 /**

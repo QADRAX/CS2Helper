@@ -1,3 +1,4 @@
+import type { GsiGatewayDiagnostics } from "@cs2helper/gsi-gateway";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 
 /**
@@ -7,6 +8,8 @@ import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 export interface Cs2TickMasterData {
   readonly state: Readonly<GsiProcessorState>;
   readonly raw: string;
+  /** HTTP ingest counters at the same instant as `state` (omitted in older JSONL replays). */
+  readonly gatewayDiagnostics?: Readonly<GsiGatewayDiagnostics>;
 }
 
 export function isCs2TickMasterData(value: unknown): value is Cs2TickMasterData {

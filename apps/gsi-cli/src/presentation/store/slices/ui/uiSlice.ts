@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
+import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
 import type { TickFrame } from "@cs2helper/cs2-client-listener";
 import type { GatewayDiagnostics } from "../../../../application/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
@@ -38,6 +38,9 @@ const uiSlice = createSlice({
     cs2TrackingUpdated: (state, action: PayloadAction<Cs2ProcessTrackingSnapshot>) => {
       state.cs2Tracking = action.payload;
     },
+    cs2ProcessProbeUpdated: (state, action: PayloadAction<Cs2ProcessStatus>) => {
+      state.cs2ProcessProbe = action.payload;
+    },
     steamStatusUpdated: (state, action: PayloadAction<SteamStatus>) => {
       state.steamStatus = action.payload;
     },
@@ -70,6 +73,7 @@ const uiSlice = createSlice({
         state.gatewayWarning = action.payload.gsiWarning;
         state.lastClientTickFrame = null;
         state.cs2Tracking = { running: false };
+        state.cs2ProcessProbe = { running: false, pid: undefined };
       })
       .addCase(startGateway.rejected, (state, action) => {
         state.status = "ERROR";
@@ -77,6 +81,7 @@ const uiSlice = createSlice({
           key: msgKeys.cli.error.gatewayStart,
           detail: action.error.message,
         };
+        state.cs2ProcessProbe = { running: false, pid: undefined };
       })
       .addCase(stopGateway.fulfilled, (state) => {
         state.status = "IDLE";
@@ -84,6 +89,7 @@ const uiSlice = createSlice({
         state.gatewayWarning = undefined;
         state.gatewayDiagnostics = { receivedRequests: 0, rejectedRequests: 0 };
         state.lastClientTickFrame = null;
+        state.cs2ProcessProbe = { running: false, pid: undefined };
       })
       .addCase(saveCliConfig.fulfilled, (state, action) => {
         state.config = action.payload;
@@ -150,6 +156,7 @@ export const {
   setUiError,
   clearError,
   cs2TrackingUpdated,
+  cs2ProcessProbeUpdated,
   steamStatusUpdated,
   steamWebApiDisabled,
   presentMonBootstrapStep,

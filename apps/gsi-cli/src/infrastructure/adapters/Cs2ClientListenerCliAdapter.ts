@@ -16,4 +16,6 @@ export class Cs2ClientListenerCliAdapter implements Cs2ClientListenerCliPort {
   stopRecording: Cs2ClientListenerCliPort["stopRecording"] = () => this.service.stopRecording();
   ensurePresentMonBootstrap: Cs2ClientListenerCliPort["ensurePresentMonBootstrap"] = (o) =>
     this.service.ensurePresentMonBootstrap(o);
+  getCs2ProcessStatus: Cs2ClientListenerCliPort["getCs2ProcessStatus"] = () =>
+    this.service.getCs2ProcessStatus();
 }

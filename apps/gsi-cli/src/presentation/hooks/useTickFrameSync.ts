@@ -1,8 +1,13 @@
-import type { TickFrame } from "@cs2helper/cs2-client-listener";
+import { isCs2TickMasterData, type TickFrame } from "@cs2helper/cs2-client-listener";
 import type { Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
 import { useEffect } from "react";
 import type { CliApp } from "../../application/CliApp";
-import { clientListenerTickFrameUpdated, cs2TrackingUpdated, selectUiStatus } from "../store";
+import {
+  clientListenerTickFrameUpdated,
+  cs2TrackingUpdated,
+  gatewayDiagnosticsUpdated,
+  selectUiStatus,
+} from "../store";
 import { useAppDispatch, useAppSelector } from "./redux";
 
 function trackingFromTickFrame(frame: TickFrame): Cs2ProcessTrackingSnapshot | null {
@@ -30,9 +35,12 @@ export function useTickFrameSync(cliApp: CliApp): void {
 
     const unsubscribe = cliApp.subscribeTickFrames((frame) => {
       dispatch(clientListenerTickFrameUpdated(frame));
-      const tracking = trackingFromTickFrame(frame);
-      if (tracking) {
-        dispatch(cs2TrackingUpdated(tracking));
+      if (isCs2TickMasterData(frame.master) && frame.master.gatewayDiagnostics) {
+        dispatch(gatewayDiagnosticsUpdated(frame.master.gatewayDiagnostics));
+      }
+      const fromPerf = trackingFromTickFrame(frame);
+      if (fromPerf) {
+        dispatch(cs2TrackingUpdated(fromPerf));
       }
     });
 

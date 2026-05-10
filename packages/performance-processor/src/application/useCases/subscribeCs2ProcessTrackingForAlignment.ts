@@ -11,6 +11,7 @@ import { createCs2ProcessTrackingSession } from "./cs2ProcessTrackingSession";
 export interface Cs2ProcessTrackingAlignmentSubscription {
   unsubscribe: () => void;
   alignToExternalTick: () => Promise<void>;
+  scheduleAlignToExternalTick: () => void;
 }
 
 /**
@@ -33,5 +34,6 @@ export const subscribeCs2ProcessTrackingForAlignment: UseCase<
   return {
     unsubscribe: session.dispose,
     alignToExternalTick: session.alignToExternalTick,
+    scheduleAlignToExternalTick: session.scheduleAlignToExternalTick,
   };
 };

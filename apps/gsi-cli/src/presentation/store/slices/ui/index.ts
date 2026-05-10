@@ -5,6 +5,7 @@ export { bootstrapPresentMonAtStartup } from "./presentMonBootstrapThunk";
 export {
   clearError,
   cs2TrackingUpdated,
+  cs2ProcessProbeUpdated,
   gatewayDiagnosticsUpdated,
   clientListenerTickFrameUpdated,
   setUiError,

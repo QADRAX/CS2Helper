@@ -19,6 +19,7 @@ export class CliAppService implements PowerShellCommandPort {
         windowsHide: true,
         maxBuffer: 16 * 1024 * 1024,
         encoding: "utf8",
+        timeout: 20_000,
       }
     );
     return stdout.trim();

@@ -1,4 +1,4 @@
-import type { Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
+import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
 import type { TickFrame } from "@cs2helper/cs2-client-listener";
 import type { GatewayDiagnostics } from "../../../../application/ports/GatewayPort";
 import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
@@ -46,6 +46,7 @@ export interface UiState {
 }
 
 const cs2TrackingInitial: Cs2ProcessTrackingSnapshot = { running: false };
+const cs2ProcessProbeInitial: Cs2ProcessStatus = { running: false, pid: undefined };
 const steamStatusInitial: SteamStatus = {
   installed: false,
   running: false,
@@ -58,6 +59,7 @@ export const uiInitialState: UiState = {
   gatewayDiagnostics: { receivedRequests: 0, rejectedRequests: 0 },
   config: {},
   cs2Tracking: cs2TrackingInitial,
+  cs2ProcessProbe: cs2ProcessProbeInitial,
   steamStatus: steamStatusInitial,
   steamWebApi: steamWebApiUiInitial,
   presentMonBootstrap: { blocking: true, stepKey: msgKeys.cli.presentMon.loader.started },

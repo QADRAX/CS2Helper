@@ -22,6 +22,10 @@ import {
 import { verifyEnvSteamWebApiKey } from "../application/useCases/verifyEnvSteamWebApiKey";
 import type { ValidateSteamApiKeyOutcome } from "../application/ports/SteamWebApiClientPort";
 import {
+  subscribeCs2ProcessStatus,
+  type SubscribeCs2ProcessStatusOptions,
+} from "../application/useCases/subscribeCs2ProcessStatus";
+import {
   subscribeSteamStatus,
   type SubscribeSteamStatusOptions,
 } from "../application/useCases/subscribeSteamStatus";
@@ -29,6 +33,7 @@ import type { CliApp } from "../application/CliApp";
 import type { GatewayStartInfo } from "../application/ports/GatewayPort";
 import type { GatewayDiagnostics } from "../application/ports/GatewayPort";
 import type { CliConfig } from "../domain/cli/config";
+import type { Cs2ProcessStatus } from "@cs2helper/performance-processor";
 import { withPorts, withPortsAsync } from "@cs2helper/shared";
 import { CliAppService } from "./CliAppService";
 import { Cs2ClientListenerCliAdapter } from "./adapters/Cs2ClientListenerCliAdapter";
@@ -74,6 +79,10 @@ export class GsiCliApplication implements CliApp {
   subscribeSteamStatus: (
     listener: (status: SteamStatus) => void,
     options?: SubscribeSteamStatusOptions
+  ) => () => void;
+  subscribeCs2ProcessStatus: (
+    listener: (status: Cs2ProcessStatus) => void,
+    options?: SubscribeCs2ProcessStatusOptions
   ) => () => void;
   verifySteamWebApi: () => Promise<ValidateSteamApiKeyOutcome>;
   ensurePresentMonBootstrap: CliApp["ensurePresentMonBootstrap"];
@@ -126,6 +135,7 @@ export class GsiCliApplication implements CliApp {
       this.steamInstallPort,
       this.steamProcessPort,
     ]);
+    this.subscribeCs2ProcessStatus = withPorts(subscribeCs2ProcessStatus, [this.listenerCli]);
     this.verifySteamWebApi = withPortsAsync(verifyEnvSteamWebApiKey, [
       this.steamWebApiKeySource,
       this.steamWebApiClient,

@@ -1,5 +1,5 @@
 import type { GsiGatewayDiagnostics, GsiGatewayOptions } from "@cs2helper/gsi-gateway";
-import type { PresentMonBootstrapOptions } from "@cs2helper/performance-processor";
+import type { Cs2ProcessStatus, PresentMonBootstrapOptions } from "@cs2helper/performance-processor";
 import type { TickFrame } from "@cs2helper/tick-hub";
 import type { Cs2ClientListenerStartResult } from "./cs2ClientListenerStartResult";
 
@@ -12,6 +12,8 @@ export interface Cs2ClientListenerSdk {
   readonly stop: () => Promise<void>;
   isRunning(): boolean;
   getGatewayDiagnostics(): Readonly<GsiGatewayDiagnostics>;
+  /** Current CS2 process presence from the same tasklist-backed adapter as performance telemetry. */
+  getCs2ProcessStatus(): Promise<Cs2ProcessStatus>;
   ensurePresentMonBootstrap(options?: PresentMonBootstrapOptions): Promise<void>;
   subscribeTickFrames(listener: (frame: TickFrame) => void): () => void;
   /** JSONL recording; delegates to the inner {@link TickHub}. */

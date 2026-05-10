@@ -13,11 +13,8 @@ export function useGatewayDiagnosticsSync(cliApp: CliApp): void {
       return;
     }
 
+    // One-shot before the first tick; afterwards `useTickFrameSync` keeps counters aligned with each frame.
     dispatch(gatewayDiagnosticsUpdated(cliApp.getGatewayDiagnostics()));
-    const interval = setInterval(() => {
-      dispatch(gatewayDiagnosticsUpdated(cliApp.getGatewayDiagnostics()));
-    }, 400);
-
-    return () => clearInterval(interval);
+    return undefined;
   }, [cliApp, dispatch, status]);
 }

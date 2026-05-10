@@ -9,7 +9,13 @@ export class GsiGatewayMasterClock implements MasterClockPort {
 
   subscribe(listener: (signal: MasterTickSignal) => void): () => void {
     return this.gateway.subscribeRawTicks((raw) => {
-      listener({ data: { state: this.gateway.getState(), raw } });
+      listener({
+        data: {
+          state: this.gateway.getState(),
+          raw,
+          gatewayDiagnostics: this.gateway.getDiagnostics(),
+        },
+      });
     });
   }
 }

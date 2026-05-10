@@ -5,6 +5,7 @@ import {
 } from "@cs2helper/gsi-gateway";
 import {
   PerformanceProcessorService,
+  type Cs2ProcessStatus,
   type Cs2ProcessTrackingAlignmentSubscription,
   type Cs2ProcessTrackingPollOptions,
   type Cs2ProcessTrackingSnapshot,
@@ -68,6 +69,27 @@ export class Cs2ClientListenerEngine {
     return this.performance.ensurePresentMonBootstrap(options);
   }
 
+  getCs2ProcessStatus(): Promise<Cs2ProcessStatus> {
+    return this.performance.getCs2Status();
+  }
+
+  private resolveTickHubOptions(): TickHubOptions {
+    const base = this.options.tickHub ?? {};
+    return {
+      ...base,
+      subscribeFrames: {
+        /** CIM/PowerShell + PresentMon can exceed a few seconds on cold start; must exceed adapter timeouts. */
+        sourceTimeoutMs: 25_000,
+        /**
+         * Keep false so every GSI POST yields a frame; performance align is non-blocking (scheduled),
+         * so the hub no longer needs to drop ticks for responsiveness.
+         */
+        coalesceQueuedMasterSignals: false,
+        ...base.subscribeFrames,
+      },
+    };
+  }
+
   async enterRunningMode(gatewayOptions?: GsiGatewayOptions): Promise<Cs2ClientListenerStartResult> {
     const gw = new GsiGatewayService({
       ...(this.options.gateway ?? {}),
@@ -78,7 +100,7 @@ export class Cs2ClientListenerEngine {
       const hub = new TickHubService(
         new GsiGatewayMasterClock(gw),
         this.sourcesPort,
-        this.options.tickHub ?? {}
+        this.resolveTickHubOptions()
       );
       this.gateway = gw;
       this.hub = hub;
@@ -158,7 +180,7 @@ export class Cs2ClientListenerEngine {
     }
     return [
       new PerformanceAlignmentTickSource(
-        () => this.perfSub!.alignToExternalTick(),
+        () => this.perfSub!.scheduleAlignToExternalTick(),
         () => this.lastPerf
       ),
     ];

@@ -19,8 +19,14 @@ export function parseTickPerformanceSnapshot(frame: TickFrame | null): Cs2Proces
     return null;
   }
   const raw = frame.sources["performance"];
-  if (raw == null || isTickSourceErrorPayload(raw)) {
+  if (raw == null) {
     return null;
+  }
+  if (isTickSourceErrorPayload(raw)) {
+    return {
+      running: false,
+      presentChainError: raw.error,
+    };
   }
   if (typeof raw !== "object" || !("running" in raw) || typeof (raw as { running?: unknown }).running !== "boolean") {
     return null;

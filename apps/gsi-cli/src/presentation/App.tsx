@@ -5,6 +5,7 @@ import { AppShell } from "./components/organisms/AppShell";
 import { useConfigBootstrap } from "./hooks/useConfigBootstrap";
 import { usePresentMonBootstrap } from "./hooks/usePresentMonBootstrap";
 import { useGatewayDiagnosticsSync } from "./hooks/useGatewayDiagnosticsSync";
+import { useCs2ProcessStatusSync } from "./hooks/useCs2ProcessStatusSync";
 import { useTickFrameSync } from "./hooks/useTickFrameSync";
 import { useSteamWebApiBootstrap } from "./hooks/useSteamWebApiBootstrap";
 import { useSystemStatusSync } from "./hooks/useSystemStatusSync";
@@ -20,6 +21,7 @@ function RootReduxEffects({ cliApp }: { cliApp: CliApp }) {
   usePresentMonBootstrap();
   useSteamWebApiBootstrap();
   useTickFrameSync(cliApp);
+  useCs2ProcessStatusSync(cliApp);
   useGatewayDiagnosticsSync(cliApp);
   useSystemStatusSync(cliApp);
   return null;

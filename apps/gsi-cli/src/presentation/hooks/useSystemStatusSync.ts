@@ -5,7 +5,8 @@ import { useAppDispatch } from "./redux";
 
 /**
  * Subscribes to Steam status from the CLI app and mirrors it into Redux.
- * CS2 process/performance snapshots come from the client listener tick stream ({@link useTickFrameSync}).
+ * CS2 install/running for the status line is polled here; performance metrics come from ticks
+ * ({@link useTickFrameSync}) and tasklist-backed {@link useCs2ProcessStatusSync} drives `running`/`pid`.
  */
 export function useSystemStatusSync(cliApp: CliApp): void {
   const dispatch = useAppDispatch();

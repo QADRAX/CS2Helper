@@ -21,13 +21,11 @@ export const queryWindowsTasklist = async (
   }
 
   try {
-    const { stdout } = await execFileAsync("tasklist", [
-      "/FI",
-      `IMAGENAME eq ${imageName}`,
-      "/FO",
-      "CSV",
-      "/NH",
-    ]);
+    const { stdout } = await execFileAsync(
+      "tasklist",
+      ["/FI", `IMAGENAME eq ${imageName}`, "/FO", "CSV", "/NH"],
+      { windowsHide: true, timeout: 15_000 }
+    );
     return parseTasklistOutput(stdout, imageName);
   } catch {
     return { running: false };
@@ -46,12 +44,18 @@ const parseTasklistOutput = (
   expectedImageName: string
 ): TasklistProcessStatus => {
   const trimmed = stdout.trim();
-  if (trimmed.length === 0 || trimmed.toUpperCase().startsWith("INFO:")) {
+  if (trimmed.length === 0) {
     return { running: false };
   }
 
   const firstLine = trimmed.split(/\r?\n/, 1)[0];
   if (!firstLine) {
+    return { running: false };
+  }
+
+  const lead = firstLine.trim();
+  // Filter miss: localized INFO lines (e.g. Spanish INFORMACIÓN:) are not CSV rows.
+  if (!lead.startsWith('"')) {
     return { running: false };
   }
 
