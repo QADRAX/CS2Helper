@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ingestGsiTick } from "../gsiGateway";
+import { ingestGsiTick } from "../useCases/ingestGsiTick";
 
 describe("ingestGsiTick use case", () => {
   it("delegates to processor.processTick and notifies raw listeners", () => {
@@ -17,7 +17,7 @@ describe("ingestGsiTick use case", () => {
     const payload = { provider: { name: "CS2" } } as any;
     const rawBody = JSON.stringify(payload);
 
-    ingestGsiTick({ processor: processorMock as any, rawTickHub }, payload, rawBody);
+    ingestGsiTick([processorMock as any, rawTickHub], payload, rawBody);
 
     expect(processTick).toHaveBeenCalledTimes(1);
     expect(processTick).toHaveBeenCalledWith(payload);

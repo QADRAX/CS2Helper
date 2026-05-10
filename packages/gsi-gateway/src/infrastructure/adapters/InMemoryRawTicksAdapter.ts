@@ -1,7 +1,7 @@
 import type {
   RawTickDispatchPort,
   RawTicksSubscriptionPort,
-} from "../../../application/gsiGateway/ports";
+} from "../../application/ports";
 
 /**
  * In-memory pub/sub for raw GSI JSON strings. Implements both subscription (CLI/tests)

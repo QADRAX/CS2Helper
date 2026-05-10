@@ -1,6 +1,6 @@
 import { request } from "http";
 import { afterEach, describe, expect, it } from "vitest";
-import { GsiGatewayService } from "../gsiGateway/GsiGatewayService";
+import { GsiGatewayService } from "../GsiGatewayService";
 
 function postJson(url: { host: string; port: number; path: string }, body: string) {
   return new Promise<{ statusCode?: number; body: string }>((resolve, reject) => {

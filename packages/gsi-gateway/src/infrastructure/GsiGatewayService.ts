@@ -5,13 +5,13 @@ import {
   subscribeEvents,
   subscribeRawTicks,
   subscribeState,
-} from "../../application/gsiGateway";
+} from "../application";
 import {
   type GsiGateway,
   type GsiGatewayDiagnostics,
   type GsiGatewayOptions,
   parseIncomingTick,
-} from "../../domain/gsiGateway";
+} from "../domain";
 import { InMemoryRawTicksAdapter } from "./adapters/InMemoryRawTicksAdapter";
 import { NodeHttpServerAdapter } from "./adapters/NodeHttpServerAdapter";
 import { createDefaultHttpConfig } from "./adapters/createDefaultHttpConfig";
@@ -30,7 +30,7 @@ export class GsiGatewayService implements GsiGateway {
 
   constructor(options: GsiGatewayOptions = {}) {
     const config = createDefaultHttpConfig(options);
-    
+
     this.processor = new GsiProcessorService({
       getTimestamp: options.getTimestamp,
     });
@@ -41,11 +41,7 @@ export class GsiGatewayService implements GsiGateway {
         this.diagnostics.receivedRequests += 1;
         try {
           const tick = parseIncomingTick(rawBody);
-          ingestGsiTick(
-            { processor: this.processor, rawTickHub: this.rawTickHub },
-            tick,
-            rawBody
-          );
+          ingestGsiTick([this.processor, this.rawTickHub], tick, rawBody);
         } catch (err) {
           this.diagnostics.rejectedRequests += 1;
           this.diagnostics.lastRejectReason =
@@ -66,7 +62,7 @@ export class GsiGatewayService implements GsiGateway {
   }
 
   getState() {
-    return getState({ processor: this.processor });
+    return getState([this.processor]);
   }
 
   getDiagnostics() {
@@ -74,14 +70,14 @@ export class GsiGatewayService implements GsiGateway {
   }
 
   subscribeState(listener: (state: any) => void) {
-    return subscribeState({ processor: this.processor }, listener);
+    return subscribeState([this.processor], listener);
   }
 
   subscribeEvents(listener: (event: any) => void) {
-    return subscribeEvents({ processor: this.processor }, listener);
+    return subscribeEvents([this.processor], listener);
   }
 
   subscribeRawTicks(listener: (raw: string) => void) {
-    return subscribeRawTicks({ rawTickHub: this.rawTickHub }, listener);
+    return subscribeRawTicks([this.rawTickHub], listener);
   }
 }

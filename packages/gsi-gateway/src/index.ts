@@ -3,11 +3,11 @@
  * Node HTTP gateway that ingests CS2 GSI ticks.
  */
 
-export { GsiGatewayService } from "./infrastructure/gsiGateway/GsiGatewayService";
+export { GsiGatewayService } from "./infrastructure/GsiGatewayService";
 export type {
   GsiGatewayOptions,
   GsiGateway,
   GsiGatewayStartInfo,
-} from "./domain/gsiGateway/serviceContracts";
+} from "./domain/serviceContracts";
 
-export type * from "./domain/gsiGateway";
+export type * from "./domain";

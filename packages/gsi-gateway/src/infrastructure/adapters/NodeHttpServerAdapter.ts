@@ -1,5 +1,5 @@
 import { createServer, Server } from "http";
-import type { HttpServerConfig, HttpListenAddress } from "../../../domain/gsiGateway/httpContracts";
+import type { HttpServerConfig, HttpListenAddress } from "../../domain/httpContracts";
 
 export interface NodeHttpServerOptions {
   config: HttpServerConfig;
@@ -21,14 +21,16 @@ export class NodeHttpServerAdapter {
 
   async start(): Promise<HttpListenAddress> {
     const HARDCODED_HOST = "127.0.0.1";
-    
+
     this.server = createServer(async (req, res) => {
       const reqUrl = req.url ?? "";
-      
+
       if (req.method === "POST" && reqUrl === "/") {
         let body = "";
-        
-        req.on("data", (chunk) => { body += chunk; });
+
+        req.on("data", (chunk) => {
+          body += chunk;
+        });
         req.on("end", async () => {
           try {
             await this.onGsiRequest(body);
@@ -50,7 +52,7 @@ export class NodeHttpServerAdapter {
     return new Promise((resolve, reject) => {
       this.server?.listen(this.config.port, HARDCODED_HOST, () => {
         const addr = this.server?.address();
-        const port = (addr && typeof addr !== 'string') ? addr.port : this.config.port;
+        const port = addr && typeof addr !== "string" ? addr.port : this.config.port;
         resolve({ port });
       });
       this.server?.on("error", reject);
