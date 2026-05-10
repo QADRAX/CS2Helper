@@ -53,6 +53,14 @@ El servidor Next aplica migraciones al arrancar vía `instrumentation` (solo run
 
 Ver comentarios en `.env.example`: `CS2H_ACCESS_TOKEN_TTL_SEC`, `CS2H_REFRESH_TOKEN_TTL_SEC`, `CS2H_RATE_LIMIT_LOGIN_PER_MIN`, `CS2H_RATE_LIMIT_ADMIN_PER_MIN`.
 
+## Instancia (`@cs2helper/community-core`)
+
+- Lógica y migraciones en el paquete **`@cs2helper/community-core`** (sin Next). La app aplica migraciones de **auth** y **community-core** juntas con `pnpm db:migrate` o, con **PGlite**, al arrancar el servidor.
+- **GET `/api/instance`**: nombre público de la instancia (JSON `{ "displayName": "..." }`).
+- **PATCH `/api/instance`**: actualizar `displayName` (cuerpo `{ "displayName": "..." }`); requiere sesión admin (`auth.rbac.manage`).
+
+Con **`postgres`**, ejecuta al menos una vez **`pnpm db:migrate`** antes de usar la API si la BD es nueva (las migraciones no se ejecutan solas en el arranque, igual que con auth).
+
 ## OpenAPI y Swagger UI
 
 - **Interfaz**: [http://localhost:3000/docs/api](http://localhost:3000/docs/api) (ajusta host/puerto si hace falta).

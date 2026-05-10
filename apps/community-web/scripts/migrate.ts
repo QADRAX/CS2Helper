@@ -3,6 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { Pool } from "pg";
 import path from "node:path";
 import { PGlite, runAuthMigrations, runAuthMigrationsPglite } from "@cs2helper/auth";
+import { runCommunityMigrations, runCommunityMigrationsPglite } from "@cs2helper/community-core";
 
 function parseDriver(v: string | undefined): "postgres" | "pglite" {
   const t = v?.trim().toLowerCase();
@@ -19,7 +20,8 @@ async function main() {
     await mkdir(dataDir, { recursive: true });
     const client = new PGlite(dataDir);
     await runAuthMigrationsPglite(client);
-    console.log("Auth migrations applied (PGlite).");
+    await runCommunityMigrationsPglite(client);
+    console.log("Auth + community-core migrations applied (PGlite).");
     return;
   }
 
@@ -31,7 +33,8 @@ async function main() {
   const pool = new Pool({ connectionString: databaseUrl });
   try {
     await runAuthMigrations(pool);
-    console.log("Auth migrations applied (PostgreSQL).");
+    await runCommunityMigrations(pool);
+    console.log("Auth + community-core migrations applied (PostgreSQL).");
   } finally {
     await pool.end();
   }

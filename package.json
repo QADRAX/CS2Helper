@@ -50,8 +50,11 @@
     "build:auth": "pnpm --filter @cs2helper/auth build",
     "lint:auth": "pnpm --filter @cs2helper/auth lint",
     "test:auth": "pnpm --filter @cs2helper/auth test",
+    "build:community-core": "pnpm --filter @cs2helper/community-core build",
+    "lint:community-core": "pnpm --filter @cs2helper/community-core lint",
+    "test:community-core": "pnpm --filter @cs2helper/community-core test",
     "dev:community-web": "pnpm --filter @cs2helper/community-web dev",
-    "build:community-web": "pnpm --filter @cs2helper/shared build && pnpm --filter @cs2helper/auth build && pnpm --filter @cs2helper/community-web build",
+    "build:community-web": "pnpm --filter @cs2helper/shared build && pnpm --filter @cs2helper/auth build && pnpm --filter @cs2helper/community-core build && pnpm --filter @cs2helper/community-web build",
     "lint:community-web": "pnpm --filter @cs2helper/community-web lint"
   },
   "devDependencies": {

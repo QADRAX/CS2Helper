@@ -1,7 +1,6 @@
 import { Buffer } from "node:buffer";
 
 import { PNG } from "pngjs";
-import koffi from "koffi";
 
 import { buildBitmapInfoHeader, flipRgbRowsVertical, swapBgraToRgbaInPlace } from "../domain/bitmapRgb";
 import { CS2_EXE_IMAGE_NAME } from "../domain/cs2ProcessName";
@@ -13,21 +12,27 @@ import {
   SRCCOPY,
 } from "../domain/win32GdiConstants";
 import { queryWindowsTasklist } from "./windowsTasklistQuery";
+import { getKoffi } from "./loadKoffiRuntime";
+
+const EnumWindowsProcType = getKoffi().proto(
+  "bool __stdcall EnumWindowsProc(uintptr_t hwnd, intptr_t lParam)"
+);
 
 function loadApis() {
+  const koffi = getKoffi();
   const user32 = koffi.load("user32.dll");
   const gdi32 = koffi.load("gdi32.dll");
 
-  const GetForegroundWindow = user32.func("__stdcall GetForegroundWindow", "uintptr_t", []);
-  const EnumWindows = user32.func("__stdcall EnumWindows", "bool", [
-    koffi.pointer(koffi.proto("EnumWindowsProc", "bool", ["uintptr_t", "intptr_t"])),
+  const GetForegroundWindow = user32.func("__stdcall", "GetForegroundWindow", "uintptr_t", []);
+  const EnumWindows = user32.func("__stdcall", "EnumWindows", "bool", [
+    koffi.pointer(EnumWindowsProcType),
     "intptr_t",
   ]);
-  const GetWindowThreadProcessId = user32.func("__stdcall GetWindowThreadProcessId", "uint32", [
+  const GetWindowThreadProcessId = user32.func("__stdcall", "GetWindowThreadProcessId", "uint32", [
     "uintptr_t",
     koffi.pointer("uint8"),
   ]);
-  const IsWindowVisible = user32.func("__stdcall IsWindowVisible", "bool", ["uintptr_t"]);
+  const IsWindowVisible = user32.func("__stdcall", "IsWindowVisible", "bool", ["uintptr_t"]);
 
   const RECT = koffi.struct("RECT", {
     left: "int32",
@@ -36,21 +41,24 @@ function loadApis() {
     bottom: "int32",
   });
 
-  const GetClientRect = user32.func("__stdcall GetClientRect", "bool", ["uintptr_t", koffi.out(RECT)]);
-  const PrintWindow = user32.func("__stdcall PrintWindow", "bool", ["uintptr_t", "uintptr_t", "uint32"]);
-  const GetDC = user32.func("__stdcall GetDC", "uintptr_t", ["uintptr_t"]);
-  const ReleaseDC = user32.func("__stdcall ReleaseDC", "int32", ["uintptr_t", "uintptr_t"]);
+  const GetClientRect = user32.func("__stdcall", "GetClientRect", "bool", [
+    "uintptr_t",
+    koffi.out(koffi.pointer(RECT)),
+  ]);
+  const PrintWindow = user32.func("__stdcall", "PrintWindow", "bool", ["uintptr_t", "uintptr_t", "uint32"]);
+  const GetDC = user32.func("__stdcall", "GetDC", "uintptr_t", ["uintptr_t"]);
+  const ReleaseDC = user32.func("__stdcall", "ReleaseDC", "int32", ["uintptr_t", "uintptr_t"]);
 
-  const CreateCompatibleDC = gdi32.func("__stdcall CreateCompatibleDC", "uintptr_t", ["uintptr_t"]);
-  const CreateCompatibleBitmap = gdi32.func("__stdcall CreateCompatibleBitmap", "uintptr_t", [
+  const CreateCompatibleDC = gdi32.func("__stdcall", "CreateCompatibleDC", "uintptr_t", ["uintptr_t"]);
+  const CreateCompatibleBitmap = gdi32.func("__stdcall", "CreateCompatibleBitmap", "uintptr_t", [
     "uintptr_t",
     "int32",
     "int32",
   ]);
-  const SelectObject = gdi32.func("__stdcall SelectObject", "uintptr_t", ["uintptr_t", "uintptr_t"]);
-  const DeleteObject = gdi32.func("__stdcall DeleteObject", "bool", ["uintptr_t"]);
-  const DeleteDC = gdi32.func("__stdcall DeleteDC", "bool", ["uintptr_t"]);
-  const BitBlt = gdi32.func("__stdcall BitBlt", "bool", [
+  const SelectObject = gdi32.func("__stdcall", "SelectObject", "uintptr_t", ["uintptr_t", "uintptr_t"]);
+  const DeleteObject = gdi32.func("__stdcall", "DeleteObject", "bool", ["uintptr_t"]);
+  const DeleteDC = gdi32.func("__stdcall", "DeleteDC", "bool", ["uintptr_t"]);
+  const BitBlt = gdi32.func("__stdcall", "BitBlt", "bool", [
     "uintptr_t",
     "int32",
     "int32",
@@ -61,7 +69,7 @@ function loadApis() {
     "int32",
     "uint32",
   ]);
-  const GetDIBits = gdi32.func("__stdcall GetDIBits", "int32", [
+  const GetDIBits = gdi32.func("__stdcall", "GetDIBits", "int32", [
     "uintptr_t",
     "uintptr_t",
     "uint32",
@@ -96,25 +104,24 @@ let enumTargetPid = 0;
 const enumScratch: bigint[] = [];
 const pidBufScratch = Buffer.alloc(4);
 
-const EnumWindowsProcType = koffi.proto(
-  "bool __stdcall EnumWindowsProc(uintptr_t hwnd, intptr_t lParam)"
-);
-
 const enumWindowsCallback =
   apis !== null
-    ? koffi.register((hwnd: number, lParam: bigint) => {
-        void lParam;
-        apis!.GetWindowThreadProcessId(hwnd, pidBufScratch);
-        const pid = pidBufScratch.readUInt32LE(0);
-        if (pid !== enumTargetPid) {
+    ? getKoffi().register(
+        (hwnd: number, lParam: bigint) => {
+          void lParam;
+          apis!.GetWindowThreadProcessId(hwnd, pidBufScratch);
+          const pid = pidBufScratch.readUInt32LE(0);
+          if (pid !== enumTargetPid) {
+            return true;
+          }
+          if (!apis!.IsWindowVisible(hwnd)) {
+            return true;
+          }
+          enumScratch.push(BigInt(hwnd));
           return true;
-        }
-        if (!apis!.IsWindowVisible(hwnd)) {
-          return true;
-        }
-        enumScratch.push(BigInt(hwnd));
-        return true;
-      }, EnumWindowsProcType)
+        },
+        getKoffi().pointer(EnumWindowsProcType)
+      )
     : null;
 
 function collectCs2WindowHandles(targetPid: number): bigint[] {

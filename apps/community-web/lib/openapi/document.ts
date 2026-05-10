@@ -31,6 +31,10 @@ export function buildOpenApiDocument(serverUrl: string) {
     servers: [{ url: serverUrl }],
     tags: [
       { name: "Health", description: "Comprobación de servicio." },
+      {
+        name: "Instance",
+        description: "Datos públicos de la instalación (`@cs2helper/community-core`).",
+      },
       { name: "Auth", description: "Login, sesión, refresh y logout (cookies)." },
       {
         name: "Admin · Invitations",
@@ -193,6 +197,23 @@ export function buildOpenApiDocument(serverUrl: string) {
             roleName: { type: "string", description: "Nombre del rol a asignar." },
           },
         },
+        InstanceDisplayNameResponse: {
+          type: "object",
+          required: ["displayName"],
+          properties: {
+            displayName: {
+              type: "string",
+              description: "Nombre visible de esta instancia (homelab / equipo).",
+            },
+          },
+        },
+        PatchInstanceDisplayNameRequest: {
+          type: "object",
+          required: ["displayName"],
+          properties: {
+            displayName: { type: "string", maxLength: 120 },
+          },
+        },
       },
       responses: {
         Unauthorized: err("No autenticado o token inválido."),
@@ -214,6 +235,55 @@ export function buildOpenApiDocument(serverUrl: string) {
                 "application/json": { schema: { $ref: "#/components/schemas/HealthResponse" } },
               },
             },
+          },
+        },
+      },
+      "/api/instance": {
+        get: {
+          tags: ["Instance"],
+          summary: "Nombre de la instancia",
+          operationId: "getInstanceDisplayName",
+          responses: {
+            "200": {
+              description: "Nombre público configurado para esta instalación.",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/InstanceDisplayNameResponse" },
+                },
+              },
+            },
+          },
+        },
+        patch: {
+          tags: ["Instance"],
+          summary: "Actualizar nombre de la instancia",
+          description: "Requiere rol admin vía permiso `auth.rbac.manage`.",
+          operationId: "patchInstanceDisplayName",
+          security: [{ accessCookie: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/PatchInstanceDisplayNameRequest" },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Actualizado.",
+              content: {
+                "application/json": { schema: { $ref: "#/components/schemas/OkBody" } },
+              },
+            },
+            "400": {
+              description: "Validación (`INSTANCE_DISPLAY_NAME_INVALID`, etc.).",
+              content: {
+                "application/json": { schema: { $ref: "#/components/schemas/ErrorBody" } },
+              },
+            },
+            "401": { $ref: "#/components/responses/Unauthorized" },
+            "403": { $ref: "#/components/responses/Forbidden" },
+            "429": { $ref: "#/components/responses/RateLimited" },
           },
         },
       },

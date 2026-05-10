@@ -2,7 +2,6 @@ import { once } from "node:events";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Worker } from "node:worker_threads";
-import koffi from "koffi";
 
 import {
   handleScoreboardHotkey,
@@ -12,6 +11,7 @@ import {
 import { DEFAULT_SCOREBOARD_HOTKEY_ID } from "../domain/defaultScoreboardHotKeyId";
 import type { ScoreboardCapturePolicy } from "../domain/scoreboardCapturePolicy";
 import { WM_QUIT } from "../domain/win32Messages";
+import { getKoffi } from "./loadKoffiRuntime";
 
 export interface ScoreboardScreenshotSdk {
   start(): Promise<void>;
@@ -32,8 +32,9 @@ function resolveHotkeyWorkerScriptPath(): string {
 }
 
 function postQuitToThread(threadId: number): void {
+  const koffi = getKoffi();
   const user32 = koffi.load("user32.dll");
-  const PostThreadMessageW = user32.func("__stdcall PostThreadMessageW", "bool", [
+  const PostThreadMessageW = user32.func("__stdcall", "PostThreadMessageW", "bool", [
     "uint32",
     "uint32",
     "uintptr_t",

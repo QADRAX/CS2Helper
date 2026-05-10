@@ -1,0 +1,33 @@
+{
+  "name": "@cs2helper/community-core",
+  "version": "1.0.0",
+  "description": "Instance settings and community product data (framework-agnostic).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "drizzle"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "pnpm run clean && tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@cs2helper/shared": "workspace:*",
+    "@electric-sql/pglite": "^0.2.17",
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.13",
+    "drizzle-kit": "^0.31.10",
+    "rimraf": "^6.1.3"
+  }
+}

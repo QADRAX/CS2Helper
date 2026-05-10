@@ -12,6 +12,7 @@ COPY apps/community-web ./apps/community-web
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @cs2helper/shared build
 RUN pnpm --filter @cs2helper/auth build
+RUN pnpm --filter @cs2helper/community-core build
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @cs2helper/community-web run build
 

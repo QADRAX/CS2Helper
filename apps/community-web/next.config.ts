@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: path.join(__dirname, "../.."),
-  transpilePackages: ["@cs2helper/auth", "swagger-ui-react"],
+  transpilePackages: ["@cs2helper/auth", "@cs2helper/community-core", "swagger-ui-react"],
   serverExternalPackages: ["pg", "@electric-sql/pglite"],
 };
 
