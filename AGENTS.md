@@ -2,6 +2,19 @@
 
 Monorepo **pnpm** (`apps/*`, `packages/*`). Objetivo: **Clean Architecture** por capas, con casos de uso explícitos y puertos inyectados.
 
+## Layout bajo `src/`
+
+En `packages/*/src` y `apps/*/src`, en la **raíz** solo deben aparecer carpetas de capa:
+
+| Carpeta | Alias habitual |
+|---------|----------------|
+| `application/` | app |
+| `infrastructure/` | infra |
+| `domain/` | — |
+| `presentation/` | — (solo apps con UI cuando aplique) |
+
+No añadir otras raíces bajo `src/` (p. ej. `src/ports`, `src/utils`); el contenido va en la capa que corresponda (`application/ports`, `domain`, etc.).
+
 ## Capas por paquete / app
 
 Orden de dependencia permitido (**hacia dentro**): *presentation (solo apps con UI)* → *application* → *domain* ← *infrastructure*.
@@ -31,7 +44,7 @@ Los **bordes del paquete** se exponen desde `src/index.ts` (o subpaths documenta
 
 ## Referencias en el repo
 
-- `packages/shared` — tipos `UseCase` / `AsyncUseCase` y helpers `withPorts` / `withPortsAsync`.
+- `packages/shared` — tipos `UseCase` / `AsyncUseCase`, helpers `withPorts` / `withPortsAsync`, y ports transversales en `application/ports/`.
 - Apps CLI: interfaz de aplicación (`CliApp`, `BenchCliApp`) en **application/**; compositor `GsiCliApplication` / `BenchCliApplication` en **infrastructure/**.
 - Ejemplos: `packages/gsi-gateway`, `packages/gsi-processor`, `apps/gsi-cli`, `apps/gsi-bench-cli`.
 

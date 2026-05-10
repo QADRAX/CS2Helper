@@ -1,3 +1,4 @@
+import type { PowerShellCommandPort } from "@cs2helper/shared";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
@@ -6,7 +7,7 @@ const execFileAsync = promisify(execFile);
 /**
  * Non-interactive PowerShell client for running `-Command` script blocks (telemetry adapters, etc.).
  */
-export class CliAppService {
+export class CliAppService implements PowerShellCommandPort {
   /**
    * Runs a PowerShell script and returns trimmed UTF-8 stdout.
    */

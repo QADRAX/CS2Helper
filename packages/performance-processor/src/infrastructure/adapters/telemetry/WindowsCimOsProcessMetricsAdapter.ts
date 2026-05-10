@@ -7,7 +7,7 @@ import {
   parseCimProcessJsonPayload,
 } from "../../../domain/telemetry/cimProcessMetricsMap";
 import { assertPositiveIntegerPid, requireWin32 } from "../../../domain/platform/requireWin32";
-import type { PowerShellCommandPort } from "../../../application/ports/PowerShellCommandPort";
+import type { PowerShellCommandPort } from "@cs2helper/shared";
 
 /**
  * Windows implementation using `Win32_Process` (CIM) for kernel/user time, working

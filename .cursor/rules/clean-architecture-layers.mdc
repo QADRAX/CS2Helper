@@ -8,6 +8,17 @@ alwaysApply: false
 
 When planning or implementing in `packages/*` or `apps/*`, follow the repo layering. See root **AGENTS.md** for the full contract.
 
+## `src/` layout (packages and apps)
+
+Under `packages/*/src` and `apps/*/src`, only these **top-level** directories are allowed:
+
+- `application/` (alias: **app**)
+- `infrastructure/` (alias: **infra**)
+- `domain/`
+- `presentation/` (only for apps with UI, when applicable)
+
+Do not add other roots (`src/ports`, `src/helpers`, etc.). Put code in the right layer (e.g. port interfaces in `application/ports/`).
+
 ## Layer placement
 
 - **domain/** — Pure domain: types, state machines, reducers, domain functions. No concrete adapters, no UI. Minimize framework/process coupling.

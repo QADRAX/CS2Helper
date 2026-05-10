@@ -15,9 +15,7 @@ export type {
   PresentMonBootstrapPort,
 } from "./application/ports/PresentMonBootstrapPort";
 
-export type { PowerShellCommandPort } from "./application/ports/PowerShellCommandPort";
-
-export type { SubscribeCs2ProcessTrackingOptions } from "./application/useCases/subscribeCs2ProcessTracking";
+export type { PowerShellCommandPort } from "@cs2helper/shared";
 
 export type * from "./domain";
 

@@ -33,7 +33,7 @@ describe("subscribeCs2ProcessTracking", () => {
     const unsub = subscribeCs2ProcessTracking(
       [cs2Process, osMetrics, gpuMetrics, presentChain],
       listener,
-      { intervalMs: 15 }
+      { processPollIntervalMs: 15 }
     );
 
     await new Promise((r) => setTimeout(r, 45));
@@ -79,7 +79,7 @@ describe("subscribeCs2ProcessTracking", () => {
     const unsub = subscribeCs2ProcessTracking(
       [cs2Process, osMetrics, { sample: vi.fn().mockResolvedValue(null) }, presentChain],
       listener,
-      { intervalMs: 20 }
+      { processPollIntervalMs: 20 }
     );
 
     await new Promise((r) => setTimeout(r, 55));
@@ -87,6 +87,24 @@ describe("subscribeCs2ProcessTracking", () => {
     expect(withCpu.length).toBeGreaterThan(0);
     expect(withCpu[0]).toBeGreaterThan(0);
 
+    unsub();
+  });
+
+  it("samples OS/GPU at systemMetricsIntervalMs when faster than process poll", async () => {
+    const cs2Process: Cs2ProcessPort = {
+      isRunning: async () => true,
+      getStatus: async () => ({ running: true, pid: 1 }),
+    };
+    const sampleOs = vi.fn().mockResolvedValue({ workingSetBytes: 1 });
+    const startSession = vi.fn().mockResolvedValue({ stop: vi.fn().mockResolvedValue(undefined) });
+    const unsub = subscribeCs2ProcessTracking(
+      [cs2Process, { sample: sampleOs }, { sample: vi.fn().mockResolvedValue(null) }, { startSession }],
+      () => {},
+      { processPollIntervalMs: 25, systemMetricsIntervalMs: 100 }
+    );
+    await new Promise((r) => setTimeout(r, 130));
+    expect(sampleOs.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(sampleOs.mock.calls.length).toBeLessThanOrEqual(3);
     unsub();
   });
 
@@ -99,7 +117,7 @@ describe("subscribeCs2ProcessTracking", () => {
     const unsub = subscribeCs2ProcessTracking(
       [cs2Process, { sample: vi.fn() }, { sample: vi.fn() }, { startSession }],
       () => {},
-      { intervalMs: 10 }
+      { processPollIntervalMs: 10 }
     );
     await new Promise((r) => setTimeout(r, 35));
     expect(startSession).not.toHaveBeenCalled();

@@ -2,9 +2,9 @@ import type { GsiProcessorState } from "@cs2helper/gsi-processor";
 import {
   PerformanceProcessorService,
   type Cs2ProcessStatus,
+  type Cs2ProcessTrackingPollOptions,
   type Cs2ProcessTrackingSnapshot,
   type PresentMonBootstrapOptions,
-  type SubscribeCs2ProcessTrackingOptions,
 } from "@cs2helper/performance-processor";
 import { getConfig } from "../application/useCases/getConfig";
 import {
@@ -86,7 +86,7 @@ export class GsiCliApplication implements CliApp {
   getCs2Status: () => Promise<Cs2ProcessStatus>;
   subscribeCs2ProcessTracking: (
     listener: (snapshot: Cs2ProcessTrackingSnapshot) => void,
-    options?: SubscribeCs2ProcessTrackingOptions
+    options?: Cs2ProcessTrackingPollOptions
   ) => () => void;
   getSteamStatus: () => Promise<SteamStatus>;
   subscribeSteamStatus: (

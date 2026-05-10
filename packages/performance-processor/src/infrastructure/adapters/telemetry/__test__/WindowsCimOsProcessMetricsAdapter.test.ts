@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
-import type { PowerShellCommandPort } from "../../../../application/ports/PowerShellCommandPort";
+import type { PowerShellCommandPort } from "@cs2helper/shared";
 import { WindowsCimOsProcessMetricsAdapter } from "../WindowsCimOsProcessMetricsAdapter";
 
 const execFileAsync = promisify(execFile);

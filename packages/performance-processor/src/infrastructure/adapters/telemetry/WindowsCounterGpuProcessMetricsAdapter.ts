@@ -7,7 +7,7 @@ import {
   parseGpuCounterJsonPayload,
 } from "../../../domain/telemetry/gpuCounterMetricsMap";
 import { assertPositiveIntegerPid, requireWin32 } from "../../../domain/platform/requireWin32";
-import type { PowerShellCommandPort } from "../../../application/ports/PowerShellCommandPort";
+import type { PowerShellCommandPort } from "@cs2helper/shared";
 
 /**
  * Samples WDDM GPU metrics for a PID via `Get-Counter` (en-US paths) and falls back to
