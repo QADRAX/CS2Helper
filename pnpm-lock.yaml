@@ -177,6 +177,34 @@ importers:
         specifier: ^8.0.10
         version: 8.0.11(@types/node@24.12.3)(esbuild@0.27.7)(tsx@4.21.0)
 
+  packages/cs2-client-listener:
+    dependencies:
+      '@cs2helper/gsi-gateway':
+        specifier: workspace:*
+        version: link:../gsi-gateway
+      '@cs2helper/gsi-processor':
+        specifier: workspace:*
+        version: link:../gsi-processor
+      '@cs2helper/performance-processor':
+        specifier: workspace:*
+        version: link:../performance-processor
+      '@cs2helper/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@cs2helper/tick-hub':
+        specifier: workspace:*
+        version: link:../tick-hub
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.12.3
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.5
+        version: 4.1.5(@types/node@24.12.3)(@vitest/coverage-v8@4.1.5)(vite@8.0.11(@types/node@24.12.3)(esbuild@0.27.7)(tsx@4.21.0))
+
   packages/gsi-gateway:
     dependencies:
       '@cs2helper/gsi-processor':

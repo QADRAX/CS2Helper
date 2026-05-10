@@ -1,0 +1,28 @@
+{
+  "name": "@cs2helper/cs2-client-listener",
+  "version": "1.0.0",
+  "description": "CS2 tick hub: GSI gateway master clock + aligned performance telemetry via tick-hub.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "pnpm run clean && tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@cs2helper/gsi-gateway": "workspace:*",
+    "@cs2helper/gsi-processor": "workspace:*",
+    "@cs2helper/performance-processor": "workspace:*",
+    "@cs2helper/tick-hub": "workspace:*",
+    "@cs2helper/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
+  }
+}
