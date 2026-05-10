@@ -90,6 +90,9 @@ importers:
       '@cs2helper/gsi-processor-ink':
         specifier: workspace:*
         version: link:../../packages/gsi-processor-ink
+      '@cs2helper/performance-processor':
+        specifier: workspace:*
+        version: link:../../packages/performance-processor
       '@cs2helper/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -114,6 +117,9 @@ importers:
       redux:
         specifier: ^5.0.1
         version: 5.0.1
+      redux-thunk:
+        specifier: ^3.1.0
+        version: 3.1.0(redux@5.0.1)
     devDependencies:
       '@types/node':
         specifier: ^24.10.1
@@ -179,6 +185,25 @@ importers:
       vite:
         specifier: ^8.0.10
         version: 8.0.11(@types/node@24.12.3)
+
+  packages/performance-processor:
+    dependencies:
+      '@cs2helper/cli-common':
+        specifier: workspace:*
+        version: link:../cli-common
+      '@cs2helper/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.12.3
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.5
+        version: 4.1.5(@types/node@24.12.3)(@vitest/coverage-v8@4.1.5)(vite@8.0.11(@types/node@24.12.3))
 
   packages/shared: {}
 

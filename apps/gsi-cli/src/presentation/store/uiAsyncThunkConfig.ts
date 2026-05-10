@@ -1,4 +1,5 @@
-import type { ThunkDispatch, UnknownAction } from "redux";
+import type { UnknownAction } from "redux";
+import type { ThunkDispatch } from "redux-thunk";
 import type { RootState } from "./rootState";
 import type { CliThunkExtra } from "./thunkExtra";
 

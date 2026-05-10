@@ -2,7 +2,7 @@ import type {
   SteamProcessPort,
   SteamProcessStatus,
 } from "../../application/ports/SteamProcessPort";
-import { queryWindowsTasklist } from "./process/windowsTasklist";
+import { queryWindowsTasklist } from "@cs2helper/performance-processor";
 
 const STEAM_IMAGE_NAME = "steam.exe";
 

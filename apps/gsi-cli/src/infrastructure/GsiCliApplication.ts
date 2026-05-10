@@ -1,4 +1,11 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import {
+  PerformanceProcessorService,
+  type Cs2ProcessStatus,
+  type Cs2ProcessTrackingSnapshot,
+  type PresentMonBootstrapOptions,
+  type SubscribeCs2ProcessTrackingOptions,
+} from "@cs2helper/performance-processor";
 import { getConfig } from "../application/useCases/getConfig";
 import {
   createOrUpdateGsiConfig,
@@ -18,18 +25,11 @@ import { getGatewayState } from "../application/useCases/getGatewayState";
 import { subscribeGatewayState } from "../application/useCases/subscribeGatewayState";
 import { startRecording } from "../application/useCases/startRecording";
 import { stopRecording } from "../application/useCases/stopRecording";
-import { getCs2Status } from "../application/useCases/getCs2Status";
-import {
-  subscribeCs2ProcessTracking,
-  type SubscribeCs2ProcessTrackingOptions,
-} from "../application/useCases/subscribeCs2ProcessTracking";
 import {
   getSteamStatus,
   type SteamStatus,
 } from "../application/useCases/getSteamStatus";
 import { verifyEnvSteamWebApiKey } from "../application/useCases/verifyEnvSteamWebApiKey";
-import { ensurePresentMonBootstrap } from "../application/useCases/ensurePresentMonBootstrap";
-import type { PresentMonBootstrapOptions } from "../application/ports/PresentMonBootstrapPort";
 import type { ValidateSteamApiKeyOutcome } from "../application/ports/SteamWebApiClientPort";
 import {
   subscribeSteamStatus,
@@ -39,22 +39,14 @@ import type { CliApp } from "../application/CliApp";
 import type { GatewayStartInfo } from "../application/ports/GatewayPort";
 import type { GatewayDiagnostics } from "../application/ports/GatewayPort";
 import type { CliConfig } from "../domain/cli/config";
-import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "../domain/telemetry/cs2Process";
 import { withPorts, withPortsAsync } from "@cs2helper/shared";
 import { CliAppService } from "./CliAppService";
-import { ManagedPresentMonBootstrapAdapter } from "./adapters/ManagedPresentMonBootstrapAdapter";
 import { FileConfigAdapter } from "./adapters/FileConfigAdapter";
 import { FileRecorderAdapter } from "./adapters/FileRecorderAdapter";
 import { FsGsiConfigFileAdapter } from "./adapters/FsGsiConfigFileAdapter";
 import { InMemoryGatewayAdapter } from "./adapters/InMemoryGatewayAdapter";
 import { SteamCs2LauncherAdapter } from "./adapters/SteamCs2LauncherAdapter";
 import { SteamRegistryCs2LocatorAdapter } from "./adapters/SteamRegistryCs2LocatorAdapter";
-import { TasklistCs2ProcessAdapter } from "./adapters/TasklistCs2ProcessAdapter";
-import {
-  PresentMonPresentChainMetricsAdapter,
-  WindowsCimOsProcessMetricsAdapter,
-  WindowsCounterGpuProcessMetricsAdapter,
-} from "./adapters/telemetry";
 import { TasklistSteamProcessAdapter } from "./adapters/TasklistSteamProcessAdapter";
 import { SteamRegistrySteamInstallAdapter } from "./adapters/SteamRegistrySteamInstallAdapter";
 import { SteamWebApiFetchAdapter } from "./adapters/SteamWebApiFetchAdapter";
@@ -72,11 +64,7 @@ export class GsiCliApplication implements CliApp {
   private readonly gsiConfigFilePort: FsGsiConfigFileAdapter;
   private readonly cs2LauncherPort: SteamCs2LauncherAdapter;
   private readonly dataFolderOpenerPort: WindowsDataFolderOpenerAdapter;
-  private readonly cs2ProcessPort: TasklistCs2ProcessAdapter;
-  private readonly osProcessMetricsPort: WindowsCimOsProcessMetricsAdapter;
-  private readonly gpuProcessMetricsPort: WindowsCounterGpuProcessMetricsAdapter;
-  private readonly presentMonBootstrap: ManagedPresentMonBootstrapAdapter;
-  private readonly presentChainMetricsPort: PresentMonPresentChainMetricsAdapter;
+  private readonly performance: PerformanceProcessorService;
   private readonly steamProcessPort: TasklistSteamProcessAdapter;
   private readonly steamInstallPort: SteamRegistrySteamInstallAdapter;
   private readonly steamWebApiKeySource: ProcessEnvSteamWebApiKeyAdapter;
@@ -118,11 +106,7 @@ export class GsiCliApplication implements CliApp {
     this.gsiConfigFilePort = new FsGsiConfigFileAdapter();
     this.cs2LauncherPort = new SteamCs2LauncherAdapter();
     this.dataFolderOpenerPort = new WindowsDataFolderOpenerAdapter();
-    this.cs2ProcessPort = new TasklistCs2ProcessAdapter();
-    this.osProcessMetricsPort = new WindowsCimOsProcessMetricsAdapter(powershell);
-    this.gpuProcessMetricsPort = new WindowsCounterGpuProcessMetricsAdapter(powershell);
-    this.presentMonBootstrap = new ManagedPresentMonBootstrapAdapter();
-    this.presentChainMetricsPort = new PresentMonPresentChainMetricsAdapter();
+    this.performance = new PerformanceProcessorService({ powershell });
     this.steamProcessPort = new TasklistSteamProcessAdapter();
     this.steamInstallPort = new SteamRegistrySteamInstallAdapter();
     this.steamWebApiKeySource = new ProcessEnvSteamWebApiKeyAdapter();
@@ -155,13 +139,10 @@ export class GsiCliApplication implements CliApp {
     ]);
     this.startRecording = withPortsAsync(startRecording, [this.gatewayPort, this.recorderPort]);
     this.stopRecording = withPortsAsync(stopRecording, [this.recorderPort]);
-    this.getCs2Status = withPortsAsync(getCs2Status, [this.cs2ProcessPort]);
-    this.subscribeCs2ProcessTracking = withPorts(subscribeCs2ProcessTracking, [
-      this.cs2ProcessPort,
-      this.osProcessMetricsPort,
-      this.gpuProcessMetricsPort,
-      this.presentChainMetricsPort,
-    ]);
+    this.getCs2Status = this.performance.getCs2Status.bind(this.performance);
+    this.subscribeCs2ProcessTracking = this.performance.subscribeCs2ProcessTracking.bind(
+      this.performance
+    );
     this.getSteamStatus = withPortsAsync(getSteamStatus, [
       this.steamInstallPort,
       this.steamProcessPort,
@@ -174,8 +155,8 @@ export class GsiCliApplication implements CliApp {
       this.steamWebApiKeySource,
       this.steamWebApiClient,
     ]);
-    this.ensurePresentMonBootstrap = withPortsAsync(ensurePresentMonBootstrap, [
-      this.presentMonBootstrap,
-    ]);
+    this.ensurePresentMonBootstrap = this.performance.ensurePresentMonBootstrap.bind(
+      this.performance
+    );
   }
 }

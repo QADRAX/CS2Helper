@@ -4,7 +4,7 @@ export type { Cs2ProcessStatus } from "../../../domain/telemetry/cs2Process";
 
 /**
  * Application port: observe whether `cs2.exe` is running and resolve its PID.
- * Starting/stopping the game is out of scope (see `Cs2LauncherPort`).
+ * Starting/stopping the game is out of scope (see launcher ports in the host app).
  */
 export interface Cs2ProcessPort {
   /** Whether the cs2.exe process is currently running. */

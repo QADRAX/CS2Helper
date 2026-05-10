@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { PresentMonBootstrapProgressEvent } from "../../../../application/ports/PresentMonBootstrapPort";
+import type { PresentMonBootstrapProgressEvent } from "@cs2helper/performance-processor";
 import { msgKeys, type MessageKey } from "../../../i18n/msgKeys";
 import { translate } from "../../../i18n/translate";
 import { enqueueNotification } from "../notifications";

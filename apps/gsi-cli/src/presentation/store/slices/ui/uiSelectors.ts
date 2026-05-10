@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
-import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "../../../../domain/telemetry/cs2Process";
+import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
 import type { SteamStatus } from "../../../../application/useCases/getSteamStatus";
 import type { SteamWebApiUiSlice } from "./types";
 import type { CliConfig } from "../../../../domain/cli/config";

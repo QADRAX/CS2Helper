@@ -1,14 +1,17 @@
 import type { GsiProcessorState } from "@cs2helper/gsi-processor";
+import type {
+  Cs2ProcessStatus,
+  Cs2ProcessTrackingSnapshot,
+  PresentMonBootstrapOptions,
+  SubscribeCs2ProcessTrackingOptions,
+} from "@cs2helper/performance-processor";
 import type { CreateOrUpdateGsiConfigResult } from "./useCases/createOrUpdateGsiConfig";
 import type { VerifyGsiConfigResult } from "./useCases/verifyGsiConfig";
-import type { SubscribeCs2ProcessTrackingOptions } from "./useCases/subscribeCs2ProcessTracking";
 import type { SteamStatus } from "./useCases/getSteamStatus";
 import type { SubscribeSteamStatusOptions } from "./useCases/subscribeSteamStatus";
-import type { PresentMonBootstrapOptions } from "./ports/PresentMonBootstrapPort";
 import type { ValidateSteamApiKeyOutcome } from "./ports/SteamWebApiClientPort";
 import type { GatewayStartInfo, GatewayDiagnostics } from "./ports/GatewayPort";
 import type { CliConfig } from "../domain/cli/config";
-import type { Cs2ProcessStatus, Cs2ProcessTrackingSnapshot } from "../domain/telemetry/cs2Process";
 
 export interface CliApp {
   startGateway: () => Promise<GatewayStartInfo>;

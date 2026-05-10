@@ -12,7 +12,7 @@ export interface Cs2LaunchOptions {
  * `steam.exe -applaunch`, etc.).
  *
  * The contract intentionally does not wait for the game to be ready —
- * presence/readiness must be observed separately via `Cs2ProcessPort`.
+ * presence/readiness must be observed separately (see `@cs2helper/performance-processor` `Cs2ProcessPort`).
  */
 export interface Cs2LauncherPort {
   /** Fires the launch request and resolves once Steam has been invoked. */

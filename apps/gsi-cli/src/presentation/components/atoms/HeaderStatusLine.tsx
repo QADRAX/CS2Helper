@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Box, Text } from "ink";
 import type { CliStatus } from "../../../domain/cli";
-import type { Cs2ProcessTrackingSnapshot } from "../../../domain/telemetry/cs2Process";
+import type { Cs2ProcessTrackingSnapshot } from "@cs2helper/performance-processor";
 import { msgKeys } from "../../i18n/msgKeys";
 import type { SteamWebApiUiSlice } from "../../store/slices/ui/types";
 import { useTranslation } from "../../i18n/useTranslation";

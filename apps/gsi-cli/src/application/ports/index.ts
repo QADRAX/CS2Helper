@@ -1,5 +1,4 @@
 export * from "./ConfigPort";
-export * from "./PresentMonBootstrapPort";
 export * from "./DataFolderOpenerPort";
 export * from "./GatewayPort";
 export * from "./RecorderPort";
@@ -8,4 +7,3 @@ export * from "./Cs2LauncherPort";
 export * from "./GsiConfigFilePort";
 export * from "./SteamInstallLocatorPort";
 export * from "./SteamProcessPort";
-export * from "./telemetry";

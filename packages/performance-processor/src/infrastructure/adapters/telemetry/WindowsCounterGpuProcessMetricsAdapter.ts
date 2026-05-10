@@ -7,7 +7,7 @@ import {
   parseGpuCounterJsonPayload,
 } from "../../../domain/telemetry/gpuCounterMetricsMap";
 import { assertPositiveIntegerPid, requireWin32 } from "../../../domain/platform/requireWin32";
-import type { CliAppService } from "../../CliAppService";
+import type { PowerShellCommandPort } from "../../../application/ports/PowerShellCommandPort";
 
 /**
  * Samples WDDM GPU metrics for a PID via `Get-Counter` (en-US paths) and falls back to
@@ -16,7 +16,7 @@ import type { CliAppService } from "../../CliAppService";
  * matching must allow `_` after the pid digit run (not only whitespace).
  */
 export class WindowsCounterGpuProcessMetricsAdapter implements GpuProcessMetricsPort {
-  constructor(private readonly powershell: CliAppService) {}
+  constructor(private readonly powershell: PowerShellCommandPort) {}
 
   async sample(pid: number): Promise<GpuProcessMetricsSample | null> {
     requireWin32("WindowsCounterGpuProcessMetricsAdapter");
