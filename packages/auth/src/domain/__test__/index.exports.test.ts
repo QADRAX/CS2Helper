@@ -12,6 +12,8 @@ describe("domain index exports", () => {
     expect(Domain.PROFILE_READ_ANY_PERMISSION).toBe("users.profile.read_any");
     expect(Domain.AUTH_RBAC_MANAGE_PERMISSION).toBe("auth.rbac.manage");
     expect(Domain.AUTH_INVITATIONS_MANAGE_PERMISSION).toBe("users.invitations.manage");
+    expect(Domain.PERSONAL_ACCESS_TOKEN_PREFIX).toBe("cs2h_pat_");
+    expect(typeof Domain.isPersonalAccessTokenPlain).toBe("function");
     expect(typeof Domain.encodeOpaqueRefreshToken).toBe("function");
     expect(Domain.AuthDomainError).toBeDefined();
   });

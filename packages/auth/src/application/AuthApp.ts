@@ -1,8 +1,11 @@
 import type {
   AccessTokenClaims,
   AuthTokens,
+  CreatePersonalAccessTokenInput,
   HostCreateInvitationInput,
   Permission,
+  PersonalAccessTokenCreated,
+  PersonalAccessTokenSummary,
   RegisterUserInput,
   Role,
   UserProfile,
@@ -19,6 +22,11 @@ export interface AuthApp {
   refreshAccessToken(refreshTokenPlain: string): Promise<AuthTokens>;
   logout(refreshTokenPlain: string): Promise<void>;
   verifyAccessToken(accessToken: string): Promise<AccessTokenClaims>;
+  /**
+   * Verifies a JWT access token or a plaintext personal access token (`cs2h_pat_…`).
+   * Strip a `Bearer ` prefix before calling.
+   */
+  verifyAccessTokenOrPersonalAccessToken(token: string): Promise<AccessTokenClaims>;
 
   assertUserHasPermission(userId: string, permissionKey: string): Promise<void>;
   getEffectivePermissions(userId: string): Promise<string[]>;
@@ -61,4 +69,11 @@ export interface AuthApp {
     input: HostCreateInvitationInput
   ): Promise<{ plainCode: string; invitationId: string; expiresAt: Date }>;
   revokeInvitation(actorUserId: string, invitationId: string): Promise<void>;
+
+  createPersonalAccessToken(
+    actorUserId: string,
+    input: CreatePersonalAccessTokenInput
+  ): Promise<PersonalAccessTokenCreated>;
+  listPersonalAccessTokens(actorUserId: string): Promise<PersonalAccessTokenSummary[]>;
+  revokePersonalAccessToken(actorUserId: string, tokenId: string): Promise<void>;
 }

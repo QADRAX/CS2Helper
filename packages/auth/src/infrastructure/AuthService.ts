@@ -1,16 +1,20 @@
 import { withPortsAsync } from "@cs2helper/shared";
 import type { Pool } from "pg";
 import type { AuthApp } from "../application/AuthApp";
-import type {
-  AccessTokenClaims,
-  AuthTokens,
-  CreateInvitationInput,
-  HostCreateInvitationInput,
-  Permission,
-  RegisterUserInput,
-  Role,
-  UserProfile,
-  UserProfileUpdate,
+import {
+  isPersonalAccessTokenPlain,
+  type AccessTokenClaims,
+  type AuthTokens,
+  type CreateInvitationInput,
+  type CreatePersonalAccessTokenInput,
+  type HostCreateInvitationInput,
+  type Permission,
+  type PersonalAccessTokenCreated,
+  type PersonalAccessTokenSummary,
+  type RegisterUserInput,
+  type Role,
+  type UserProfile,
+  type UserProfileUpdate,
 } from "../domain";
 import {
   AUTH_INVITATIONS_MANAGE_PERMISSION,
@@ -22,25 +26,30 @@ import { assignPermissionToRole } from "../application/useCases/assignPermission
 import { assignRoleToUser } from "../application/useCases/assignRoleToUser";
 import { authenticateUser } from "../application/useCases/authenticateUser";
 import { createInvitation } from "../application/useCases/createInvitation";
+import { createPersonalAccessToken } from "../application/useCases/createPersonalAccessToken";
 import { createPermission } from "../application/useCases/createPermission";
 import { createRole } from "../application/useCases/createRole";
 import { deleteRole } from "../application/useCases/deleteRole";
 import { getEffectivePermissions } from "../application/useCases/getEffectivePermissions";
 import { getUserProfile } from "../application/useCases/getUserProfile";
 import { listPermissions } from "../application/useCases/listPermissions";
+import { listPersonalAccessTokens } from "../application/useCases/listPersonalAccessTokens";
 import { listRoles } from "../application/useCases/listRoles";
 import { logoutUser } from "../application/useCases/logoutUser";
 import { refreshAccessToken } from "../application/useCases/refreshAccessToken";
 import { registerUser } from "../application/useCases/registerUser";
 import { removeRoleFromUser } from "../application/useCases/removeRoleFromUser";
 import { revokeInvitation } from "../application/useCases/revokeInvitation";
+import { revokePersonalAccessToken } from "../application/useCases/revokePersonalAccessToken";
 import { revokePermissionFromRole } from "../application/useCases/revokePermissionFromRole";
 import { updateUserProfile } from "../application/useCases/updateUserProfile";
 import { verifyAccessToken } from "../application/useCases/verifyAccessToken";
+import { verifyPersonalAccessToken } from "../application/useCases/verifyPersonalAccessToken";
 import { DrizzleRbacRepository } from "./adapters/DrizzleRbacRepository";
 import { DrizzleRefreshTokenStore } from "./adapters/DrizzleRefreshTokenStore";
 import { DrizzleUserProfileRepository } from "./adapters/DrizzleUserProfileRepository";
 import { DrizzleInvitationRepository } from "./adapters/DrizzleInvitationRepository";
+import { DrizzlePersonalAccessTokenRepository } from "./adapters/DrizzlePersonalAccessTokenRepository";
 import { DrizzleUserRepository } from "./adapters/DrizzleUserRepository";
 import { JoseJwtAdapter } from "./adapters/JoseJwtAdapter";
 import { NodeSecureRandomAdapter } from "./adapters/NodeSecureRandomAdapter";
@@ -73,12 +82,14 @@ export class AuthService implements AuthApp {
   private readonly random: NodeSecureRandomAdapter;
   private readonly sessionPolicy: SessionPolicyPort;
   private readonly invitations: DrizzleInvitationRepository;
+  private readonly patTokens: DrizzlePersonalAccessTokenRepository;
 
   private readonly register: (input: RegisterUserInput) => Promise<AuthTokens>;
   private readonly login: (email: string, password: string) => Promise<AuthTokens>;
   private readonly refresh: (refreshTokenPlain: string) => Promise<AuthTokens>;
   private readonly logoutBound: (refreshTokenPlain: string) => Promise<void>;
   private readonly verify: (accessToken: string) => Promise<AccessTokenClaims>;
+  private readonly verifyPat: (plainToken: string) => Promise<AccessTokenClaims>;
   private readonly assertPermission: (userId: string, permissionKey: string) => Promise<void>;
   private readonly effectivePermissions: (userId: string) => Promise<string[]>;
   private readonly profileGet: (subjectUserId: string, actorUserId: string) => Promise<UserProfile>;
@@ -110,6 +121,13 @@ export class AuthService implements AuthApp {
   ) => Promise<{ plainCode: string; invitationId: string; expiresAt: Date }>;
   private readonly inviteRevoke: (invitationId: string) => Promise<void>;
 
+  private readonly patCreate: (
+    userId: string,
+    input: CreatePersonalAccessTokenInput
+  ) => Promise<PersonalAccessTokenCreated>;
+  private readonly patList: (userId: string) => Promise<PersonalAccessTokenSummary[]>;
+  private readonly patRevoke: (userId: string, tokenId: string) => Promise<void>;
+
   constructor(pool: Pool, options: AuthServiceOptions) {
     const db = createAuthDb(pool);
     this.clock = new SystemClockAdapter();
@@ -117,6 +135,7 @@ export class AuthService implements AuthApp {
     this.profiles = new DrizzleUserProfileRepository(db);
     this.rbac = new DrizzleRbacRepository(db);
     this.invitations = new DrizzleInvitationRepository(db, this.clock);
+    this.patTokens = new DrizzlePersonalAccessTokenRepository(db, this.clock);
     this.refreshTokens = new DrizzleRefreshTokenStore(db, this.clock);
     this.passwordHasher = new ScryptPasswordHasher();
     this.jwt = new JoseJwtAdapter({
@@ -167,6 +186,13 @@ export class AuthService implements AuthApp {
     ]);
     this.logoutBound = withPortsAsync(logoutUser, [this.refreshTokens]);
     this.verify = withPortsAsync(verifyAccessToken, [this.jwt]);
+    this.verifyPat = withPortsAsync(verifyPersonalAccessToken, [
+      this.patTokens,
+      this.users,
+      this.rbac,
+      this.jwt,
+      this.clock,
+    ]);
     this.assertPermission = withPortsAsync(assertUserHasPermission, [this.rbac]);
     this.effectivePermissions = withPortsAsync(getEffectivePermissions, [this.rbac]);
     this.profileGet = withPortsAsync(getUserProfile, [this.profiles, this.rbac]);
@@ -188,6 +214,14 @@ export class AuthService implements AuthApp {
       this.clock,
     ]);
     this.inviteRevoke = withPortsAsync(revokeInvitation, [this.invitations]);
+
+    this.patCreate = withPortsAsync(createPersonalAccessToken, [
+      this.patTokens,
+      this.random,
+      this.clock,
+    ]);
+    this.patList = withPortsAsync(listPersonalAccessTokens, [this.patTokens]);
+    this.patRevoke = withPortsAsync(revokePersonalAccessToken, [this.patTokens]);
   }
 
   registerUser(input: RegisterUserInput): Promise<AuthTokens> {
@@ -208,6 +242,14 @@ export class AuthService implements AuthApp {
 
   verifyAccessToken(accessToken: string): Promise<AccessTokenClaims> {
     return this.verify(accessToken);
+  }
+
+  verifyAccessTokenOrPersonalAccessToken(token: string): Promise<AccessTokenClaims> {
+    const t = token.trim();
+    if (isPersonalAccessTokenPlain(t)) {
+      return this.verifyPat(t);
+    }
+    return this.verify(t);
   }
 
   assertUserHasPermission(userId: string, permissionKey: string): Promise<void> {
@@ -317,5 +359,20 @@ export class AuthService implements AuthApp {
   async revokeInvitation(actorUserId: string, invitationId: string): Promise<void> {
     await this.assertPermission(actorUserId, AUTH_INVITATIONS_MANAGE_PERMISSION);
     return this.inviteRevoke(invitationId);
+  }
+
+  createPersonalAccessToken(
+    actorUserId: string,
+    input: CreatePersonalAccessTokenInput
+  ): Promise<PersonalAccessTokenCreated> {
+    return this.patCreate(actorUserId, input);
+  }
+
+  listPersonalAccessTokens(actorUserId: string): Promise<PersonalAccessTokenSummary[]> {
+    return this.patList(actorUserId);
+  }
+
+  revokePersonalAccessToken(actorUserId: string, tokenId: string): Promise<void> {
+    return this.patRevoke(actorUserId, tokenId);
   }
 }

@@ -15,6 +15,14 @@ export function createJwtPortFake(overrides: Partial<JwtPort> = {}): JwtPort {
       iat: 1,
       exp: 2,
     })),
+    buildSyntheticAccessClaims: vi.fn((payload) => ({
+      sub: payload.sub,
+      email: payload.email,
+      permissions: [...payload.permissions],
+      roles: [...payload.roles],
+      iat: 10,
+      exp: 20,
+    })),
     ...overrides,
   };
 }

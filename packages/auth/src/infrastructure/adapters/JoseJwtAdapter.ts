@@ -54,6 +54,27 @@ export class JoseJwtAdapter implements JwtPort {
     return { token, expiresAt: exp };
   }
 
+  buildSyntheticAccessClaims(payload: {
+    sub: string;
+    email: string;
+    permissions: readonly string[];
+    roles: readonly string[];
+  }): AccessTokenClaims {
+    const now = this.clock.now();
+    const iat = Math.floor(now.getTime() / 1000);
+    const exp = iat + this.accessTokenTtlSec;
+    return {
+      sub: payload.sub,
+      email: payload.email,
+      permissions: payload.permissions,
+      roles: payload.roles,
+      iat,
+      exp,
+      iss: this.issuer,
+      aud: this.audience,
+    };
+  }
+
   async verifyAccess(token: string): Promise<AccessTokenClaims> {
     try {
       const { payload } = await jwtVerify(token, this.encodedSecret, {

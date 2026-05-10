@@ -13,3 +13,5 @@ export * from "./encodeOpaqueRefreshToken";
 export * from "./registerUserInput";
 export * from "./createInvitationInput";
 export * from "./hostCreateInvitationInput";
+export * from "./patPrefix";
+export * from "./personalAccessToken";

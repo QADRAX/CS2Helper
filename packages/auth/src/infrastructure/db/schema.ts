@@ -95,6 +95,20 @@ export const invitations = pgTable("invitations", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const personalAccessTokens = pgTable("personal_access_tokens", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  tokenPrefix: text("token_prefix").notNull(),
+  label: text("label"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const authSchema = {
   users,
   userProfiles,
@@ -104,4 +118,5 @@ export const authSchema = {
   rolePermissions,
   refreshTokens,
   invitations,
+  personalAccessTokens,
 };

@@ -4,6 +4,7 @@ export * from "./fixtures";
 export * from "./invitationRepository";
 export * from "./jwtPort";
 export * from "./passwordHasher";
+export * from "./personalAccessTokenRepository";
 export * from "./rbacRepository";
 export * from "./refreshTokenStore";
 export * from "./secureRandom";

@@ -19,3 +19,7 @@ export * from "./assignRoleToUser";
 export * from "./removeRoleFromUser";
 export * from "./listRoles";
 export * from "./listPermissions";
+export * from "./createPersonalAccessToken";
+export * from "./listPersonalAccessTokens";
+export * from "./revokePersonalAccessToken";
+export * from "./verifyPersonalAccessToken";

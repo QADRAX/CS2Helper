@@ -8,3 +8,4 @@ export * from "./clockPort";
 export * from "./secureRandomPort";
 export * from "./sessionPolicyPort";
 export * from "./invitationRepositoryPort";
+export * from "./personalAccessTokenRepositoryPort";
