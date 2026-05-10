@@ -27,17 +27,17 @@ export function buildReplayTimelineMetadata(
     return { durationSeconds: 0, tickIndexBySecond: [-1] };
   }
 
-  const durationSeconds = Math.max(
-    Math.floor((steps.at(-1)?.timestamp ?? 0) / timestampStepMs),
-    0
-  );
+  /** Tick hub uses wall-clock `Date.now()`; timeline length must be relative to the session start. */
+  const t0 = steps[0]!.timestamp;
+  const tLast = steps.at(-1)?.timestamp ?? t0;
+  const durationSeconds = Math.max(Math.floor((tLast - t0) / timestampStepMs), 0);
   const tickIndexBySecond: number[] = [];
   let cursor = -1;
 
   for (let second = 0; second <= durationSeconds; second += 1) {
     while (
       cursor + 1 < steps.length &&
-      Math.floor(steps[cursor + 1]!.timestamp / timestampStepMs) <= second
+      Math.floor((steps[cursor + 1]!.timestamp - t0) / timestampStepMs) <= second
     ) {
       cursor += 1;
     }
