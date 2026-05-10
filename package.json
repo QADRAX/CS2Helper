@@ -6,6 +6,11 @@
   "author": "Qadrax",
   "private": true,
   "packageManager": "pnpm@10.20.0",
+  "pnpm": {
+    "overrides": {
+      "esbuild@<=0.24.2": "0.25.12"
+    }
+  },
   "scripts": {
     "typecheck": "pnpm -r --if-present run typecheck",
     "build": "pnpm -r --if-present run build",
@@ -33,7 +38,10 @@
     "lint:gsi-processor-ink": "pnpm --filter @cs2helper/gsi-processor-ink lint",
     "build:gsi-bench-cli": "pnpm --filter @cs2helper/gsi-bench-cli build",
     "lint:gsi-bench-cli": "pnpm --filter @cs2helper/gsi-bench-cli lint",
-    "test:gsi-bench-cli": "pnpm --filter @cs2helper/gsi-bench-cli test"
+    "test:gsi-bench-cli": "pnpm --filter @cs2helper/gsi-bench-cli test",
+    "build:auth": "pnpm --filter @cs2helper/auth build",
+    "lint:auth": "pnpm --filter @cs2helper/auth lint",
+    "test:auth": "pnpm --filter @cs2helper/auth test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
