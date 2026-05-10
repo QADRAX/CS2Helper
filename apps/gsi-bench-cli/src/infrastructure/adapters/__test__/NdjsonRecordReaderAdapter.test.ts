@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import os from "os";
 import path from "path";
 import { describe, expect, it } from "vitest";
-import type { GsiRecordFile } from "../../../../domain/bench";
+import type { GsiRecordFile } from "../../../domain";
 import { NdjsonRecordReaderAdapter } from "../NdjsonRecordReaderAdapter";
 
 describe("NdjsonRecordReaderAdapter", () => {

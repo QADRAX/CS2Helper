@@ -1,12 +1,12 @@
 import fs from "fs/promises";
 import type { CS2GameState } from "@cs2helper/gsi-processor";
-import type { RecordReaderPort } from "../../../application/bench";
+import type { RecordReaderPort } from "../../application";
 import type {
   GsiRecordFile,
   GsiRecordFrame,
   GsiRecordParseError,
   ReadRecordFramesResult,
-} from "../../../domain/bench";
+} from "../../domain";
 
 /** Reads raw GSI payload records from disk, including pretty-printed JSON payloads. */
 export class NdjsonRecordReaderAdapter implements RecordReaderPort {

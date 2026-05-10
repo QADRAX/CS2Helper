@@ -1,8 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
 import { getGsiCliRecordingsDir } from "@cs2helper/cli-common";
-import type { RecordCatalogPort } from "../../../application/bench";
-import type { GsiRecordFile } from "../../../domain/bench";
+import type { RecordCatalogPort } from "../../application";
+import type { GsiRecordFile } from "../../domain";
 
 /** Filesystem adapter that lists records written by `gsi-cli`. */
 export class FsRecordCatalogAdapter implements RecordCatalogPort {

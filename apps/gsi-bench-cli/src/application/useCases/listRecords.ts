@@ -1,5 +1,5 @@
 import type { UseCase } from "@cs2helper/shared";
-import type { GsiRecordFile } from "../../../domain/bench";
+import type { GsiRecordFile } from "../../domain";
 import type { RecordCatalogPort } from "../ports";
 
 /**

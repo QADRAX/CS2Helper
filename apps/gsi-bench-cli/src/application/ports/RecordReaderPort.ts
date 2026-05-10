@@ -1,4 +1,4 @@
-import type { GsiRecordFile, ReadRecordFramesResult } from "../../../domain/bench";
+import type { GsiRecordFile, ReadRecordFramesResult } from "../../domain";
 
 /** Reads and parses frames from a raw GSI record file. */
 export interface RecordReaderPort {

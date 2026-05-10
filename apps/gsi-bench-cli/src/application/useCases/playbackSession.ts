@@ -4,7 +4,7 @@ import type {
   ReplayResult,
   ReplaySeekMode,
   ReplaySpeed,
-} from "../../../domain/bench";
+} from "../../domain";
 
 const TICK_MS = 1_000;
 

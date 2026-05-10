@@ -5,7 +5,7 @@ import {
   type GsiProcessorStatusLabels,
 } from "@cs2helper/gsi-processor-ink";
 import type { BenchCliApp } from "../../../application";
-import type { GsiRecordFile, ReplayPlaybackSession, ReplayResult } from "../../../domain/bench";
+import type { GsiRecordFile, ReplayPlaybackSession, ReplayResult } from "../../../domain";
 import { MenuOptionLine } from "../atoms";
 
 type ScreenMode = "list" | "loading" | "player" | "analysis";

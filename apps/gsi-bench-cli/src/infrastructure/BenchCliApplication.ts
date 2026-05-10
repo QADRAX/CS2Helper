@@ -5,12 +5,12 @@ import type {
   ReplayResult,
   ReplaySeekMode,
   ReplaySpeed,
-} from "../../domain/bench";
-import type { BenchCliApp } from "../../application";
-import { listRecords } from "../../application/bench/useCases/listRecords";
-import { selectRecord } from "../../application/bench/useCases/selectRecord";
-import { replayRecord } from "../../application/bench/useCases/replayRecord";
-import { analyzeRecordReplay } from "../../application/bench/useCases/analyzeRecordReplay";
+} from "../domain";
+import type { BenchCliApp } from "../application";
+import { listRecords } from "../application/useCases/listRecords";
+import { selectRecord } from "../application/useCases/selectRecord";
+import { replayRecord } from "../application/useCases/replayRecord";
+import { analyzeRecordReplay } from "../application/useCases/analyzeRecordReplay";
 import {
   advancePlayback,
   createPlaybackSession,
@@ -18,7 +18,7 @@ import {
   setPlaybackSpeed,
   togglePlayback,
   toggleSeekMode,
-} from "../../application/bench/useCases/playbackSession";
+} from "../application/useCases/playbackSession";
 import { FsRecordCatalogAdapter } from "./adapters/FsRecordCatalogAdapter";
 import { GsiProcessorReplayAdapter } from "./adapters/GsiProcessorReplayAdapter";
 import { NdjsonRecordReaderAdapter } from "./adapters/NdjsonRecordReaderAdapter";

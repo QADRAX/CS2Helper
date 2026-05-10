@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "ink";
-import { BenchCliApplication } from "./infrastructure/bench/BenchCliApplication.js";
+import { BenchCliApplication } from "./infrastructure/BenchCliApplication.js";
 import { App } from "./presentation/App.js";
 
 const CLEAR_TERMINAL = "\x1B[2J\x1B[3J\x1B[H";

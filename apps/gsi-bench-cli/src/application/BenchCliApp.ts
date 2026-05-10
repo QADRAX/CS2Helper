@@ -4,7 +4,7 @@ import type {
   ReplayResult,
   ReplaySeekMode,
   ReplaySpeed,
-} from "../domain/bench";
+} from "../domain";
 
 /** Application-facing API for the GSI bench CLI (implemented by the infrastructure composition root). */
 export interface BenchCliApp {

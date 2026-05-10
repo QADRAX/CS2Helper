@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { GsiRecordFile, ReadRecordFramesResult } from "../../../../domain/bench";
+import type { GsiRecordFile, ReadRecordFramesResult } from "../../../domain";
 import { GsiProcessorReplayAdapter } from "../GsiProcessorReplayAdapter";
 
 describe("GsiProcessorReplayAdapter", () => {

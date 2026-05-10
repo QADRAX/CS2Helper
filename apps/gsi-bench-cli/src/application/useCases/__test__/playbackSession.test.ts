@@ -7,7 +7,7 @@ import {
   togglePlayback,
   toggleSeekMode,
 } from "../playbackSession";
-import type { ReplayResult } from "../../../../domain/bench";
+import type { ReplayResult } from "../../../domain";
 
 describe("playbackSession", () => {
   it("advances with speed and pauses at end", () => {

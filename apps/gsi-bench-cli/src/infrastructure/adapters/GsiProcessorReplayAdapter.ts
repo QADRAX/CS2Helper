@@ -3,7 +3,7 @@ import {
   type GsiProcessorEvent,
   type GsiProcessorState,
 } from "@cs2helper/gsi-processor";
-import type { ProcessorReplayPort } from "../../../application/bench";
+import type { ProcessorReplayPort } from "../../application";
 import type {
   GsiRecordFile,
   ReadRecordFramesResult,
@@ -11,7 +11,7 @@ import type {
   ReplayTimelineMetadata,
   ReplayStateSummary,
   ReplayStep,
-} from "../../../domain/bench";
+} from "../../domain";
 
 const TIMESTAMP_STEP_MS = 1_000;
 
