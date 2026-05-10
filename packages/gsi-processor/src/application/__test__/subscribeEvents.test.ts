@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { subscribeEvents } from "../gsiProcessor";
+import { subscribeEvents } from "..";
 
 describe("subscribeEvents use case", () => {
   it("delegates to eventsPort.subscribe", () => {
@@ -9,10 +9,9 @@ describe("subscribeEvents use case", () => {
       subscribe: vi.fn().mockReturnValue(unsub),
     };
     const listener = vi.fn();
-    
-    // Injected as an object { events }
-    const result = subscribeEvents({ events: eventsPort as any }, listener);
-    
+
+    const result = subscribeEvents([eventsPort as any], listener);
+
     expect(eventsPort.subscribe).toHaveBeenCalledWith(listener);
     expect(result).toBe(unsub);
   });

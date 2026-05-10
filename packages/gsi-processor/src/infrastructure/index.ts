@@ -1,1 +1,1 @@
-export * from "./gsiProcessor";
+export * from "./GsiProcessorService";

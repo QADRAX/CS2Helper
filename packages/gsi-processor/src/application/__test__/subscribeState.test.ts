@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { subscribeState } from "../gsiProcessor";
+import { subscribeState } from "..";
 
 describe("subscribeState use case", () => {
   it("delegates to statePort.subscribeState", () => {
@@ -10,10 +10,9 @@ describe("subscribeState use case", () => {
       subscribeState: vi.fn().mockReturnValue(unsub),
     };
     const listener = vi.fn();
-    
-    // Injected as an object { state }
-    const result = subscribeState({ state: statePort as any }, listener);
-    
+
+    const result = subscribeState([statePort as any], listener);
+
     expect(statePort.subscribeState).toHaveBeenCalledWith(listener);
     expect(result).toBe(unsub);
   });

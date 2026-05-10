@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { processTick } from "../gsiProcessor";
-import { createInitialGsiProcessorState, createInitialGsiProcessorMemory } from "../../domain/gsiProcessor";
+import { processTick } from "..";
+import { createInitialGsiProcessorState, createInitialGsiProcessorMemory } from "../../domain";
 
 describe("processTick use case", () => {
   it("orchestrates domain processing and updates ports", () => {
@@ -22,17 +22,8 @@ describe("processTick use case", () => {
     };
 
     const tick = { provider: { name: "test" } };
-    
-    // Injected as an object { state, memory, events, clock }
-    processTick(
-      {
-        state: statePort as any,
-        memory: memoryPort as any,
-        events: eventsPort as any,
-        clock: clockPort as any
-      },
-      tick
-    );
+
+    processTick([statePort as any, memoryPort as any, eventsPort as any, clockPort as any], tick);
 
     expect(statePort.getState).toHaveBeenCalled();
     expect(statePort.setState).toHaveBeenCalled();
