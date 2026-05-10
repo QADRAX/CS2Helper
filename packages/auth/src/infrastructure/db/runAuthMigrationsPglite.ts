@@ -1,15 +1,14 @@
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { drizzle } from "drizzle-orm/pglite";
 import type { PGlite } from "@electric-sql/pglite";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { getAuthMigrationsFolder } from "./authMigrationsPath";
 
 /**
  * Applies SQL migrations under `packages/auth/drizzle` to a PGlite instance.
  */
 export async function runAuthMigrationsPglite(
   client: PGlite,
-  migrationsFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../drizzle")
+  migrationsFolder = getAuthMigrationsFolder()
 ): Promise<void> {
   const db = drizzle(client);
   await migrate(db, { migrationsFolder });

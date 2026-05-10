@@ -1,5 +1,5 @@
+import { mkdir } from "node:fs/promises";
 import path from "node:path";
-import { createRequire } from "node:module";
 import { Pool } from "pg";
 import {
   AuthService,
@@ -12,11 +12,6 @@ import { wireAuthInfrastructure } from "./service";
 
 declare global {
   var __cs2h_auth_init_promise: Promise<void> | undefined;
-}
-
-function authMigrationsDir(): string {
-  const require = createRequire(import.meta.url);
-  return path.join(path.dirname(require.resolve("@cs2helper/auth/package.json")), "drizzle");
 }
 
 function buildAuthOptions(c: AppConfig): AuthServiceOptions {
@@ -35,8 +30,9 @@ async function doInitAuth(config: AppConfig): Promise<void> {
   const opts = buildAuthOptions(config);
   if (config.databaseDriver === "pglite") {
     const dataDir = path.resolve(process.cwd(), config.pgliteDataDir);
+    await mkdir(dataDir, { recursive: true });
     const client = new PGlite(dataDir);
-    await runAuthMigrationsPglite(client, authMigrationsDir());
+    await runAuthMigrationsPglite(client);
     wireAuthInfrastructure({ auth: new AuthService(client, opts), pglite: client });
   } else {
     const url = config.databaseUrl || "postgresql://127.0.0.1:5432/postgres";

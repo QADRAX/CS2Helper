@@ -40,7 +40,7 @@ El servidor Next aplica migraciones al arrancar vía `instrumentation` (solo run
 | `CS2H_BOOTSTRAP_ROOT_ENABLED` | Si `true`, crea el primer admin si no existe (requiere email y password). |
 | `CS2H_BOOTSTRAP_ROOT_EMAIL` | Email del admin raíz. |
 | `CS2H_BOOTSTRAP_ROOT_PASSWORD` | Contraseña inicial. |
-| `CS2H_BOOTSTRAP_ROOT_UPDATE_PASSWORD` | Peligroso: si `true`, resetea la contraseña del admin con ese email. |
+| `CS2H_BOOTSTRAP_ROOT_UPDATE_PASSWORD` | Si `true`, actualiza la contraseña del usuario con ese email **si ya es admin**. Si el usuario **no existe** (BD vacía / primer arranque), equivale a crear el primer admin con ese email y contraseña. Si ya hay admin pero el email no coincide, se registra un aviso en consola. |
 
 ## Registro e invitaciones
 

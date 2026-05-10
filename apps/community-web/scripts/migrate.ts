@@ -1,7 +1,7 @@
 import "dotenv/config";
+import { mkdir } from "node:fs/promises";
 import { Pool } from "pg";
 import path from "node:path";
-import { createRequire } from "node:module";
 import { PGlite, runAuthMigrations, runAuthMigrationsPglite } from "@cs2helper/auth";
 
 function parseDriver(v: string | undefined): "postgres" | "pglite" {
@@ -10,20 +10,15 @@ function parseDriver(v: string | undefined): "postgres" | "pglite" {
   return "postgres";
 }
 
-function authMigrationsDir(): string {
-  const require = createRequire(import.meta.url);
-  return path.join(path.dirname(require.resolve("@cs2helper/auth/package.json")), "drizzle");
-}
-
 async function main() {
   const driver = parseDriver(process.env.CS2H_DATABASE_DRIVER);
-  const migrationsFolder = authMigrationsDir();
 
   if (driver === "pglite") {
     const rel = process.env.CS2H_PGLITE_DATA_DIR?.trim() || ".data/pglite";
     const dataDir = path.resolve(process.cwd(), rel);
+    await mkdir(dataDir, { recursive: true });
     const client = new PGlite(dataDir);
-    await runAuthMigrationsPglite(client, migrationsFolder);
+    await runAuthMigrationsPglite(client);
     console.log("Auth migrations applied (PGlite).");
     return;
   }
@@ -35,7 +30,7 @@ async function main() {
   }
   const pool = new Pool({ connectionString: databaseUrl });
   try {
-    await runAuthMigrations(pool, migrationsFolder);
+    await runAuthMigrations(pool);
     console.log("Auth migrations applied (PostgreSQL).");
   } finally {
     await pool.end();

@@ -5,6 +5,7 @@ export async function register() {
   const { loadConfig, assertProductionConfig } = await import("./lib/config");
   const { initAuthFromConfig } = await import("./lib/auth/init-runtime");
   const { getAuthService } = await import("./lib/auth/service");
+  const { AuthDomainError } = await import("@cs2helper/auth");
 
   const c = loadConfig();
   try {
@@ -22,8 +23,22 @@ export async function register() {
   const auth = getAuthService();
 
   if (c.bootstrapRootUpdatePassword) {
-    await auth.resetRootAdminPasswordFromBootstrap(email, password);
-    return;
+    try {
+      await auth.resetRootAdminPasswordFromBootstrap(email, password);
+      return;
+    } catch (e) {
+      if (e instanceof AuthDomainError && e.code === "USER_NOT_FOUND") {
+        const { created } = await auth.ensureRootUserFromBootstrap({ email, password });
+        if (!created) {
+          console.warn(
+            "[instrumentation] bootstrap: CS2H_BOOTSTRAP_ROOT_UPDATE_PASSWORD: usuario no encontrado, " +
+              "pero ya existe un admin (ensureRoot no creó usuario). Revisa CS2H_BOOTSTRAP_ROOT_EMAIL."
+          );
+        }
+        return;
+      }
+      throw e;
+    }
   }
 
   if (c.bootstrapRootEnabled) {

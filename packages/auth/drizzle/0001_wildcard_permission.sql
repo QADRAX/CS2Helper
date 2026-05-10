@@ -3,6 +3,8 @@ INSERT INTO "permissions" ("key", "description") VALUES
 	('*', 'All permissions (wildcard; grants every check in this package)')
 ON CONFLICT ("key") DO NOTHING;
 
+--> statement-breakpoint
+
 INSERT INTO "role_permissions" ("role_id", "permission_id")
 SELECT r.id, p.id
 FROM "roles" r
