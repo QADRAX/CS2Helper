@@ -11,3 +11,5 @@ export * from "./wildcardPermission";
 export * from "./permissionKeys";
 export * from "./encodeOpaqueRefreshToken";
 export * from "./registerUserInput";
+export * from "./createInvitationInput";
+export * from "./hostCreateInvitationInput";

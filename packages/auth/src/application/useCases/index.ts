@@ -1,5 +1,7 @@
 export * from "./issueSessionForUser";
 export * from "./registerUser";
+export * from "./createInvitation";
+export * from "./revokeInvitation";
 export * from "./authenticateUser";
 export * from "./refreshAccessToken";
 export * from "./logoutUser";

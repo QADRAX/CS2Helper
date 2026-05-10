@@ -1,6 +1,7 @@
 import type {
   AccessTokenClaims,
   AuthTokens,
+  HostCreateInvitationInput,
   Permission,
   RegisterUserInput,
   Role,
@@ -10,7 +11,7 @@ import type {
 
 /**
  * Application API exposed to Next.js routes or other hosts.
- * Admin methods require permission `auth.rbac.manage` (`AUTH_RBAC_MANAGE_PERMISSION` in domain).
+ * Admin RBAC requires `auth.rbac.manage`; invitation create/revoke requires `users.invitations.manage` (see domain `permissionKeys`).
  */
 export interface AuthApp {
   registerUser(input: RegisterUserInput): Promise<AuthTokens>;
@@ -54,4 +55,10 @@ export interface AuthApp {
   removeRoleFromUser(actorUserId: string, userId: string, roleName: string): Promise<void>;
   listRoles(actorUserId: string): Promise<Role[]>;
   listPermissions(actorUserId: string): Promise<Permission[]>;
+
+  createInvitation(
+    actorUserId: string,
+    input: HostCreateInvitationInput
+  ): Promise<{ plainCode: string; invitationId: string; expiresAt: Date }>;
+  revokeInvitation(actorUserId: string, invitationId: string): Promise<void>;
 }

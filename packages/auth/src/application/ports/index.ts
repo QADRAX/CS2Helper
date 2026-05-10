@@ -7,3 +7,4 @@ export * from "./passwordHasherPort";
 export * from "./clockPort";
 export * from "./secureRandomPort";
 export * from "./sessionPolicyPort";
+export * from "./invitationRepositoryPort";

@@ -1,6 +1,7 @@
 export * from "./clock";
 export * from "./compositePorts";
 export * from "./fixtures";
+export * from "./invitationRepository";
 export * from "./jwtPort";
 export * from "./passwordHasher";
 export * from "./rbacRepository";

@@ -6,3 +6,6 @@ export const PROFILE_UPDATE_ANY_PERMISSION = "users.profile.update_any" as const
 
 /** RBAC administration via `AuthApp` admin methods (or wildcard `*`). */
 export const AUTH_RBAC_MANAGE_PERMISSION = "auth.rbac.manage" as const;
+
+/** Create or revoke user invitations (or wildcard `*`). */
+export const AUTH_INVITATIONS_MANAGE_PERMISSION = "users.invitations.manage" as const;

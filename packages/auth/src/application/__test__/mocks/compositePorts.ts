@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 import type {
   ClockPort,
+  InvitationRepositoryPort,
   JwtPort,
   PasswordHasherPort,
   RbacRepositoryPort,
@@ -12,6 +13,7 @@ import type {
 } from "../../ports";
 import type { SessionIssuePortsTuple } from "../../useCases/issueSessionForUser";
 import { createClockFake } from "./clock";
+import { createInvitationRepositoryFake } from "./invitationRepository";
 import { createJwtPortFake } from "./jwtPort";
 import { createPasswordHasherFake } from "./passwordHasher";
 import { createRbacRepositoryFake } from "./rbacRepository";
@@ -31,6 +33,7 @@ export type RegisterUserPorts = [
   ClockPort,
   SecureRandomPort,
   SessionPolicyPort,
+  InvitationRepositoryPort,
 ];
 
 export function createRegisterUserPorts(overrides?: {
@@ -43,9 +46,11 @@ export function createRegisterUserPorts(overrides?: {
   clock?: ClockPort;
   random?: SecureRandomPort;
   policy?: Partial<SessionPolicyPort>;
+  invitations?: Partial<InvitationRepositoryPort>;
 }): RegisterUserPorts {
   const users = createUserRepositoryFake(overrides?.users);
   const profiles = createUserProfileRepositoryFake(overrides?.profiles);
+  const invitations = createInvitationRepositoryFake(overrides?.invitations);
   const rbac = createRbacRepositoryFake({
     getEffectivePermissionKeysForUser: vi.fn(async () => ["users.profile.read"]),
     getRoleNamesForUser: vi.fn(async () => ["member"]),
@@ -67,6 +72,7 @@ export function createRegisterUserPorts(overrides?: {
     clock,
     random,
     policy,
+    invitations,
   ];
 }
 

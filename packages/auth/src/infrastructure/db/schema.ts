@@ -1,5 +1,6 @@
 import {
   boolean,
+  integer,
   pgTable,
   primaryKey,
   text,
@@ -80,6 +81,20 @@ export const refreshTokens = pgTable("refresh_tokens", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const invitations = pgTable("invitations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  codeHash: text("code_hash").notNull().unique(),
+  createdByUserId: uuid("created_by_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "restrict" }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  maxUses: integer("max_uses").notNull(),
+  usesCount: integer("uses_count").notNull().default(0),
+  extraRoleName: text("extra_role_name"),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const authSchema = {
   users,
   userProfiles,
@@ -88,4 +103,5 @@ export const authSchema = {
   userRoles,
   rolePermissions,
   refreshTokens,
+  invitations,
 };

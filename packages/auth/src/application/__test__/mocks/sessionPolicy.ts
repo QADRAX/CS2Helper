@@ -7,6 +7,7 @@ export function createSessionPolicyFake(
     accessTokenTtlSec: 300,
     refreshTokenTtlSec: 60 * 60 * 24 * 14,
     defaultRegistrationRoleName: "member",
+    requireInvitationForRegister: false,
     ...overrides,
   };
 }

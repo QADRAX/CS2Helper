@@ -11,7 +11,10 @@ export type AuthErrorCode =
   | "PERMISSION_NOT_FOUND"
   | "PERMISSION_DENIED"
   | "VALIDATION_ERROR"
-  | "PROFILE_NOT_FOUND";
+  | "PROFILE_NOT_FOUND"
+  | "INVITATION_REQUIRED"
+  | "INVITATION_INVALID"
+  | "INVITATION_NOT_FOUND";
 
 export class AuthDomainError extends Error {
   readonly code: AuthErrorCode;

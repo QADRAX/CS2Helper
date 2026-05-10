@@ -4,18 +4,24 @@ import type { AuthApp } from "../application/AuthApp";
 import type {
   AccessTokenClaims,
   AuthTokens,
+  CreateInvitationInput,
+  HostCreateInvitationInput,
   Permission,
   RegisterUserInput,
   Role,
   UserProfile,
   UserProfileUpdate,
 } from "../domain";
-import { AUTH_RBAC_MANAGE_PERMISSION } from "../domain";
+import {
+  AUTH_INVITATIONS_MANAGE_PERMISSION,
+  AUTH_RBAC_MANAGE_PERMISSION,
+} from "../domain";
 import type { SessionPolicyPort } from "../application/ports";
 import { assertUserHasPermission } from "../application/useCases/assertUserHasPermission";
 import { assignPermissionToRole } from "../application/useCases/assignPermissionToRole";
 import { assignRoleToUser } from "../application/useCases/assignRoleToUser";
 import { authenticateUser } from "../application/useCases/authenticateUser";
+import { createInvitation } from "../application/useCases/createInvitation";
 import { createPermission } from "../application/useCases/createPermission";
 import { createRole } from "../application/useCases/createRole";
 import { deleteRole } from "../application/useCases/deleteRole";
@@ -27,12 +33,14 @@ import { logoutUser } from "../application/useCases/logoutUser";
 import { refreshAccessToken } from "../application/useCases/refreshAccessToken";
 import { registerUser } from "../application/useCases/registerUser";
 import { removeRoleFromUser } from "../application/useCases/removeRoleFromUser";
+import { revokeInvitation } from "../application/useCases/revokeInvitation";
 import { revokePermissionFromRole } from "../application/useCases/revokePermissionFromRole";
 import { updateUserProfile } from "../application/useCases/updateUserProfile";
 import { verifyAccessToken } from "../application/useCases/verifyAccessToken";
 import { DrizzleRbacRepository } from "./adapters/DrizzleRbacRepository";
 import { DrizzleRefreshTokenStore } from "./adapters/DrizzleRefreshTokenStore";
 import { DrizzleUserProfileRepository } from "./adapters/DrizzleUserProfileRepository";
+import { DrizzleInvitationRepository } from "./adapters/DrizzleInvitationRepository";
 import { DrizzleUserRepository } from "./adapters/DrizzleUserRepository";
 import { JoseJwtAdapter } from "./adapters/JoseJwtAdapter";
 import { NodeSecureRandomAdapter } from "./adapters/NodeSecureRandomAdapter";
@@ -47,6 +55,8 @@ export type AuthServiceOptions = {
   accessTokenTtlSec: number;
   refreshTokenTtlSec: number;
   defaultRegistrationRoleName: string;
+  /** When true, signup requires a valid {@link RegisterUserInput.invitationPlainCode}. Default false. */
+  requireInvitationForRegister?: boolean;
 };
 
 /**
@@ -62,6 +72,7 @@ export class AuthService implements AuthApp {
   private readonly clock: SystemClockAdapter;
   private readonly random: NodeSecureRandomAdapter;
   private readonly sessionPolicy: SessionPolicyPort;
+  private readonly invitations: DrizzleInvitationRepository;
 
   private readonly register: (input: RegisterUserInput) => Promise<AuthTokens>;
   private readonly login: (email: string, password: string) => Promise<AuthTokens>;
@@ -93,12 +104,19 @@ export class AuthService implements AuthApp {
   private readonly rbacListRoles: () => Promise<Role[]>;
   private readonly rbacListPermissions: () => Promise<Permission[]>;
 
+  private readonly inviteCreate: (
+    createdByUserId: string,
+    input: CreateInvitationInput
+  ) => Promise<{ plainCode: string; invitationId: string; expiresAt: Date }>;
+  private readonly inviteRevoke: (invitationId: string) => Promise<void>;
+
   constructor(pool: Pool, options: AuthServiceOptions) {
     const db = createAuthDb(pool);
     this.clock = new SystemClockAdapter();
     this.users = new DrizzleUserRepository(db);
     this.profiles = new DrizzleUserProfileRepository(db);
     this.rbac = new DrizzleRbacRepository(db);
+    this.invitations = new DrizzleInvitationRepository(db, this.clock);
     this.refreshTokens = new DrizzleRefreshTokenStore(db, this.clock);
     this.passwordHasher = new ScryptPasswordHasher();
     this.jwt = new JoseJwtAdapter({
@@ -113,6 +131,7 @@ export class AuthService implements AuthApp {
       accessTokenTtlSec: options.accessTokenTtlSec,
       refreshTokenTtlSec: options.refreshTokenTtlSec,
       defaultRegistrationRoleName: options.defaultRegistrationRoleName,
+      requireInvitationForRegister: options.requireInvitationForRegister ?? false,
     };
 
     this.register = withPortsAsync(registerUser, [
@@ -125,6 +144,7 @@ export class AuthService implements AuthApp {
       this.clock,
       this.random,
       this.sessionPolicy,
+      this.invitations,
     ]);
     this.login = withPortsAsync(authenticateUser, [
       this.users,
@@ -161,6 +181,13 @@ export class AuthService implements AuthApp {
     this.rbacRemoveRole = withPortsAsync(removeRoleFromUser, [this.rbac]);
     this.rbacListRoles = withPortsAsync(listRoles, [this.rbac]);
     this.rbacListPermissions = withPortsAsync(listPermissions, [this.rbac]);
+
+    this.inviteCreate = withPortsAsync(createInvitation, [
+      this.invitations,
+      this.random,
+      this.clock,
+    ]);
+    this.inviteRevoke = withPortsAsync(revokeInvitation, [this.invitations]);
   }
 
   registerUser(input: RegisterUserInput): Promise<AuthTokens> {
@@ -270,5 +297,25 @@ export class AuthService implements AuthApp {
   async listPermissions(actorUserId: string): Promise<Permission[]> {
     await this.assertPermission(actorUserId, AUTH_RBAC_MANAGE_PERMISSION);
     return this.rbacListPermissions();
+  }
+
+  async createInvitation(
+    actorUserId: string,
+    input: HostCreateInvitationInput
+  ): Promise<{ plainCode: string; invitationId: string; expiresAt: Date }> {
+    await this.assertPermission(actorUserId, AUTH_INVITATIONS_MANAGE_PERMISSION);
+    const expiresAt = new Date(
+      this.clock.now().getTime() + Math.max(0, input.ttlSec) * 1000
+    );
+    return this.inviteCreate(actorUserId, {
+      expiresAt,
+      maxUses: input.maxUses,
+      extraRoleName: input.extraRoleName ?? null,
+    });
+  }
+
+  async revokeInvitation(actorUserId: string, invitationId: string): Promise<void> {
+    await this.assertPermission(actorUserId, AUTH_INVITATIONS_MANAGE_PERMISSION);
+    return this.inviteRevoke(invitationId);
   }
 }
