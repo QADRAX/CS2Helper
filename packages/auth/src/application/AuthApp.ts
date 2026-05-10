@@ -1,10 +1,16 @@
-import type { AuthTokens, Permission, Role, UserProfile, UserProfileUpdate } from "../domain";
-import type { AccessTokenClaims } from "../domain";
-import type { RegisterUserInput } from "./useCases/registerUser";
+import type {
+  AccessTokenClaims,
+  AuthTokens,
+  Permission,
+  RegisterUserInput,
+  Role,
+  UserProfile,
+  UserProfileUpdate,
+} from "../domain";
 
 /**
  * Application API exposed to Next.js routes or other hosts.
- * Admin methods require the actor to hold `auth.rbac.manage` unless noted.
+ * Admin methods require permission `auth.rbac.manage` (`AUTH_RBAC_MANAGE_PERMISSION` in domain).
  */
 export interface AuthApp {
   registerUser(input: RegisterUserInput): Promise<AuthTokens>;
@@ -49,6 +55,3 @@ export interface AuthApp {
   listRoles(actorUserId: string): Promise<Role[]>;
   listPermissions(actorUserId: string): Promise<Permission[]>;
 }
-
-/** Permission required for RBAC administration via `AuthApp` admin methods. */
-export const AUTH_RBAC_MANAGE_PERMISSION = "auth.rbac.manage" as const;

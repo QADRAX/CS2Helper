@@ -7,3 +7,7 @@ export * from "./validateEmail";
 export * from "./validatePassword";
 export * from "./effectivePermissions";
 export * from "./refreshTokenHash";
+export * from "./wildcardPermission";
+export * from "./permissionKeys";
+export * from "./encodeOpaqueRefreshToken";
+export * from "./registerUserInput";

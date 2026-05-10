@@ -1,13 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
+import { PROFILE_UPDATE_ANY_PERMISSION, WILDCARD_PERMISSION_KEY } from "../../domain";
 import {
   createRbacRepositoryFake,
   createUserProfileRepositoryFake,
   sampleUserProfile,
 } from "./mocks";
-import {
-  PROFILE_UPDATE_ANY_PERMISSION,
-  updateUserProfile,
-} from "../useCases/updateUserProfile";
+import { updateUserProfile } from "../useCases/updateUserProfile";
 
 describe("updateUserProfile", () => {
   it("updates when actor is subject", async () => {
@@ -35,6 +33,20 @@ describe("updateUserProfile", () => {
     await expect(
       updateUserProfile([profiles, rbac], "u2", "u1", { displayName: "X" })
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("allows updating another user with wildcard *", async () => {
+    const updated = sampleUserProfile({ userId: "u2", displayName: "X" });
+    const profiles = createUserProfileRepositoryFake({
+      findByUserId: vi.fn(async () => sampleUserProfile({ userId: "u2" })),
+      updateProfile: vi.fn(async () => updated),
+    });
+    const rbac = createRbacRepositoryFake({
+      getEffectivePermissionKeysForUser: vi.fn(async () => [WILDCARD_PERMISSION_KEY]),
+    });
+    await expect(
+      updateUserProfile([profiles, rbac], "u2", "u1", { displayName: "X" })
+    ).resolves.toEqual(updated);
   });
 
   it("allows updating another user with update_any", async () => {

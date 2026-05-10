@@ -1,6 +1,6 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
 import type { AuthTokens } from "../../domain";
-import { AuthDomainError } from "../../domain";
+import { AuthDomainError, encodeOpaqueRefreshToken } from "../../domain";
 import type {
   ClockPort,
   JwtPort,
@@ -10,10 +10,6 @@ import type {
   SessionPolicyPort,
   UserRepositoryPort,
 } from "../ports";
-
-function encodeOpaqueRefreshToken(bytes: Uint8Array): string {
-  return Buffer.from(bytes).toString("base64url");
-}
 
 /**
  * Rotates the refresh token and returns new access + refresh tokens.

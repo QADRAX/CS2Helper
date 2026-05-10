@@ -1,16 +1,16 @@
 import { withPortsAsync } from "@cs2helper/shared";
 import type { Pool } from "pg";
 import type { AuthApp } from "../application/AuthApp";
-import { AUTH_RBAC_MANAGE_PERMISSION } from "../application/AuthApp";
 import type {
+  AccessTokenClaims,
+  AuthTokens,
   Permission,
+  RegisterUserInput,
   Role,
   UserProfile,
   UserProfileUpdate,
 } from "../domain";
-import type { AccessTokenClaims } from "../domain";
-import type { AuthTokens } from "../domain";
-import type { RegisterUserInput } from "../application/useCases/registerUser";
+import { AUTH_RBAC_MANAGE_PERMISSION } from "../domain";
 import type { SessionPolicyPort } from "../application/ports";
 import { assertUserHasPermission } from "../application/useCases/assertUserHasPermission";
 import { assignPermissionToRole } from "../application/useCases/assignPermissionToRole";

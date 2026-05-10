@@ -1,9 +1,11 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
 import type { UserProfile, UserProfileUpdate } from "../../domain";
-import { AuthDomainError } from "../../domain";
+import {
+  AuthDomainError,
+  PROFILE_UPDATE_ANY_PERMISSION,
+  effectiveKeysGrantPermission,
+} from "../../domain";
 import type { RbacRepositoryPort, UserProfileRepositoryPort } from "../ports";
-
-export const PROFILE_UPDATE_ANY_PERMISSION = "users.profile.update_any" as const;
 
 /**
  * Ports tuple order: `[profiles, rbac]`.
@@ -15,7 +17,7 @@ export const updateUserProfile: AsyncUseCase<
 > = async ([profiles, rbac], subjectUserId, actorUserId, patch) => {
   if (subjectUserId !== actorUserId) {
     const keys = await rbac.getEffectivePermissionKeysForUser(actorUserId);
-    if (!keys.includes(PROFILE_UPDATE_ANY_PERMISSION)) {
+    if (!effectiveKeysGrantPermission(keys, PROFILE_UPDATE_ANY_PERMISSION)) {
       throw new AuthDomainError("FORBIDDEN", "Cannot update another user's profile");
     }
   }

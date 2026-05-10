@@ -1,5 +1,5 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
-import type { AuthTokens } from "../../domain";
+import type { AuthTokens, RegisterUserInput } from "../../domain";
 import { AuthDomainError } from "../../domain";
 import { validateEmail } from "../../domain";
 import { validatePassword } from "../../domain";
@@ -15,11 +15,6 @@ import type {
   UserRepositoryPort,
 } from "../ports";
 import { issueSessionForUser } from "./issueSessionForUser";
-
-export type RegisterUserInput = {
-  email: string;
-  password: string;
-};
 
 /**
  * Ports tuple order:

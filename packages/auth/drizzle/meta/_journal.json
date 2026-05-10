@@ -8,6 +8,13 @@
       "when": 1746883200000,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1746883300000,
+      "tag": "0001_wildcard_permission",
+      "breakpoints": true
     }
   ]
 }

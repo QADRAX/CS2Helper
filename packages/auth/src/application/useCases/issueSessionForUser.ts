@@ -1,4 +1,5 @@
 import type { AuthTokens } from "../../domain";
+import { encodeOpaqueRefreshToken } from "../../domain";
 import type {
   ClockPort,
   JwtPort,
@@ -16,10 +17,6 @@ export type SessionIssuePortsTuple = [
   RbacRepositoryPort,
   SessionPolicyPort,
 ];
-
-function encodeOpaqueRefreshToken(bytes: Uint8Array): string {
-  return Buffer.from(bytes).toString("base64url");
-}
 
 /**
  * Issues a new access token and refresh token for an existing user.

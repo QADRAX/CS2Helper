@@ -1,5 +1,5 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
-import { AuthDomainError } from "../../domain";
+import { AuthDomainError, effectiveKeysGrantPermission } from "../../domain";
 import type { RbacRepositoryPort } from "../ports";
 
 /**
@@ -13,7 +13,7 @@ export const assertUserHasPermission: AsyncUseCase<
   void
 > = async ([rbac], userId, permissionKey) => {
   const keys = await rbac.getEffectivePermissionKeysForUser(userId);
-  if (!keys.includes(permissionKey)) {
+  if (!effectiveKeysGrantPermission(keys, permissionKey)) {
     throw new AuthDomainError("PERMISSION_DENIED", "Missing required permission");
   }
 };

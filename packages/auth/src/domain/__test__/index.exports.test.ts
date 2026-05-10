@@ -7,6 +7,11 @@ describe("domain index exports", () => {
     expect(typeof Domain.validatePassword).toBe("function");
     expect(typeof Domain.effectivePermissionKeys).toBe("function");
     expect(typeof Domain.refreshTokenStorageHash).toBe("function");
+    expect(typeof Domain.effectiveKeysGrantPermission).toBe("function");
+    expect(Domain.WILDCARD_PERMISSION_KEY).toBe("*");
+    expect(Domain.PROFILE_READ_ANY_PERMISSION).toBe("users.profile.read_any");
+    expect(Domain.AUTH_RBAC_MANAGE_PERMISSION).toBe("auth.rbac.manage");
+    expect(typeof Domain.encodeOpaqueRefreshToken).toBe("function");
     expect(Domain.AuthDomainError).toBeDefined();
   });
 });
