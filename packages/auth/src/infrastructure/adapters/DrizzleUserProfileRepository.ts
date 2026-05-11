@@ -1,24 +1,10 @@
 import { eq } from "drizzle-orm";
 import type { UserProfile, UserProfileUpdate } from "../../domain";
 import { AuthDomainError } from "../../domain";
+import { normalizeSteamProfileTextField } from "../../domain/xmlCdata";
 import type { UserProfileRepositoryPort } from "../../application/ports";
 import type { AuthDb } from "../db/createAuthDb";
 import { userProfiles } from "../db/schema";
-
-function parseProfileData(raw: string | null): Record<string, unknown> | null {
-  if (raw == null || raw === "") return null;
-  try {
-    const v = JSON.parse(raw) as unknown;
-    return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
-  } catch {
-    return null;
-  }
-}
-
-function serializeProfileData(data: Record<string, unknown> | null | undefined): string | null {
-  if (data == null) return null;
-  return JSON.stringify(data);
-}
 
 export class DrizzleUserProfileRepository implements UserProfileRepositoryPort {
   constructor(private readonly db: AuthDb) {}
@@ -39,12 +25,8 @@ export class DrizzleUserProfileRepository implements UserProfileRepositoryPort {
     if (!row) return null;
     return {
       userId: row.userId,
-      displayName: row.displayName,
-      avatarUrl: row.avatarUrl,
-      bio: row.bio,
-      locale: row.locale,
-      timezone: row.timezone,
-      profileData: parseProfileData(row.profileData),
+      displayName: normalizeSteamProfileTextField(row.displayName),
+      avatarUrl: normalizeSteamProfileTextField(row.avatarUrl),
       updatedAt: row.updatedAt,
     };
   }
@@ -57,23 +39,12 @@ export class DrizzleUserProfileRepository implements UserProfileRepositoryPort {
     const next = {
       displayName: patch.displayName !== undefined ? patch.displayName : existing.displayName,
       avatarUrl: patch.avatarUrl !== undefined ? patch.avatarUrl : existing.avatarUrl,
-      bio: patch.bio !== undefined ? patch.bio : existing.bio,
-      locale: patch.locale !== undefined ? patch.locale : existing.locale,
-      timezone: patch.timezone !== undefined ? patch.timezone : existing.timezone,
-      profileData:
-        patch.profileData !== undefined
-          ? serializeProfileData(patch.profileData)
-          : serializeProfileData(existing.profileData),
     };
     await this.db
       .update(userProfiles)
       .set({
         displayName: next.displayName,
         avatarUrl: next.avatarUrl,
-        bio: next.bio,
-        locale: next.locale,
-        timezone: next.timezone,
-        profileData: next.profileData,
         updatedAt: new Date(),
       })
       .where(eq(userProfiles.userId, userId));

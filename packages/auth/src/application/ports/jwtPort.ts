@@ -3,7 +3,7 @@ import type { AccessTokenClaims } from "../../domain";
 export interface JwtPort {
   signAccess(payload: {
     sub: string;
-    email: string;
+    steamId: string;
     permissions: readonly string[];
     roles: readonly string[];
   }): Promise<{ token: string; expiresAt: Date }>;
@@ -16,7 +16,7 @@ export interface JwtPort {
    */
   buildSyntheticAccessClaims(payload: {
     sub: string;
-    email: string;
+    steamId: string;
     permissions: readonly string[];
     roles: readonly string[];
   }): AccessTokenClaims;

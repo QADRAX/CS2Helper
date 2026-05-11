@@ -9,3 +9,4 @@ export * from "./secureRandomPort";
 export * from "./sessionPolicyPort";
 export * from "./invitationRepositoryPort";
 export * from "./personalAccessTokenRepositoryPort";
+export * from "./steamOpenIdVerifierPort";

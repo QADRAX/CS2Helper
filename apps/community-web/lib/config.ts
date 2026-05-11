@@ -38,13 +38,11 @@ export type AppConfig = {
   accessTokenTtlSec: number;
   refreshTokenTtlSec: number;
   defaultRegistrationRoleName: string;
-  requireInvitationForRegister: boolean;
-  /** When true and env credentials set, creates first admin if none exists. */
-  bootstrapRootEnabled: boolean;
-  bootstrapRootEmail: string;
-  bootstrapRootPassword: string;
-  /** Dangerous: resets password for existing admin matching email. */
-  bootstrapRootUpdatePassword: boolean;
+  /**
+   * SteamID64 for the first admin when the database has no admin yet.
+   * After the first admin exists, this is ignored (use invitations for new users).
+   */
+  bootstrapRootSteamId: string;
   rateLimitLoginPerMinute: number;
   rateLimitAdminPerMinute: number;
 };
@@ -90,17 +88,7 @@ export function loadConfig(): AppConfig {
     refreshTokenTtlSec: parseIntEnv(process.env.CS2H_REFRESH_TOKEN_TTL_SEC, 60 * 60 * 24 * 14),
     defaultRegistrationRoleName:
       process.env.CS2H_DEFAULT_REGISTRATION_ROLE?.trim() || "member",
-    requireInvitationForRegister: parseBool(
-      process.env.CS2H_REQUIRE_INVITATION_FOR_REGISTER,
-      false
-    ),
-    bootstrapRootEnabled: parseBool(process.env.CS2H_BOOTSTRAP_ROOT_ENABLED, false),
-    bootstrapRootEmail: process.env.CS2H_BOOTSTRAP_ROOT_EMAIL?.trim() ?? "",
-    bootstrapRootPassword: process.env.CS2H_BOOTSTRAP_ROOT_PASSWORD ?? "",
-    bootstrapRootUpdatePassword: parseBool(
-      process.env.CS2H_BOOTSTRAP_ROOT_UPDATE_PASSWORD,
-      false
-    ),
+    bootstrapRootSteamId: process.env.CS2H_BOOTSTRAP_ROOT_STEAM_ID?.trim() ?? "",
     rateLimitLoginPerMinute: parseIntEnv(process.env.CS2H_RATE_LIMIT_LOGIN_PER_MIN, 30),
     rateLimitAdminPerMinute: parseIntEnv(process.env.CS2H_RATE_LIMIT_ADMIN_PER_MIN, 120),
   };

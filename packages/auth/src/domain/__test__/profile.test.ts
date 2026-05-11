@@ -9,10 +9,6 @@ describe("profile types", () => {
       userId: "u",
       displayName: null,
       avatarUrl: null,
-      bio: null,
-      locale: null,
-      timezone: null,
-      profileData: { theme: "dark" },
       updatedAt: now,
     };
     const patch: UserProfileUpdate = { displayName: "N" };

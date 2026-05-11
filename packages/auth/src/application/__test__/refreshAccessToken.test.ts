@@ -38,7 +38,7 @@ describe("refreshAccessToken", () => {
 
   it("returns new tokens when rotation succeeds", async () => {
     const users = createUserRepositoryFake({
-      findById: vi.fn(async () => sampleUser({ id: "u1", email: "a@b.com", isActive: true })),
+      findById: vi.fn(async () => sampleUser({ id: "u1", isActive: true })),
     });
     const ports = createRefreshAccessTokenPorts({
       users,

@@ -24,7 +24,7 @@ function buildAuthOptions(c: AppConfig): AuthServiceOptions {
     accessTokenTtlSec: c.accessTokenTtlSec,
     refreshTokenTtlSec: c.refreshTokenTtlSec,
     defaultRegistrationRoleName: c.defaultRegistrationRoleName,
-    requireInvitationForRegister: c.requireInvitationForRegister,
+    bootstrapRootSteamId: c.bootstrapRootSteamId || undefined,
   };
 }
 

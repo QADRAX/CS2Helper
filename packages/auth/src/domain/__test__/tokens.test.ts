@@ -14,7 +14,7 @@ describe("tokens types", () => {
     };
     const claims: AccessTokenClaims = {
       sub: "u",
-      email: "e@e.com",
+      steamId: "76561198000000001",
       permissions: ["p"],
       roles: ["r"],
       iat: 1,

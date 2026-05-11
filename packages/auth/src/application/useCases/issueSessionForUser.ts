@@ -25,7 +25,7 @@ export type SessionIssuePortsTuple = [
  */
 export async function issueSessionForUser(
   ports: SessionIssuePortsTuple,
-  params: { userId: string; email: string }
+  params: { userId: string; steamId: string }
 ): Promise<AuthTokens> {
   const [jwt, refreshTokens, clock, random, rbac, sessionPolicy] = ports;
   const now = clock.now();
@@ -33,7 +33,7 @@ export async function issueSessionForUser(
   const roles = await rbac.getRoleNamesForUser(params.userId);
   const { token: accessToken, expiresAt: accessTokenExpiresAt } = await jwt.signAccess({
     sub: params.userId,
-    email: params.email,
+    steamId: params.steamId,
     permissions,
     roles,
   });

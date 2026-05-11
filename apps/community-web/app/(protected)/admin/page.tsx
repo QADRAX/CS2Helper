@@ -18,7 +18,10 @@ export default async function AdminHomePage() {
     <div className="flex flex-col gap-6">
       <h1 className="font-mono text-2xl font-black">Administración</h1>
       <p className="max-w-prose font-mono text-sm">
-        Conectado como <span className="font-bold">{session.email}</span>
+        Conectado como{" "}
+        <span className="font-bold" title={session.steamId}>
+          Steam {session.steamId}
+        </span>
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
         {canInvite ? (

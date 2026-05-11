@@ -7,20 +7,19 @@ import type {
   Permission,
   PersonalAccessTokenCreated,
   PersonalAccessTokenSummary,
-  RegisterUserInput,
   Role,
   User,
   UserProfile,
   UserProfileUpdate,
 } from "../domain";
+import type { CompleteSteamOpenIdInput } from "../application/useCases/completeSteamOpenIdSignIn";
 
 /**
  * Application API exposed to Next.js routes or other hosts.
  * Admin RBAC requires `auth.rbac.manage`; invitation create/revoke requires `users.invitations.manage` (see domain `permissionKeys`).
  */
 export interface AuthApp {
-  registerUser(input: RegisterUserInput): Promise<AuthTokens>;
-  authenticateUser(email: string, password: string): Promise<AuthTokens>;
+  completeSteamOpenIdSignIn(input: CompleteSteamOpenIdInput): Promise<AuthTokens>;
   refreshAccessToken(refreshTokenPlain: string): Promise<AuthTokens>;
   logout(refreshTokenPlain: string): Promise<void>;
   verifyAccessToken(accessToken: string): Promise<AccessTokenClaims>;
@@ -73,18 +72,6 @@ export interface AuthApp {
   revokeInvitation(actorUserId: string, invitationId: string): Promise<void>;
   listInvitations(actorUserId: string): Promise<InvitationListItem[]>;
   listUsers(actorUserId: string): Promise<User[]>;
-
-  /**
-   * Trusted-host only: create first admin when none exists. Idempotent when an admin is present.
-   */
-  ensureRootUserFromBootstrap(input: { email: string; password: string }): Promise<{ created: boolean }>;
-  /**
-   * Trusted-host only: reset password for an existing admin user by email.
-   */
-  resetRootAdminPasswordFromBootstrap(
-    email: string,
-    newPassword: string
-  ): Promise<{ updated: boolean }>;
 
   createPersonalAccessToken(
     actorUserId: string,

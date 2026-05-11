@@ -13,7 +13,6 @@ import {
   type Permission,
   type PersonalAccessTokenCreated,
   type PersonalAccessTokenSummary,
-  type RegisterUserInput,
   type Role,
   type User,
   type UserProfile,
@@ -24,11 +23,11 @@ import {
   AUTH_RBAC_MANAGE_PERMISSION,
 } from "../domain";
 import type { SessionPolicyPort } from "../application/ports";
+import type { CompleteSteamOpenIdInput } from "../application/useCases/completeSteamOpenIdSignIn";
 import { assertUserHasPermission } from "../application/useCases/assertUserHasPermission";
 import { assignPermissionToRole } from "../application/useCases/assignPermissionToRole";
 import { assignRoleToUser } from "../application/useCases/assignRoleToUser";
-import { authenticateUser } from "../application/useCases/authenticateUser";
-import { bootstrapRootUserIfEmpty } from "../application/useCases/bootstrapRootUserIfEmpty";
+import { completeSteamOpenIdSignIn } from "../application/useCases/completeSteamOpenIdSignIn";
 import { createInvitation } from "../application/useCases/createInvitation";
 import { createPersonalAccessToken } from "../application/useCases/createPersonalAccessToken";
 import { createPermission } from "../application/useCases/createPermission";
@@ -43,9 +42,7 @@ import { listRoles } from "../application/useCases/listRoles";
 import { listUsers } from "../application/useCases/listUsers";
 import { logoutUser } from "../application/useCases/logoutUser";
 import { refreshAccessToken } from "../application/useCases/refreshAccessToken";
-import { registerUser } from "../application/useCases/registerUser";
 import { removeRoleFromUser } from "../application/useCases/removeRoleFromUser";
-import { resetRootAdminPassword } from "../application/useCases/resetRootAdminPassword";
 import { revokeInvitation } from "../application/useCases/revokeInvitation";
 import { revokePersonalAccessToken } from "../application/useCases/revokePersonalAccessToken";
 import { revokePermissionFromRole } from "../application/useCases/revokePermissionFromRole";
@@ -58,9 +55,9 @@ import { DrizzleUserProfileRepository } from "./adapters/DrizzleUserProfileRepos
 import { DrizzleInvitationRepository } from "./adapters/DrizzleInvitationRepository";
 import { DrizzlePersonalAccessTokenRepository } from "./adapters/DrizzlePersonalAccessTokenRepository";
 import { DrizzleUserRepository } from "./adapters/DrizzleUserRepository";
+import { FetchSteamOpenIdVerifier } from "./adapters/FetchSteamOpenIdVerifier";
 import { JoseJwtAdapter } from "./adapters/JoseJwtAdapter";
 import { NodeSecureRandomAdapter } from "./adapters/NodeSecureRandomAdapter";
-import { ScryptPasswordHasher } from "./adapters/ScryptPasswordHasher";
 import { SystemClockAdapter } from "./adapters/SystemClockAdapter";
 import { createAuthDb, createAuthDbFromPglite } from "./db/createAuthDb";
 
@@ -71,8 +68,11 @@ export type AuthServiceOptions = {
   accessTokenTtlSec: number;
   refreshTokenTtlSec: number;
   defaultRegistrationRoleName: string;
-  /** When true, signup requires a valid {@link RegisterUserInput.invitationPlainCode}. Default false. */
-  requireInvitationForRegister?: boolean;
+  /**
+   * When no admin exists yet, the first successful Steam OpenID for this SteamID64
+   * creates the admin user (no invitation). Ignored once an admin exists.
+   */
+  bootstrapRootSteamId?: string;
 };
 
 /**
@@ -83,16 +83,16 @@ export class AuthService implements AuthApp {
   private readonly profiles: DrizzleUserProfileRepository;
   private readonly rbac: DrizzleRbacRepository;
   private readonly refreshTokens: DrizzleRefreshTokenStore;
-  private readonly passwordHasher: ScryptPasswordHasher;
+  private readonly steamOpenId: FetchSteamOpenIdVerifier;
   private readonly jwt: JoseJwtAdapter;
   private readonly clock: SystemClockAdapter;
   private readonly random: NodeSecureRandomAdapter;
   private readonly sessionPolicy: SessionPolicyPort;
   private readonly invitations: DrizzleInvitationRepository;
   private readonly patTokens: DrizzlePersonalAccessTokenRepository;
+  private readonly bootstrapRootSteamId: string;
 
-  private readonly register: (input: RegisterUserInput) => Promise<AuthTokens>;
-  private readonly login: (email: string, password: string) => Promise<AuthTokens>;
+  private readonly completeSteam: (input: CompleteSteamOpenIdInput) => Promise<AuthTokens>;
   private readonly refresh: (refreshTokenPlain: string) => Promise<AuthTokens>;
   private readonly logoutBound: (refreshTokenPlain: string) => Promise<void>;
   private readonly verify: (accessToken: string) => Promise<AccessTokenClaims>;
@@ -129,14 +129,6 @@ export class AuthService implements AuthApp {
   private readonly inviteRevoke: (invitationId: string) => Promise<void>;
   private readonly inviteList: () => Promise<InvitationListItem[]>;
   private readonly usersList: () => Promise<User[]>;
-  private readonly bootstrapRoot: (input: {
-    email: string;
-    password: string;
-  }) => Promise<{ created: boolean }>;
-  private readonly resetRootPassword: (
-    email: string,
-    newPassword: string
-  ) => Promise<{ updated: boolean }>;
 
   private readonly patCreate: (
     userId: string,
@@ -155,7 +147,7 @@ export class AuthService implements AuthApp {
     this.invitations = new DrizzleInvitationRepository(db, this.clock);
     this.patTokens = new DrizzlePersonalAccessTokenRepository(db, this.clock);
     this.refreshTokens = new DrizzleRefreshTokenStore(db, this.clock);
-    this.passwordHasher = new ScryptPasswordHasher();
+    this.steamOpenId = new FetchSteamOpenIdVerifier();
     this.jwt = new JoseJwtAdapter({
       secret: options.jwtSecret,
       issuer: options.jwtIssuer,
@@ -164,34 +156,25 @@ export class AuthService implements AuthApp {
       clock: this.clock,
     });
     this.random = new NodeSecureRandomAdapter();
+    this.bootstrapRootSteamId = options.bootstrapRootSteamId?.trim() ?? "";
     this.sessionPolicy = {
       accessTokenTtlSec: options.accessTokenTtlSec,
       refreshTokenTtlSec: options.refreshTokenTtlSec,
       defaultRegistrationRoleName: options.defaultRegistrationRoleName,
-      requireInvitationForRegister: options.requireInvitationForRegister ?? false,
+      requireInvitationForRegister: true,
     };
 
-    this.register = withPortsAsync(registerUser, [
+    this.completeSteam = withPortsAsync(completeSteamOpenIdSignIn, [
+      this.steamOpenId,
       this.users,
       this.profiles,
       this.rbac,
-      this.passwordHasher,
       this.jwt,
       this.refreshTokens,
       this.clock,
       this.random,
       this.sessionPolicy,
       this.invitations,
-    ]);
-    this.login = withPortsAsync(authenticateUser, [
-      this.users,
-      this.passwordHasher,
-      this.rbac,
-      this.jwt,
-      this.refreshTokens,
-      this.clock,
-      this.random,
-      this.sessionPolicy,
     ]);
     this.refresh = withPortsAsync(refreshAccessToken, [
       this.users,
@@ -234,17 +217,6 @@ export class AuthService implements AuthApp {
     this.inviteRevoke = withPortsAsync(revokeInvitation, [this.invitations]);
     this.inviteList = withPortsAsync(listInvitations, [this.invitations]);
     this.usersList = withPortsAsync(listUsers, [this.users]);
-    this.bootstrapRoot = withPortsAsync(bootstrapRootUserIfEmpty, [
-      this.users,
-      this.profiles,
-      this.rbac,
-      this.passwordHasher,
-    ]);
-    this.resetRootPassword = withPortsAsync(resetRootAdminPassword, [
-      this.users,
-      this.passwordHasher,
-      this.rbac,
-    ]);
 
     this.patCreate = withPortsAsync(createPersonalAccessToken, [
       this.patTokens,
@@ -255,12 +227,14 @@ export class AuthService implements AuthApp {
     this.patRevoke = withPortsAsync(revokePersonalAccessToken, [this.patTokens]);
   }
 
-  registerUser(input: RegisterUserInput): Promise<AuthTokens> {
-    return this.register(input);
-  }
-
-  authenticateUser(email: string, password: string): Promise<AuthTokens> {
-    return this.login(email, password);
+  completeSteamOpenIdSignIn(input: CompleteSteamOpenIdInput): Promise<AuthTokens> {
+    const fromInput = input.bootstrapRootSteamId?.trim() ?? "";
+    const bootstrap =
+      fromInput.length > 0 ? fromInput : this.bootstrapRootSteamId || undefined;
+    return this.completeSteam({
+      ...input,
+      bootstrapRootSteamId: bootstrap,
+    });
   }
 
   refreshAccessToken(refreshTokenPlain: string): Promise<AuthTokens> {
@@ -400,20 +374,6 @@ export class AuthService implements AuthApp {
   async listUsers(actorUserId: string): Promise<User[]> {
     await this.assertPermission(actorUserId, AUTH_RBAC_MANAGE_PERMISSION);
     return this.usersList();
-  }
-
-  ensureRootUserFromBootstrap(input: {
-    email: string;
-    password: string;
-  }): Promise<{ created: boolean }> {
-    return this.bootstrapRoot(input);
-  }
-
-  resetRootAdminPasswordFromBootstrap(
-    email: string,
-    newPassword: string
-  ): Promise<{ updated: boolean }> {
-    return this.resetRootPassword(email, newPassword);
   }
 
   createPersonalAccessToken(

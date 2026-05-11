@@ -33,21 +33,17 @@ El servidor Next aplica migraciones al arrancar vía `instrumentation` (solo run
 | `NEXT_PUBLIC_SITE_NAME` | Nombre mostrado en UI. |
 | `TRUST_PROXY` | `true` si hay proxy y quieres confiar en `X-Forwarded-For` para rate limit / IP. |
 
-## Bootstrap de administrador
+## Bootstrap de administrador (Steam)
 
 | Variable | Descripción |
 |----------|-------------|
-| `CS2H_BOOTSTRAP_ROOT_ENABLED` | Si `true`, crea el primer admin si no existe (requiere email y password). |
-| `CS2H_BOOTSTRAP_ROOT_EMAIL` | Email del admin raíz. |
-| `CS2H_BOOTSTRAP_ROOT_PASSWORD` | Contraseña inicial. |
-| `CS2H_BOOTSTRAP_ROOT_UPDATE_PASSWORD` | Si `true`, actualiza la contraseña del usuario con ese email **si ya es admin**. Si el usuario **no existe** (BD vacía / primer arranque), equivale a crear el primer admin con ese email y contraseña. Si ya hay admin pero el email no coincide, se registra un aviso en consola. |
+| `CS2H_BOOTSTRAP_ROOT_STEAM_ID` | SteamID64 del primer admin cuando **aún no existe** ningún usuario con rol `admin`. Tras crear el primer admin, se ignora. Los demás usuarios entran solo con **invitación** (flujo Steam + código). |
 
 ## Registro e invitaciones
 
 | Variable | Descripción |
 |----------|-------------|
-| `CS2H_REQUIRE_INVITATION_FOR_REGISTER` | Requerir invitación para registrarse. |
-| `CS2H_DEFAULT_REGISTRATION_ROLE` | Rol por defecto (p. ej. `member`). |
+| `CS2H_DEFAULT_REGISTRATION_ROLE` | Rol por defecto para cuentas nuevas creadas con invitación (p. ej. `member`). Las altas son siempre vía Steam OpenID + código de invitación válido, salvo el bootstrap anterior. |
 
 ## Rate limiting y TTL
 

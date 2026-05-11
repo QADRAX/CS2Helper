@@ -6,13 +6,13 @@ describe("issueSessionForUser", () => {
   it("loads rbac, signs access, persists refresh", async () => {
     const ports = createSessionIssuePorts();
     const [jwt, refresh, , random, rbac] = ports;
-    const result = await issueSessionForUser(ports, { userId: "u1", email: "a@b.com" });
+    const result = await issueSessionForUser(ports, { userId: "u1", steamId: "76561198000000001" });
     expect(rbac.getEffectivePermissionKeysForUser).toHaveBeenCalledWith("u1");
     expect(rbac.getRoleNamesForUser).toHaveBeenCalledWith("u1");
     expect(jwt.signAccess).toHaveBeenCalledWith(
       expect.objectContaining({
         sub: "u1",
-        email: "a@b.com",
+        steamId: "76561198000000001",
       })
     );
     expect(refresh.saveForUser).toHaveBeenCalledWith(

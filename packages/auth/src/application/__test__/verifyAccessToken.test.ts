@@ -6,7 +6,7 @@ describe("verifyAccessToken", () => {
   it("delegates to jwt port", async () => {
     const claims = {
       sub: "u1",
-      email: "a@b.com",
+      steamId: "76561198000000001",
       permissions: ["p"] as const,
       roles: ["r"] as const,
       iat: 1,

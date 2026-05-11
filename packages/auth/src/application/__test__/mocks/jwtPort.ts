@@ -9,7 +9,7 @@ export function createJwtPortFake(overrides: Partial<JwtPort> = {}): JwtPort {
     })),
     verifyAccess: vi.fn(async () => ({
       sub: "u1",
-      email: "a@b.com",
+      steamId: "76561198000000001",
       permissions: [],
       roles: [],
       iat: 1,
@@ -17,7 +17,7 @@ export function createJwtPortFake(overrides: Partial<JwtPort> = {}): JwtPort {
     })),
     buildSyntheticAccessClaims: vi.fn((payload) => ({
       sub: payload.sub,
-      email: payload.email,
+      steamId: payload.steamId,
       permissions: [...payload.permissions],
       roles: [...payload.roles],
       iat: 10,

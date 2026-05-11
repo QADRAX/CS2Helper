@@ -1,11 +1,10 @@
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"email" text NOT NULL,
-	"password_hash" text NOT NULL,
+	"steam_id" text NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
+	CONSTRAINT "users_steam_id_unique" UNIQUE("steam_id")
 );
 
 --> statement-breakpoint
@@ -34,10 +33,6 @@ CREATE TABLE "user_profiles" (
 	"user_id" uuid PRIMARY KEY NOT NULL,
 	"display_name" text,
 	"avatar_url" text,
-	"bio" text,
-	"locale" text,
-	"timezone" text,
-	"profile_data" text,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
@@ -71,6 +66,36 @@ CREATE TABLE "refresh_tokens" (
 
 --> statement-breakpoint
 
+CREATE TABLE "invitations" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"code_hash" text NOT NULL,
+	"created_by_user_id" uuid NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"max_uses" integer NOT NULL,
+	"uses_count" integer DEFAULT 0 NOT NULL,
+	"extra_role_name" text,
+	"revoked_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "invitations_code_hash_unique" UNIQUE("code_hash")
+);
+
+--> statement-breakpoint
+
+CREATE TABLE "personal_access_tokens" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"token_hash" text NOT NULL,
+	"token_prefix" text NOT NULL,
+	"label" text,
+	"expires_at" timestamp with time zone,
+	"last_used_at" timestamp with time zone,
+	"revoked_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "personal_access_tokens_token_hash_unique" UNIQUE("token_hash")
+);
+
+--> statement-breakpoint
+
 ALTER TABLE "user_profiles" ADD CONSTRAINT "user_profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
 
 --> statement-breakpoint
@@ -95,7 +120,23 @@ ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_user_id_users_id_fk"
 
 --> statement-breakpoint
 
+ALTER TABLE "invitations" ADD CONSTRAINT "invitations_created_by_user_id_users_id_fk" FOREIGN KEY ("created_by_user_id") REFERENCES "public"."users"("id") ON DELETE restrict ON UPDATE no action;
+
+--> statement-breakpoint
+
+ALTER TABLE "personal_access_tokens" ADD CONSTRAINT "personal_access_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+
+--> statement-breakpoint
+
 CREATE INDEX "refresh_tokens_user_id_idx" ON "refresh_tokens" ("user_id");
+
+--> statement-breakpoint
+
+CREATE INDEX "invitations_created_by_user_id_idx" ON "invitations" ("created_by_user_id");
+
+--> statement-breakpoint
+
+CREATE INDEX "personal_access_tokens_user_id_idx" ON "personal_access_tokens" ("user_id");
 
 --> statement-breakpoint
 
@@ -104,7 +145,9 @@ INSERT INTO "permissions" ("key", "description") VALUES
 	('users.profile.read', 'Read own profile metadata (reserved for future fine-grained use)'),
 	('users.profile.update', 'Update own profile metadata (reserved for future fine-grained use)'),
 	('users.profile.read_any', 'Read any user profile'),
-	('users.profile.update_any', 'Update any user profile')
+	('users.profile.update_any', 'Update any user profile'),
+	('*', 'All permissions (wildcard; grants every check in this package)'),
+	('users.invitations.manage', 'Create and revoke user invitations')
 ON CONFLICT ("key") DO NOTHING;
 
 --> statement-breakpoint

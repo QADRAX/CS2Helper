@@ -24,7 +24,9 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     users: users.map((u) => ({
       id: u.id,
-      email: u.email,
+      steamId: u.steamId,
+      displayName: u.displayName,
+      avatarUrl: u.avatarUrl,
       isActive: u.isActive,
       createdAt: u.createdAt.toISOString(),
     })),

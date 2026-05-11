@@ -6,10 +6,9 @@ export function createUserRepositoryFake(
 ): UserRepositoryPort {
   return {
     createUser: vi.fn(async () => ({ id: "u1" })),
-    findWithPasswordByEmail: vi.fn(async () => null),
+    findBySteamId: vi.fn(async () => null),
     findById: vi.fn(async () => null),
     listUsers: vi.fn(async () => []),
-    updatePasswordHash: vi.fn(async () => {}),
     ...overrides,
   };
 }

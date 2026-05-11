@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-type UserRow = { id: string; email: string; isActive: boolean; createdAt: string };
+type UserRow = {
+  id: string;
+  steamId: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  isActive: boolean;
+  createdAt: string;
+};
 type RoleRow = { id: string; name: string };
 
 export default function UsersAdminPage() {
@@ -68,7 +75,8 @@ export default function UsersAdminPage() {
           <table className="w-full border-collapse font-mono text-xs">
             <thead>
               <tr className="border-b-[3px] border-border text-left">
-                <th className="p-2">Email</th>
+                <th className="p-2">Perfil</th>
+                <th className="p-2">SteamID64</th>
                 <th className="p-2">Rol a asignar</th>
                 <th className="p-2" />
               </tr>
@@ -76,7 +84,25 @@ export default function UsersAdminPage() {
             <tbody>
               {users.map((u) => (
                 <tr key={u.id} className="border-b-2 border-border">
-                  <td className="p-2 font-bold">{u.email}</td>
+                  <td className="p-2">
+                    <div className="flex items-center gap-2">
+                      {u.avatarUrl ? (
+                        <img
+                          src={u.avatarUrl}
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded border-2 border-border"
+                          width={32}
+                          height={32}
+                        />
+                      ) : (
+                        <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded border-2 border-border bg-muted text-[10px]">
+                          —
+                        </span>
+                      )}
+                      <span className="font-bold">{u.displayName ?? "—"}</span>
+                    </div>
+                  </td>
+                  <td className="p-2 text-[11px] text-muted-foreground">{u.steamId}</td>
                   <td className="p-2">
                     <select
                       className="h-9 w-full max-w-[160px] border-[3px] border-border bg-card px-2 font-bold"

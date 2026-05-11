@@ -55,7 +55,7 @@ export const refreshAccessToken: AsyncUseCase<
   const roles = await rbac.getRoleNamesForUser(user.id);
   const { token: accessToken, expiresAt: accessTokenExpiresAt } = await jwt.signAccess({
     sub: user.id,
-    email: user.email,
+    steamId: user.steamId,
     permissions,
     roles,
   });

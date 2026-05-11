@@ -7,12 +7,14 @@ describe("user types", () => {
     const now = new Date();
     const u: User = {
       id: "id",
-      email: "e@e.com",
+      steamId: "76561198000000001",
+      displayName: null,
+      avatarUrl: null,
       isActive: true,
       createdAt: now,
       updatedAt: now,
     };
     expect(u.id).toBe("id");
-    expectTypeOf<User["email"]>().toBeString();
+    expectTypeOf<User["steamId"]>().toEqualTypeOf<string>();
   });
 });

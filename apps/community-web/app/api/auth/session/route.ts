@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   }
   return NextResponse.json({
     sub: claims.sub,
-    email: claims.email,
+    steamId: claims.steamId,
     permissions: claims.permissions,
     roles: claims.roles,
   });

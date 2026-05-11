@@ -56,7 +56,9 @@ describe("verifyPersonalAccessToken", () => {
         id === "u99"
           ? {
               id: "u99",
-              email: "pat@example.com",
+              steamId: "76561198000000099",
+              displayName: null,
+              avatarUrl: null,
               isActive: true,
               createdAt: now,
               updatedAt: now,
@@ -74,12 +76,12 @@ describe("verifyPersonalAccessToken", () => {
     expect(pat.recordLastUsed).toHaveBeenCalledWith("pat-row", now);
     expect(jwt.buildSyntheticAccessClaims).toHaveBeenCalledWith({
       sub: "u99",
-      email: "pat@example.com",
+      steamId: "76561198000000099",
       permissions: ["p1"],
       roles: ["member"],
     });
     expect(claims.sub).toBe("u99");
-    expect(claims.email).toBe("pat@example.com");
+    expect(claims.steamId).toBe("76561198000000099");
   });
 
   it("rejects expired token by row expiry", async () => {

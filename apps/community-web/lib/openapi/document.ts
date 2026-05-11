@@ -21,7 +21,8 @@ export function buildOpenApiDocument(serverUrl: string) {
       description: [
         "API HTTP de la app Next.js **community-web** (auth por cookies httpOnly).",
         "",
-        "- Tras **POST /api/auth/login**, el navegador recibe cookies `cs2h_access` y `cs2h_refresh` (no van en el cuerpo JSON).",
+        "- Tras **GET /api/auth/steam/callback** (tras redirigir desde Steam), el navegador recibe cookies `cs2h_access` y `cs2h_refresh` (no van en JSON).",
+        "- El flujo empieza en **GET /api/auth/steam/start** (`invite` y `next` opcionales en query).",
         "- **Try it out**: en rutas protegidas, usa *Authorize* y pega el valor de la cookie `cs2h_access`, o inicia sesión en `/login` en la misma pestaña.",
         "- **POST /api/auth/refresh** requiere la cookie `cs2h_refresh`.",
         "",
@@ -51,7 +52,7 @@ export function buildOpenApiDocument(serverUrl: string) {
           type: "apiKey",
           in: "cookie",
           name: "cs2h_access",
-          description: "JWT de acceso emitido tras login (httpOnly).",
+          description: "JWT de acceso emitido tras login con Steam (httpOnly).",
         },
         refreshCookie: {
           type: "apiKey",
@@ -68,7 +69,7 @@ export function buildOpenApiDocument(serverUrl: string) {
             error: {
               type: "string",
               description:
-                "Código de error (p. ej. `unauthorized`, `forbidden`, `rate_limited`, `invalid_json`, códigos `AuthDomainError` como `INVALID_CREDENTIALS`).",
+                "Código de error (p. ej. `unauthorized`, `forbidden`, `rate_limited`, `invalid_json`, códigos `AuthDomainError` como `STEAM_OPENID_INVALID`, `INVITATION_REQUIRED`).",
             },
           },
         },
@@ -85,20 +86,12 @@ export function buildOpenApiDocument(serverUrl: string) {
             service: { type: "string", example: "community-web" },
           },
         },
-        LoginRequest: {
-          type: "object",
-          required: ["email", "password"],
-          properties: {
-            email: { type: "string", format: "email" },
-            password: { type: "string", format: "password" },
-          },
-        },
         SessionResponse: {
           type: "object",
-          required: ["sub", "email", "permissions", "roles"],
+          required: ["sub", "steamId", "permissions", "roles"],
           properties: {
             sub: { type: "string", description: "Id de usuario (subject JWT)." },
-            email: { type: "string", format: "email" },
+            steamId: { type: "string", description: "SteamID64 del usuario." },
             permissions: {
               type: "array",
               items: { type: "string" },
@@ -162,7 +155,9 @@ export function buildOpenApiDocument(serverUrl: string) {
           type: "object",
           properties: {
             id: { type: "string" },
-            email: { type: "string", format: "email" },
+            steamId: { type: "string" },
+            displayName: { type: "string", nullable: true },
+            avatarUrl: { type: "string", nullable: true },
             isActive: { type: "boolean" },
             createdAt: { type: "string", format: "date-time" },
           },
@@ -287,40 +282,52 @@ export function buildOpenApiDocument(serverUrl: string) {
           },
         },
       },
-      "/api/auth/login": {
-        post: {
+      "/api/auth/steam/start": {
+        get: {
           tags: ["Auth"],
-          summary: "Iniciar sesión",
+          summary: "Iniciar login con Steam (OpenID 2.0)",
           description:
-            "Autentica por email/contraseña. Respuesta **200** con `{ ok: true }` y cabeceras `Set-Cookie` para `cs2h_access` y `cs2h_refresh`. Errores 401 con `{ error: \"INVALID_CREDENTIALS\" | \"USER_INACTIVE\" | ... }`.",
-          operationId: "postAuthLogin",
-          requestBody: {
-            required: true,
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/LoginRequest" } },
+            "Redirige 302 a Steam. Establece cookie de estado firmada. Query opcional: `invite`, `next`. Puede responder 429 (rate limit) o 500 (`missing_app_url`).",
+          operationId: "getAuthSteamStart",
+          parameters: [
+            {
+              name: "invite",
+              in: "query",
+              required: false,
+              schema: { type: "string" },
             },
-          },
+            {
+              name: "next",
+              in: "query",
+              required: false,
+              schema: { type: "string", example: "/admin" },
+            },
+          ],
           responses: {
-            "200": {
-              description: "Login correcto; cookies establecidas.",
-              content: {
-                "application/json": { schema: { $ref: "#/components/schemas/OkBody" } },
-              },
-              headers: {
-                "Set-Cookie": {
-                  description: "Cookies httpOnly `cs2h_access` y `cs2h_refresh`.",
-                  schema: { type: "string" },
-                },
-              },
+            "302": {
+              description: "Redirección a steamcommunity.com/openid/login.",
             },
-            "400": { $ref: "#/components/responses/BadRequest" },
-            "401": {
-              description: "Credenciales incorrectas o usuario inactivo.",
+            "429": { $ref: "#/components/responses/RateLimited" },
+            "500": {
+              description: "Config incompleta (p. ej. sin APP_URL).",
               content: {
                 "application/json": { schema: { $ref: "#/components/schemas/ErrorBody" } },
               },
             },
-            "429": { $ref: "#/components/responses/RateLimited" },
+          },
+        },
+      },
+      "/api/auth/steam/callback": {
+        get: {
+          tags: ["Auth"],
+          summary: "Callback OpenID de Steam",
+          description:
+            "Completa verificación con Steam, emite sesión y redirige a `next` con cookies `cs2h_access` y `cs2h_refresh`. Errores → redirección a `/login?error=...`.",
+          operationId: "getAuthSteamCallback",
+          responses: {
+            "302": {
+              description: "Redirección a la app con cookies o a login con error.",
+            },
           },
         },
       },

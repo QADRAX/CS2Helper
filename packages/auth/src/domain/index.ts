@@ -1,4 +1,5 @@
 export * from "./errors";
+export * from "./xmlCdata";
 export * from "./user";
 export * from "./profile";
 export * from "./rbac";
@@ -10,7 +11,6 @@ export * from "./refreshTokenHash";
 export * from "./wildcardPermission";
 export * from "./permissionKeys";
 export * from "./encodeOpaqueRefreshToken";
-export * from "./registerUserInput";
 export * from "./createInvitationInput";
 export * from "./hostCreateInvitationInput";
 export * from "./invitationListItem";

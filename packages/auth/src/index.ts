@@ -12,5 +12,7 @@ export { PGlite } from "@electric-sql/pglite";
 export { authSchema } from "./infrastructure/db/schema";
 
 export type { AuthApp } from "./application/AuthApp";
+export type { CompleteSteamOpenIdInput } from "./application/useCases/completeSteamOpenIdSignIn";
+export { FetchSteamOpenIdVerifier } from "./infrastructure/adapters/FetchSteamOpenIdVerifier";
 
 export * from "./domain";

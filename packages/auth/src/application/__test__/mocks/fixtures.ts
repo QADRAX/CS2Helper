@@ -4,7 +4,9 @@ export function sampleUser(overrides: Partial<User> = {}): User {
   const now = new Date("2026-01-01T00:00:00.000Z");
   return {
     id: "user-1",
-    email: "user@example.com",
+    steamId: "76561198000000001",
+    displayName: "Player",
+    avatarUrl: null,
     isActive: true,
     createdAt: now,
     updatedAt: now,
@@ -18,10 +20,6 @@ export function sampleUserProfile(overrides: Partial<UserProfile> = {}): UserPro
     userId: "user-1",
     displayName: "Display",
     avatarUrl: null,
-    bio: null,
-    locale: null,
-    timezone: null,
-    profileData: null,
     updatedAt: now,
     ...overrides,
   };

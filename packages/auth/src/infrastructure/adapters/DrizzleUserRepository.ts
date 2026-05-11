@@ -1,61 +1,90 @@
 import { asc, eq } from "drizzle-orm";
 import type { User } from "../../domain";
-import type { UserRepositoryPort, UserWithPassword } from "../../application/ports";
+import { normalizeSteamProfileTextField } from "../../domain/xmlCdata";
+import type { UserRepositoryPort } from "../../application/ports";
 import type { AuthDb } from "../db/createAuthDb";
-import { users } from "../db/schema";
+import { userProfiles, users } from "../db/schema";
 
 export class DrizzleUserRepository implements UserRepositoryPort {
   constructor(private readonly db: AuthDb) {}
 
-  async createUser(input: { email: string; passwordHash: string }): Promise<{ id: string }> {
-    const [row] = await this.db
-      .insert(users)
-      .values({ email: input.email, passwordHash: input.passwordHash })
-      .returning();
+  async createUser(input: { steamId: string }): Promise<{ id: string }> {
+    const [row] = await this.db.insert(users).values({ steamId: input.steamId }).returning();
     if (!row) {
       throw new Error("Failed to create user");
     }
     return { id: row.id };
   }
 
-  async findWithPasswordByEmail(email: string): Promise<UserWithPassword | null> {
-    const [row] = await this.db.select().from(users).where(eq(users.email, email)).limit(1);
+  async findBySteamId(
+    steamId64: string
+  ): Promise<{ id: string; steamId: string; isActive: boolean } | null> {
+    const [row] = await this.db
+      .select({
+        id: users.id,
+        steamId: users.steamId,
+        isActive: users.isActive,
+      })
+      .from(users)
+      .where(eq(users.steamId, steamId64))
+      .limit(1);
     if (!row) return null;
+    return row;
+  }
+
+  private mapJoinedRow(row: {
+    id: string;
+    steamId: string;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    displayName: string | null;
+    avatarUrl: string | null;
+  }): User {
     return {
       id: row.id,
-      email: row.email,
-      passwordHash: row.passwordHash,
+      steamId: row.steamId,
+      displayName: normalizeSteamProfileTextField(row.displayName),
+      avatarUrl: normalizeSteamProfileTextField(row.avatarUrl),
       isActive: row.isActive,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     };
   }
 
   async findById(id: string): Promise<User | null> {
-    const [row] = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    const [row] = await this.db
+      .select({
+        id: users.id,
+        steamId: users.steamId,
+        isActive: users.isActive,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        displayName: userProfiles.displayName,
+        avatarUrl: userProfiles.avatarUrl,
+      })
+      .from(users)
+      .leftJoin(userProfiles, eq(userProfiles.userId, users.id))
+      .where(eq(users.id, id))
+      .limit(1);
     if (!row) return null;
-    return {
-      id: row.id,
-      email: row.email,
-      isActive: row.isActive,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    };
+    return this.mapJoinedRow(row);
   }
 
   async listUsers(): Promise<User[]> {
-    const rows = await this.db.select().from(users).orderBy(asc(users.email));
-    return rows.map((row) => ({
-      id: row.id,
-      email: row.email,
-      isActive: row.isActive,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }));
-  }
-
-  async updatePasswordHash(userId: string, passwordHash: string): Promise<void> {
-    await this.db
-      .update(users)
-      .set({ passwordHash, updatedAt: new Date() })
-      .where(eq(users.id, userId));
+    const rows = await this.db
+      .select({
+        id: users.id,
+        steamId: users.steamId,
+        isActive: users.isActive,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        displayName: userProfiles.displayName,
+        avatarUrl: userProfiles.avatarUrl,
+      })
+      .from(users)
+      .leftJoin(userProfiles, eq(userProfiles.userId, users.id))
+      .orderBy(asc(users.id));
+    return rows.map((r) => this.mapJoinedRow(r));
   }
 }

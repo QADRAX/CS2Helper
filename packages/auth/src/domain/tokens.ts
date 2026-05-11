@@ -9,7 +9,8 @@ export interface AuthTokens {
 
 export interface AccessTokenClaims {
   sub: UserId;
-  email: string;
+  /** SteamID64 from the `steam_id` JWT claim. */
+  steamId: string;
   permissions: readonly string[];
   roles: readonly string[];
   iat: number;

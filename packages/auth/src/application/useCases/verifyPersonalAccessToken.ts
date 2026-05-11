@@ -44,7 +44,7 @@ export const verifyPersonalAccessToken: AsyncUseCase<
   const roles = await rbac.getRoleNamesForUser(user.id);
   return jwt.buildSyntheticAccessClaims({
     sub: user.id,
-    email: user.email,
+    steamId: user.steamId,
     permissions,
     roles,
   });

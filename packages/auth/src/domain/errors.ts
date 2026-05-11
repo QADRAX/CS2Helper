@@ -1,6 +1,4 @@
 export type AuthErrorCode =
-  | "INVALID_CREDENTIALS"
-  | "EMAIL_TAKEN"
   | "USER_NOT_FOUND"
   | "USER_INACTIVE"
   | "INVALID_TOKEN"
@@ -16,7 +14,8 @@ export type AuthErrorCode =
   | "INVITATION_INVALID"
   | "INVITATION_NOT_FOUND"
   | "PERSONAL_ACCESS_TOKEN_NOT_FOUND"
-  | "NOT_ADMIN";
+  | "NOT_ADMIN"
+  | "STEAM_OPENID_INVALID";
 
 export class AuthDomainError extends Error {
   readonly code: AuthErrorCode;

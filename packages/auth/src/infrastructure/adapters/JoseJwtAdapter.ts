@@ -33,17 +33,18 @@ export class JoseJwtAdapter implements JwtPort {
 
   async signAccess(payload: {
     sub: string;
-    email: string;
+    steamId: string;
     permissions: readonly string[];
     roles: readonly string[];
   }): Promise<{ token: string; expiresAt: Date }> {
     const now = this.clock.now();
     const exp = new Date(now.getTime() + this.accessTokenTtlSec * 1000);
-    const builder = new SignJWT({
-      email: payload.email,
+    const jwtPayload: Record<string, unknown> = {
+      steam_id: payload.steamId,
       permissions: [...payload.permissions],
       roles: [...payload.roles],
-    })
+    };
+    const builder = new SignJWT(jwtPayload)
       .setProtectedHeader({ alg: "HS256" })
       .setSubject(payload.sub)
       .setIssuedAt(now)
@@ -56,7 +57,7 @@ export class JoseJwtAdapter implements JwtPort {
 
   buildSyntheticAccessClaims(payload: {
     sub: string;
-    email: string;
+    steamId: string;
     permissions: readonly string[];
     roles: readonly string[];
   }): AccessTokenClaims {
@@ -65,7 +66,7 @@ export class JoseJwtAdapter implements JwtPort {
     const exp = iat + this.accessTokenTtlSec;
     return {
       sub: payload.sub,
-      email: payload.email,
+      steamId: payload.steamId,
       permissions: payload.permissions,
       roles: payload.roles,
       iat,
@@ -85,16 +86,16 @@ export class JoseJwtAdapter implements JwtPort {
       if (!sub) {
         throw new AuthDomainError("INVALID_TOKEN", "Access token missing subject");
       }
-      const email = payload.email;
-      if (typeof email !== "string") {
-        throw new AuthDomainError("INVALID_TOKEN", "Access token missing email");
+      const steamIdRaw = payload.steam_id;
+      if (typeof steamIdRaw !== "string" || steamIdRaw.length === 0) {
+        throw new AuthDomainError("INVALID_TOKEN", "Access token missing steam_id");
       }
       if (typeof payload.iat !== "number" || typeof payload.exp !== "number") {
         throw new AuthDomainError("INVALID_TOKEN", "Access token missing timestamps");
       }
       return {
         sub,
-        email,
+        steamId: steamIdRaw,
         permissions: asStringArray(payload.permissions),
         roles: asStringArray(payload.roles),
         iat: payload.iat,
