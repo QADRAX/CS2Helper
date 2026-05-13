@@ -1,0 +1,13 @@
+# Monorepo Docker build context (see apps/cs2-dedicated-server/Dockerfile + turbo prune)
+node_modules
+**/node_modules
+dist
+**/dist
+.turbo
+**/.turbo
+.git
+.cursor
+.vscode
+**/coverage
+out-docker-test
+out

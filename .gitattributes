@@ -1,2 +1,8 @@
 # Shell scripts run inside Linux images; CRLF breaks shebang (#!/usr/bin/env bash\r).
+# Dedicated server entrypoint/helpers (Docker); same rule as all *.sh.
+apps/cs2-dedicated-server/scripts/*.sh text eol=lf
 *.sh text eol=lf
+
+# Compose `env_file`; CRLF can leave \r on values and break Basic auth in the status sidecar.
+.env text eol=lf
+.env.example text eol=lf

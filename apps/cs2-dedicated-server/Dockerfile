@@ -1,22 +1,30 @@
 # Build from monorepo root:
 #   docker build -f apps/cs2-dedicated-server/Dockerfile -t cs2helper/cs2-dedicated-server:local .
 #
-# The status HTTP sidecar is compiled from packages/cs2-dedicated-status-http (TypeScript → dist).
+# Status HTTP sidecar: turbo prune + pnpm + vite build (bundle + dist/package.json type:module) + tsc declarations.
 #
 # Requires ~35GB+ free on the volume mounted at CS2_INSTALL_DIR for game files + Workshop cache.
 # Linux/amd64 only. GSI cfg is written at runtime to ${CS2_INSTALL_DIR}/game/csgo/cfg (see entrypoint).
-# Status: HTTP on CS2_STATUS_PORT (default 28080/tcp) when CS2_STATUS_SERVER=1 — publish with -p 28080:28080.
-#   Requires CS2_STATUS_HTTP_USER + CS2_STATUS_HTTP_PASSWORD (Basic auth on all endpoints).
+# Status: HTTP on CS2_STATUS_PORT (default 28080/tcp) when CS2_STATUS_SERVER=1 — GET /, GET /events (SSE), POST /update — publish with -p 28080:28080.
+#   Optional Basic auth: set CS2_STATUS_HTTP_USER + CS2_STATUS_HTTP_PASSWORD together, or omit both (open if port is published).
+
+FROM node:22-bookworm AS cs2-status-prune
+WORKDIR /repo
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@10.20.0 --activate
+COPY . .
+RUN pnpm dlx turbo@2.6.1 prune @cs2helper/cs2-dedicated-status-http --docker
 
 FROM node:22-bookworm AS cs2-status-http-build
-
-# Standalone npm build (no full pnpm workspace) so partial COPY works reliably.
-WORKDIR /build/packages/cs2-dedicated-status-http
-COPY tsconfig.base.json /build/tsconfig.base.json
-COPY packages/cs2-dedicated-status-http/package.json ./
-COPY packages/cs2-dedicated-status-http/tsconfig.json ./
-COPY packages/cs2-dedicated-status-http/src ./src
-RUN npm install && npm run build
+WORKDIR /repo
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@10.20.0 --activate
+COPY --from=cs2-status-prune /repo/out/json/ .
+RUN pnpm install --frozen-lockfile
+COPY --from=cs2-status-prune /repo/out/full/ .
+# turbo prune does not ship the repo-root tsconfig extended by packages/*/tsconfig.json
+COPY tsconfig.base.json ./tsconfig.base.json
+RUN pnpm exec turbo run build --filter=@cs2helper/cs2-dedicated-status-http
 
 FROM ubuntu:22.04
 
@@ -70,8 +78,12 @@ WORKDIR ${CS2_INSTALL_DIR}
 COPY apps/cs2-dedicated-server/scripts/entrypoint.sh /entrypoint.sh
 COPY apps/cs2-dedicated-server/scripts/install-cs2.sh /usr/share/cs2helper/cs2-dedicated-server/install-cs2.sh
 COPY apps/cs2-dedicated-server/scripts/write-cs2-exec.sh /usr/share/cs2helper/cs2-dedicated-server/write-cs2-exec.sh
+# Windows CRLF checkouts break shebangs in Linux; normalize even if repo slips CRLF.
+RUN sed -i 's/\r$//' /entrypoint.sh \
+  /usr/share/cs2helper/cs2-dedicated-server/install-cs2.sh \
+  /usr/share/cs2helper/cs2-dedicated-server/write-cs2-exec.sh
 COPY apps/cs2-dedicated-server/config/gsi/ ${GSI_TEMPLATE_DIR}/
-COPY --from=cs2-status-http-build /build/packages/cs2-dedicated-status-http/dist /usr/share/cs2helper/cs2-dedicated-status-http/dist
+COPY --from=cs2-status-http-build /repo/packages/cs2-dedicated-status-http/dist /usr/share/cs2helper/cs2-dedicated-status-http/dist
 
 ENV CS2_INSTALL_SCRIPT=/usr/share/cs2helper/cs2-dedicated-server/install-cs2.sh
 ENV CS2_WRITE_LAUNCH_SCRIPT=/usr/share/cs2helper/cs2-dedicated-server/write-cs2-exec.sh

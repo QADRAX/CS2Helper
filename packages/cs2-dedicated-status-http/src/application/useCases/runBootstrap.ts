@@ -29,7 +29,7 @@ export const runBootstrap: AsyncUseCase<
 > = async ([install, bash, game, state, lifecycle, log], paths) => {
   state.setLastUpdateError(null);
   state.setPhase("updating");
-  await runSteamInstallWithProgress([install, state], paths.installScript);
+  await runSteamInstallWithProgress([install, state], { installScript: paths.installScript });
   state.setUpdateProgress(null);
   state.setPhase("starting");
   await runBashScript([bash], paths.writeScript);

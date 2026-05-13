@@ -1,0 +1,15 @@
+---
+description: Dedicated server shell scripts must use LF for Linux/Docker shebangs
+globs: apps/cs2-dedicated-server/scripts/**/*.sh
+alwaysApply: false
+---
+
+# CS2 dedicated server scripts (LF only)
+
+Files under `apps/cs2-dedicated-server/scripts/` are **executed inside Linux containers** (Docker entrypoint, steamcmd helpers). They **must** use **Unix line endings (LF only)**, never CRLF.
+
+- CRLF makes the shebang fail (`/usr/bin/env: 'bash\r': No such file or directory`).
+- When editing these `*.sh` files: preserve or normalize to LF; do not let the editor or tooling convert them to CRLF.
+- The repo enforces this via `.gitattributes` (`text eol=lf`) and `.editorconfig` for that path.
+
+If you add new scripts in this folder, apply the same rule.

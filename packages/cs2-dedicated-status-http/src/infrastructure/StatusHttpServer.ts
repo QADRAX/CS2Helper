@@ -1,6 +1,7 @@
 import http from "node:http";
 import type { DedicatedStatusHttpApplication } from "./DedicatedStatusHttpApplication";
 import { requireAuth } from "./basicAuth";
+import { startStatusSse } from "./statusSse";
 
 const json = (res: http.ServerResponse, code: number, body: unknown): void => {
   const s = JSON.stringify(body);
@@ -13,30 +14,29 @@ const json = (res: http.ServerResponse, code: number, body: unknown): void => {
 
 export type StatusHttpServerOptions = {
   app: DedicatedStatusHttpApplication;
+  /** Both non-empty → Basic auth on all routes. Omit or use empty strings for no auth (only on trusted networks). */
   httpUser: string;
   httpPass: string;
+  /** Milliseconds between SSE snapshots on `GET /events` (minimum 200 enforced in `main`). */
+  sseIntervalMs: number;
+  /** When true, omit an SSE frame if the JSON equals the previous frame. */
+  sseCoalesce: boolean;
 };
 
 export const createStatusHttpServer = (options: StatusHttpServerOptions): http.Server => {
-  const { app, httpUser, httpPass } = options;
+  const { app, httpUser, httpPass, sseIntervalMs, sseCoalesce } = options;
 
   return http.createServer(async (req, res) => {
     const path = req.url?.split("?")[0] ?? "/";
     if (!requireAuth(req, res, httpUser, httpPass)) return;
 
-    if (req.method === "GET" && path === "/health") {
-      json(res, 200, app.getHealthJson());
+    if (req.method === "GET" && path === "/") {
+      json(res, 200, await app.getRootStatusJson());
       return;
     }
 
-    if (req.method === "GET" && path === "/ready") {
-      const { statusCode, body } = await app.evaluateReady();
-      json(res, statusCode, body);
-      return;
-    }
-
-    if (req.method === "GET" && (path === "/" || path === "/status")) {
-      json(res, 200, await app.getStatusJson());
+    if (req.method === "GET" && path === "/events") {
+      startStatusSse(req, res, app, { intervalMs: sseIntervalMs, coalesce: sseCoalesce });
       return;
     }
 
@@ -50,17 +50,36 @@ export const createStatusHttpServer = (options: StatusHttpServerOptions): http.S
           return;
         }
         app.lockOps();
+        let updateResponseSent = false;
         try {
-          await app.runForcedUpdate();
-          json(res, 200, { ok: true, updated: true, phase: app.getPhase() });
+          await app.runForcedUpdate({
+            onFirstDownloadPercentLog: () => {
+              if (updateResponseSent || res.headersSent) return;
+              updateResponseSent = true;
+              json(res, 202, {
+                ok: true,
+                accepted: true,
+                updating: true,
+                phase: app.getPhase(),
+                poll: "GET /",
+                message:
+                  "Update running; poll `GET /` or subscribe to `GET /events` (SSE) until phase is running or error.",
+              });
+            },
+          });
+          if (!updateResponseSent) {
+            json(res, 200, { ok: true, updated: true, phase: app.getPhase() });
+          }
         } catch (e) {
           app.recordOperationalFailure(e);
-          json(res, 500, {
-            ok: false,
-            error: "update_failed",
-            message: app.getLastUpdateError(),
-            phase: app.getPhase(),
-          });
+          if (!updateResponseSent) {
+            json(res, 500, {
+              ok: false,
+              error: "update_failed",
+              message: app.getLastUpdateError(),
+              phase: app.getPhase(),
+            });
+          }
         } finally {
           app.unlockOps();
         }

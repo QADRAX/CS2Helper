@@ -1,8 +1,6 @@
 import { withPorts, withPortsAsync } from "@cs2helper/shared";
 import {
-  buildHealthResponse,
   buildStatusResponse,
-  evaluateReady,
   recordOperationalFailure,
   runBootstrap,
   runForcedUpdate,
@@ -14,9 +12,11 @@ import type { GameChildRunnerPort } from "../application/ports/GameChildRunnerPo
 import type { InstallRunnerPort } from "../application/ports/InstallRunnerPort";
 import type { ProcessLifecyclePort } from "../application/ports/ProcessLifecyclePort";
 import type { TcpProbePort } from "../application/ports/TcpProbePort";
+import type { DedicatedStatusPublicJson } from "../domain/dedicatedStatusPublicJson";
 import type { DedicatedStatusPaths } from "../domain/dedicatedStatusPaths";
 import type { ReadyProbeConfig } from "../domain/probeConfig";
 import type { DedicatedStatusPhase } from "../domain/statusPhase";
+import type { SteamInstallProgressHooks } from "../domain/steamInstallHooks";
 import { ConsoleChildExitLog } from "./adapters/ConsoleChildExitLog";
 import { InMemoryDedicatedStatusState } from "./adapters/InMemoryDedicatedStatusState";
 import { NodeBashInheritRunner } from "./adapters/NodeBashInheritRunner";
@@ -84,15 +84,7 @@ export class DedicatedStatusHttpApplication {
     this.game.signalShutdownKill();
   }
 
-  getHealthJson(): Record<string, unknown> {
-    return withPorts(buildHealthResponse, [this.state, this.game])();
-  }
-
-  async evaluateReady(): Promise<{ statusCode: number; body: Record<string, unknown> }> {
-    return withPortsAsync(evaluateReady, [this.state, this.game, this.tcp])(this.probe);
-  }
-
-  async getStatusJson(): Promise<Record<string, unknown>> {
+  async getRootStatusJson(): Promise<DedicatedStatusPublicJson> {
     return withPortsAsync(buildStatusResponse, [this.state, this.game, this.tcp])(this.probe);
   }
 
@@ -107,7 +99,7 @@ export class DedicatedStatusHttpApplication {
     ])(this.paths);
   }
 
-  async runForcedUpdate(): Promise<void> {
+  async runForcedUpdate(hooks?: SteamInstallProgressHooks): Promise<void> {
     return withPortsAsync(runForcedUpdate, [
       this.install,
       this.bash,
@@ -115,7 +107,10 @@ export class DedicatedStatusHttpApplication {
       this.state,
       this.lifecycle,
       this.log,
-    ])(this.paths);
+    ])({
+      ...this.paths,
+      ...hooks,
+    });
   }
 
   recordOperationalFailure(error: unknown): void {

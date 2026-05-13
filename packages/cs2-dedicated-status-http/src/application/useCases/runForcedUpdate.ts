@@ -1,5 +1,5 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
-import type { DedicatedStatusPaths } from "../../domain/dedicatedStatusPaths";
+import type { ForcedUpdateInput } from "../../domain/forcedUpdateInput";
 import type { BashScriptRunnerPort } from "../ports/BashScriptRunnerPort";
 import type { ChildExitLogPort } from "../ports/ChildExitLogPort";
 import type { DedicatedStatusStatePort } from "../ports/DedicatedStatusStatePort";
@@ -24,16 +24,20 @@ export const runForcedUpdate: AsyncUseCase<
     ProcessLifecyclePort,
     ChildExitLogPort,
   ],
-  [paths: DedicatedStatusPaths],
+  [input: ForcedUpdateInput],
   void
-> = async ([install, bash, game, state, lifecycle, log], paths) => {
+> = async ([install, bash, game, state, lifecycle, log], input) => {
+  const { installScript, writeScript, childScript, onFirstDownloadPercentLog } = input;
   state.setLastUpdateError(null);
   state.setPhase("updating");
   await game.stopForUpdate(45_000);
-  await runSteamInstallWithProgress([install, state], paths.installScript);
+  await runSteamInstallWithProgress([install, state], {
+    installScript,
+    onFirstDownloadPercentLog,
+  });
   state.setUpdateProgress(null);
   state.setPhase("starting");
-  await runBashScript([bash], paths.writeScript);
-  await spawnDedicatedGame([game, state, lifecycle, log], paths.childScript);
+  await runBashScript([bash], writeScript);
+  await spawnDedicatedGame([game, state, lifecycle, log], childScript);
   state.setPhase("running");
 };

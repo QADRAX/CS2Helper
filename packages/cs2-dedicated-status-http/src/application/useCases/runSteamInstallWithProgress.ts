@@ -1,4 +1,5 @@
 import type { AsyncUseCase } from "@cs2helper/shared";
+import type { RunSteamInstallInput } from "../../domain/steamInstallHooks";
 import {
   mergeSteamProgress,
   parseSteamcmdLine,
@@ -13,9 +14,29 @@ import type { InstallRunnerPort } from "../ports/InstallRunnerPort";
  */
 export const runSteamInstallWithProgress: AsyncUseCase<
   [InstallRunnerPort, DedicatedStatusStatePort],
-  [installScript: string],
+  [input: RunSteamInstallInput],
   void
-> = async ([install, state], installScript) => {
+> = async ([install, state], input) => {
+  const { installScript, onFirstDownloadPercentLog } = input;
+  let firstPercentNotified = false;
+
+  const maybeNotifyFirstPercent = (parsed: ReturnType<typeof parseSteamcmdLine>): void => {
+    if (
+      firstPercentNotified ||
+      !onFirstDownloadPercentLog ||
+      !parsed ||
+      parsed.percent == null
+    ) {
+      return;
+    }
+    firstPercentNotified = true;
+    try {
+      onFirstDownloadPercentLog();
+    } catch {
+      /* HTTP / caller must not break steamcmd */
+    }
+  };
+
   state.setUpdateProgress({
     percent: 0,
     stage: "starting_steamcmd",
@@ -34,6 +55,7 @@ export const runSteamInstallWithProgress: AsyncUseCase<
       if (parsed) {
         const prev = state.snapshot().updateProgress;
         state.setUpdateProgress(mergeSteamProgress(prev, parsed));
+        maybeNotifyFirstPercent(parsed);
       }
     }
   };
@@ -46,6 +68,7 @@ export const runSteamInstallWithProgress: AsyncUseCase<
       if (parsed) {
         const prev = state.snapshot().updateProgress;
         state.setUpdateProgress(mergeSteamProgress(prev, parsed));
+        maybeNotifyFirstPercent(parsed);
       }
     }
 
