@@ -1,0 +1,2 @@
+# Shell scripts run inside Linux images; CRLF breaks shebang (#!/usr/bin/env bash\r).
+*.sh text eol=lf

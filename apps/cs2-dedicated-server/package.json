@@ -1,0 +1,10 @@
+{
+  "name": "@cs2helper/cs2-dedicated-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Docker image for Counter-Strike 2 dedicated server (steamcmd + volume install).",
+  "scripts": {
+    "docker:build": "docker build -f apps/cs2-dedicated-server/Dockerfile -t cs2helper/cs2-dedicated-server:local .",
+    "docker:run": "docker run --rm -it -p 27015:27015/udp -p 27015:27015/tcp -p 27020:27020/udp -p 28080:28080/tcp -e SRCDS_TOKEN -e GSI_URI -e CS2_STATUS_HTTP_USER=admin -e CS2_STATUS_HTTP_PASSWORD=changeme -v cs2-dedicated-data:/opt/cs2 cs2helper/cs2-dedicated-server:local"
+  }
+}

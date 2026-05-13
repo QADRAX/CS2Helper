@@ -1,0 +1,11 @@
+{
+  "name": "@cs2helper/cs2-dedicated-status-http",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal HTTP sidecar for CS2 dedicated Docker: health/ready + spawn server binary.",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "typecheck": "node --check server.mjs"
+  }
+}

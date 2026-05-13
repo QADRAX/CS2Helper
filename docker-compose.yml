@@ -1,0 +1,27 @@
+# Monorepo stack (incremental). From repo root:
+#   cp .env.example .env   # then edit .env
+#   docker compose up --build cs2-dedicated-server
+#
+# Compose reads `.env` for ${VAR} substitution in this file; the same file is passed
+# into the container via `env_file` (extra keys like HOST_* are harmless).
+
+services:
+  cs2-dedicated-server:
+    build:
+      context: .
+      dockerfile: apps/cs2-dedicated-server/Dockerfile
+    image: cs2helper/cs2-dedicated-server:local
+    platform: linux/amd64
+    env_file:
+      - .env
+    ports:
+      - "${HOST_PORT_CS2:-27015}:27015/tcp"
+      - "${HOST_PORT_CS2:-27015}:27015/udp"
+      - "${HOST_PORT_CS2_TV:-27020}:27020/udp"
+      - "${HOST_PORT_CS2_STATUS:-28080}:28080/tcp"
+    volumes:
+      - cs2_dedicated_data:/opt/cs2
+    restart: unless-stopped
+
+volumes:
+  cs2_dedicated_data:

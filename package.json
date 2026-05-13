@@ -55,7 +55,8 @@
     "test:community-core": "pnpm --filter @cs2helper/community-core test",
     "dev:community-web": "pnpm --filter @cs2helper/community-web dev",
     "build:community-web": "pnpm --filter @cs2helper/shared build && pnpm --filter @cs2helper/auth build && pnpm --filter @cs2helper/community-core build && pnpm --filter @cs2helper/community-web build",
-    "lint:community-web": "pnpm --filter @cs2helper/community-web lint"
+    "lint:community-web": "pnpm --filter @cs2helper/community-web lint",
+    "docker:cs2-dedicated-server": "pnpm --filter @cs2helper/cs2-dedicated-server run docker:build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
