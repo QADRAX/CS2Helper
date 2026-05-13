@@ -15,6 +15,10 @@ En `packages/*/src` y `apps/*/src`, en la **raíz** solo deben aparecer carpetas
 
 No añadir otras raíces bajo `src/` (p. ej. `src/ports`, `src/utils`); el contenido va en la capa que corresponda (`application/ports`, `domain`, etc.).
 
+## Paquetes .NET / plugins CounterStrikeSharp
+
+Los paquetes TypeScript bajo `packages/*/src` siguen el layout de capas anterior. Los plugins de servidor **.NET** (p. ej. `packages/cs2sharp-server-plugin`) **no** usan ese layout: convención habitual de .NET (`*.csproj` en la raíz del paquete, fuentes `.cs`, salida publicada en `dist/` con `dotnet publish`). Un `package.json` mínimo puede anclar scripts `build` / `clean` para pnpm y Turbo. En `cs2sharp-server-plugin`, el código C# sigue carpetas **`domain/`** (estado y reglas sin CounterStrikeSharp), **`application/`** (contratos p. ej. `IConsoleCommandRegistration`, `IGameHookRegistration`), **`infrastructure/`** (implementaciones que llaman a `AddCommand`, `RegisterListener`, etc.) y **`plugin/`** (entrada `BasePlugin` + `PluginBootstrap` que compone listas de registros). Añadir comandos nuevos: nueva clase en `infrastructure/commands/` + una entrada en la colección de `PluginBootstrap`.
+
 ## Capas por paquete / app
 
 Orden de dependencia permitido (**hacia dentro**): *presentation (solo apps con UI)* → *application* → *domain* ← *infrastructure*.
@@ -53,6 +57,7 @@ Los **bordes del paquete** se exponen desde `src/index.ts` (o subpaths documenta
 ## Referencias en el repo
 
 - `packages/shared` — tipos `UseCase` / `AsyncUseCase`, helpers `withPorts` / `withPortsAsync`, y ports transversales en `application/ports/`.
+- `packages/cs2sharp-server-plugin` — plugin CounterStrikeSharp (.NET 8); ver sección *Paquetes .NET / plugins CounterStrikeSharp*.
 - Apps CLI: interfaz de aplicación (`CliApp`, `BenchCliApp`) en **application/**; compositor `GsiCliApplication` / `BenchCliApplication` en **infrastructure/**.
 - Ejemplos: `packages/gsi-gateway`, `packages/gsi-processor`, `apps/gsi-cli`, `apps/gsi-bench-cli`.
 

@@ -1,0 +1,10 @@
+{
+  "name": "@cs2helper/cs2sharp-server-plugin",
+  "version": "0.0.1",
+  "private": true,
+  "description": "CounterStrikeSharp (C#) server plugin for CS2 — build output in dist/ for deployment to addons/counterstrikesharp/plugins.",
+  "scripts": {
+    "build": "dotnet publish Cs2SharpServerPlugin.csproj -c Release -o dist --nologo -v minimal",
+    "clean": "dotnet clean Cs2SharpServerPlugin.csproj -c Release --nologo -v q && rimraf dist bin obj"
+  }
+}

@@ -56,7 +56,8 @@
     "dev:community-web": "pnpm --filter @cs2helper/community-web dev",
     "build:community-web": "pnpm --filter @cs2helper/shared build && pnpm --filter @cs2helper/auth build && pnpm --filter @cs2helper/community-core build && pnpm --filter @cs2helper/community-web build",
     "lint:community-web": "pnpm --filter @cs2helper/community-web lint",
-    "docker:cs2-dedicated-server": "pnpm --filter @cs2helper/cs2-dedicated-server run docker:build"
+    "docker:cs2-dedicated-server": "pnpm --filter @cs2helper/cs2-dedicated-server run docker:build",
+    "build:cs2sharp-server-plugin": "pnpm --filter @cs2helper/cs2sharp-server-plugin build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
