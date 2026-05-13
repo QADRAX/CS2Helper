@@ -2,7 +2,7 @@
 # Counter-Strike 2 dedicated server container entrypoint.
 #
 # Without status HTTP (CS2_STATUS_SERVER=0): install (steamcmd + GSI), write launch script, exec CS2.
-# With status HTTP (default): Node orchestrates install + game and exposes /status, /update (see server.mjs).
+# With status HTTP (default): Node orchestrates install + game and exposes /status, /update (see status-http package).
 #
 # Required for public Internet: SRCDS_TOKEN (GSLT) — https://steamcommunity.com/dev/managegameservers
 # Name / RCON: CS2_HOSTNAME (+hostname), CS2_RCON_PASSWORD (+rcon_password; alias CS2_RCONPW).
@@ -16,7 +16,7 @@ set -euo pipefail
 CS2_INSTALL_DIR="${CS2_INSTALL_DIR:-/opt/cs2}"
 INSTALL_SCRIPT="${CS2_INSTALL_SCRIPT:-/usr/share/cs2helper/cs2-dedicated-server/install-cs2.sh}"
 WRITE_SCRIPT="${CS2_WRITE_LAUNCH_SCRIPT:-/usr/share/cs2helper/cs2-dedicated-server/write-cs2-exec.sh}"
-STATUS_SCRIPT="/usr/share/cs2helper/cs2-dedicated-status-http/server.mjs"
+STATUS_SCRIPT="/usr/share/cs2helper/cs2-dedicated-status-http/dist/infrastructure/main.js"
 
 die() {
   echo "error: $*" >&2

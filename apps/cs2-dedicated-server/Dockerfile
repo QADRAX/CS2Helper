@@ -1,10 +1,22 @@
 # Build from monorepo root:
 #   docker build -f apps/cs2-dedicated-server/Dockerfile -t cs2helper/cs2-dedicated-server:local .
 #
+# The status HTTP sidecar is compiled from packages/cs2-dedicated-status-http (TypeScript → dist).
+#
 # Requires ~35GB+ free on the volume mounted at CS2_INSTALL_DIR for game files + Workshop cache.
 # Linux/amd64 only. GSI cfg is written at runtime to ${CS2_INSTALL_DIR}/game/csgo/cfg (see entrypoint).
 # Status: HTTP on CS2_STATUS_PORT (default 28080/tcp) when CS2_STATUS_SERVER=1 — publish with -p 28080:28080.
 #   Requires CS2_STATUS_HTTP_USER + CS2_STATUS_HTTP_PASSWORD (Basic auth on all endpoints).
+
+FROM node:22-bookworm AS cs2-status-http-build
+
+# Standalone npm build (no full pnpm workspace) so partial COPY works reliably.
+WORKDIR /build/packages/cs2-dedicated-status-http
+COPY tsconfig.base.json /build/tsconfig.base.json
+COPY packages/cs2-dedicated-status-http/package.json ./
+COPY packages/cs2-dedicated-status-http/tsconfig.json ./
+COPY packages/cs2-dedicated-status-http/src ./src
+RUN npm install && npm run build
 
 FROM ubuntu:22.04
 
@@ -59,7 +71,7 @@ COPY apps/cs2-dedicated-server/scripts/entrypoint.sh /entrypoint.sh
 COPY apps/cs2-dedicated-server/scripts/install-cs2.sh /usr/share/cs2helper/cs2-dedicated-server/install-cs2.sh
 COPY apps/cs2-dedicated-server/scripts/write-cs2-exec.sh /usr/share/cs2helper/cs2-dedicated-server/write-cs2-exec.sh
 COPY apps/cs2-dedicated-server/config/gsi/ ${GSI_TEMPLATE_DIR}/
-COPY packages/cs2-dedicated-status-http/server.mjs /usr/share/cs2helper/cs2-dedicated-status-http/server.mjs
+COPY --from=cs2-status-http-build /build/packages/cs2-dedicated-status-http/dist /usr/share/cs2helper/cs2-dedicated-status-http/dist
 
 ENV CS2_INSTALL_SCRIPT=/usr/share/cs2helper/cs2-dedicated-server/install-cs2.sh
 ENV CS2_WRITE_LAUNCH_SCRIPT=/usr/share/cs2helper/cs2-dedicated-server/write-cs2-exec.sh
